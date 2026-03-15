@@ -7,7 +7,8 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
-project(steamvr_overlay_vulkan)
+set(PNAME text_display_steamvr_overlay)
+project(${PNAME})
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -77,16 +78,16 @@ message(STATUS "ENABLE_VULKAN_DYNAMIC_RENDERING = ${ENABLE_VULKAN_DYNAMIC_RENDER
 message(STATUS "IMGUI_OPENVR_PLATFORM_BACKEND = ${IMGUI_OPENVR_PLATFORM_BACKEND}")
 message(STATUS "IMGUI_SDL_PLATFORM_BACKEND = ${IMGUI_SDL_PLATFORM_BACKEND}")
 
-add_executable(steamvr_overlay_vulkan
+add_executable(${PNAME}
     "src/Main.cpp"
     "src/VulkanRenderer.cpp"
     "src/ImGuiWindow.cpp"
     "src/ImGuiOverlayWindow.cpp"
 )
 
-target_compile_features(steamvr_overlay_vulkan PUBLIC cxx_std_23)
+target_compile_features(${PNAME} PUBLIC cxx_std_23)
 
-target_link_libraries(steamvr_overlay_vulkan
+target_link_libraries(${PNAME}
     PRIVATE
         OpenVR::API
         ImGui
@@ -121,18 +122,18 @@ if (EXAMPLE_OVERLAY_ORIGIN_RELATIVE)
     add_definitions(-DEXAMPLE_OVERLAY_ORIGIN_RELATIVE)
 endif()
 
-add_custom_target(steamvr_overlay_vulkan_resources)
+add_custom_target(${PNAME}_resources)
 
 add_custom_command(
-    TARGET steamvr_overlay_vulkan_resources POST_BUILD
+    TARGET ${PNAME}_resources POST_BUILD
     COMMENT "Copying Resources & Manifest"
     COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CMAKE_SOURCE_DIR}/resources ${CMAKE_BINARY_DIR}
 )
-add_dependencies(steamvr_overlay_vulkan steamvr_overlay_vulkan_resources)
+add_dependencies(${PNAME} ${PNAME}_resources)
 
 add_custom_command(
-    TARGET steamvr_overlay_vulkan POST_BUILD
+    TARGET ${PNAME} POST_BUILD
     COMMENT "Copying DLLs"
-    COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:steamvr_overlay_vulkan> $<TARGET_RUNTIME_DLLS:steamvr_overlay_vulkan>
+    COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${PNAME}> $<TARGET_RUNTIME_DLLS:${PNAME}>
     COMMAND_EXPAND_LISTS
 )

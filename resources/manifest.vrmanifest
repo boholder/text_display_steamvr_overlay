@@ -2,15 +2,15 @@
     "source": "builtin",
     "applications": [
         {
-            "app_key": "github.VulkanOverlayExample",
+            "app_key": "com.github.boholder.text_display_steamvr_overlay",
             "launch_type": "binary",
-            "binary_path_windows": "steamvr_overlay_vulkan.exe",
+            "binary_path_windows": "text_display_steamvr_overlay.exe",
             "is_dashboard_overlay": true,
 
             "strings": {
                 "en_us": {
-                    "name": "Vulkan Overlay Example",
-                    "description": "Example project to create SteamVR overlays"
+                    "name": "Text Display Overlay",
+                    "description": "An OpenVR overlay that displays text sent from other software"
                 }
             }
         }
