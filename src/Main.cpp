@@ -21,6 +21,8 @@
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_vulkan.h>
 
+#include <spdlog/spdlog.h>
+
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include <glm/glm.hpp>
@@ -70,7 +72,7 @@ static auto UpdateApplicationRefreshRate() -> void
     }
     catch (std::exception& ex)
     {
-        printf("%s\n\n", ex.what());
+        spdlog::error("Failed to update HMD refresh rate: {}", ex.what());
         if (g_hmd_refresh_rate == 24.0f)
             std::exit(EXIT_FAILURE);
     }
@@ -91,7 +93,7 @@ int main(
     }
     catch (std::exception& ex)
     {
-        printf("%s\n\n", ex.what());
+        spdlog::error("Failed to initialize OpenVR: {}", ex.what());
         return EXIT_FAILURE;
     }
 
@@ -103,7 +105,7 @@ int main(
     }
     catch (std::exception& ex)
     {
-        printf("%s\n\n", ex.what());
+        spdlog::error("Failed to install OpenVR manifest: {}", ex.what());
         return EXIT_FAILURE;
     }
 
@@ -168,7 +170,7 @@ int main(
     }
     catch (std::exception& ex)
     {
-        printf("%s\n\n", ex.what());
+        spdlog::error("Failed to create or setup overlay: {}", ex.what());
         return EXIT_FAILURE;
     }
 

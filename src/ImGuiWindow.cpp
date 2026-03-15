@@ -8,6 +8,8 @@
 
 #include "ImGuiWindow.h"
 
+#include <spdlog/spdlog.h>
+
 #include <imgui.h>
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_vulkan.h>
@@ -34,14 +36,14 @@ auto ImGuiWindow::Initialize(VulkanRenderer*& renderer, const char* name, int wi
     window_ = SDL_CreateWindow(name, width * static_cast<int>(dpiScale), height * static_cast<int>(dpiScale), sdl_window_flags);
     if (window_ == nullptr)
     {
-        printf("SDL_CreateWindow(): %s\n", SDL_GetError());
+        spdlog::error("[SDL] Failed to create a window: {}", SDL_GetError());
         return;
     }
 
     VkSurfaceKHR surface = {};
     if (SDL_Vulkan_CreateSurface(window_, renderer->Instance(), renderer->Allocator(), &surface) == 0)
     {
-        printf("SDL_Vulkan_CreateSurface(): %s\n", SDL_GetError());
+        spdlog::error("[SDL] Failed to create a Vulkan rendering surface for window: {}", SDL_GetError());
         return;
     }
 
