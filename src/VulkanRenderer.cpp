@@ -173,13 +173,6 @@ auto VulkanRenderer::Initialize() -> void
 
     vulkan_device_extensions_ = GetVulkanDeviceExtensionsRequiredByOpenVR(vulkan_physical_device_);
 
-#ifdef IMGUI_SDL_PLATFORM_BACKEND
-    if (!IsVulkanDeviceExtensionAvailable(vulkan_physical_device_, VK_KHR_SWAPCHAIN_EXTENSION_NAME))
-        std::exit(EXIT_FAILURE);
-
-    vulkan_device_extensions_.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-#endif
-
     should_enable_dynamic_rendering_ = true;
 
     if (!IsVulkanDeviceExtensionAvailable(vulkan_physical_device_, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME))
@@ -337,10 +330,6 @@ auto VulkanRenderer::SetupWindow(Vulkan_Window* window, VkSurfaceKHR surface, ui
     window->surface_format = surface_format;
     window->present_mode = present_mode;
     window->clear_enable = true;
-
-#ifdef IMGUI_SDL_PLATFORM_BACKEND
-    this->SetupSwapchain(window, width, height);
-#endif
 }
 
 auto VulkanRenderer::SetupOverlay(uint32_t width, uint32_t height, VkSurfaceFormatKHR format) -> void

@@ -26,20 +26,12 @@ if(NOT DEFINED IMGUI_OPENVR_PLATFORM_BACKEND)
     set(IMGUI_OPENVR_PLATFORM_BACKEND OFF CACHE BOOL "Headless OpenVR backend for ImGui" FORCE)
 endif()
 
-if(NOT DEFINED IMGUI_SDL_PLATFORM_BACKEND)
-    set(IMGUI_SDL_PLATFORM_BACKEND OFF CACHE BOOL "SDL3 Window backend for ImGui" FORCE)
-endif()
-
 if(NOT DEFINED EXAMPLE_OVERLAY_TYPE_DASHBOARD)
     set(EXAMPLE_OVERLAY_TYPE_DASHBOARD OFF CACHE BOOL "Example Dashboard Overlay" FORCE)
 endif()
 
 if(NOT DEFINED EXAMPLE_OVERLAY_DEVICE_RELATIVE)
     set(EXAMPLE_OVERLAY_DEVICE_RELATIVE OFF CACHE BOOL "Example Device Relative World Overlay" FORCE)
-endif()
-
-if(NOT DEFINED EXAMPLE_OVERLAY_ORIGIN_RELATIVE)
-    set(IMGUI_SDL_PLATFORM_BACKEND OFF CACHE BOOL "Example Origin Relative World Overlay" FORCE)
 endif()
 
 # Renderer configuration
@@ -50,16 +42,14 @@ set(ENABLE_VULKAN_VALIDATION ON)
 # ImGui backend configuration
 
 # Custom OpenVR backend built for headless overlay rendering, this is the most performant option if you don't need physical Window as it does not present a swapchain
-set(IMGUI_OPENVR_PLATFORM_BACKEND OFF)
-# ImGui's official SDL3 backend for rendering cross-platform compatible Windows through usage of SDL3 which does require the usage of swapchain
-set(IMGUI_SDL_PLATFORM_BACKEND ON)
+set(IMGUI_OPENVR_PLATFORM_BACKEND ON)
 
 # Example configuration
 
-set(EXAMPLE_OVERLAY_TYPE_DASHBOARD ON)
+set(EXAMPLE_OVERLAY_TYPE_DASHBOARD OFF)
 # These need IMGUI_OPENVR_PLATFORM_BACKEND
 set(EXAMPLE_OVERLAY_DEVICE_RELATIVE OFF)
-set(EXAMPLE_OVERLAY_ORIGIN_RELATIVE OFF)
+set(EXAMPLE_OVERLAY_ORIGIN_RELATIVE ON)
 
 set(OpenVR_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/OpenVR)
 set(GLM_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/glm)
@@ -76,7 +66,6 @@ add_subdirectory(3rdparty)
 message(STATUS "ENABLE_VULKAN_VALIDATION = ${ENABLE_VULKAN_VALIDATION}")
 message(STATUS "ENABLE_VULKAN_DYNAMIC_RENDERING = ${ENABLE_VULKAN_DYNAMIC_RENDERING}")
 message(STATUS "IMGUI_OPENVR_PLATFORM_BACKEND = ${IMGUI_OPENVR_PLATFORM_BACKEND}")
-message(STATUS "IMGUI_SDL_PLATFORM_BACKEND = ${IMGUI_SDL_PLATFORM_BACKEND}")
 
 add_executable(${PNAME}
     "src/Main.cpp"
@@ -104,10 +93,6 @@ endif()
 
 if (IMGUI_OPENVR_PLATFORM_BACKEND)
     add_definitions(-DIMGUI_OPENVR_PLATFORM_BACKEND)
-endif()
-
-if (IMGUI_SDL_PLATFORM_BACKEND)
-    add_definitions(-DIMGUI_SDL_PLATFORM_BACKEND)
 endif()
 
 if (EXAMPLE_OVERLAY_TYPE_DASHBOARD)
