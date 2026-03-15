@@ -1,5 +1,8 @@
 # Text Display SteamVR Overlay
 
+> [!WARNING]
+> Work in progress, not ready for use.
+
 An OpenVR overlay that displays text sent from other software.
 
 ## Build
