@@ -1,6 +1,3 @@
-[submodule "3rdparty/OpenVR"]
-	path = 3rdparty/OpenVR
-	url = https://github.com/ValveSoftware/openvr.git
 [submodule "3rdparty/ImGui"]
 	path = 3rdparty/ImGui
 	url = https://github.com/ocornut/imgui.git

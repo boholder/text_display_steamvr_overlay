@@ -3,8 +3,6 @@
 *.lo
 *.o
 
-out/
-
 # Precompiled Headers
 *.gch
 *.pch
