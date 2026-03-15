@@ -92,6 +92,7 @@ target_link_libraries(${PNAME}
         OpenVR::API
         ImGui
         glm::glm
+        spdlog::spdlog
 )
 
 if (ENABLE_VULKAN_VALIDATION)
