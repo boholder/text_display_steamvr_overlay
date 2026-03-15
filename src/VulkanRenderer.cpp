@@ -8,6 +8,8 @@
 
 #include "VulkanRenderer.h"
 
+#include <spdlog/spdlog.h>
+
 #include "VulkanUtils.h"
 
 #include <ranges>
@@ -90,7 +92,7 @@ auto VulkanRenderer::Initialize() -> void
         (void)pUserData;
         (void)pLayerPrefix;
 
-        fprintf(stderr, "[Vulkan] Debug report from ObjectType: %i\nMessage: %s\n\n", objectType, pMessage);
+        spdlog::error("[Vulkan] Debug report from ObjectType: [{}], message: {}", (int)objectType, pMessage);
         return VK_FALSE;
     };
 
@@ -140,7 +142,7 @@ auto VulkanRenderer::Initialize() -> void
     VkPhysicalDeviceProperties properties = {};
     vkGetPhysicalDeviceProperties(vulkan_physical_device_, &properties);
 
-    printf("Using device %s, Discrete: %s\n", properties.deviceName, properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ? "Yes" : "No");
+    spdlog::info("Using device [{}], Discrete: [{}]", properties.deviceName, properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ? "Yes" : "No");
     assert(vulkan_physical_device_ != VK_NULL_HANDLE);
 
     uint32_t family_prop_count = {};
@@ -273,7 +275,7 @@ auto VulkanRenderer::SetupWindow(Vulkan_Window* window, VkSurfaceKHR surface, ui
 
     if (result != VK_TRUE)
     {
-        fprintf(stderr, "Error no WSI support on physical device 0\n");
+        spdlog::error("No WSI support on physical device 0");
         exit(-1);
     }
 
@@ -315,11 +317,11 @@ auto VulkanRenderer::SetupWindow(Vulkan_Window* window, VkSurfaceKHR surface, ui
         }
     };
 
-    printf("Available present modes: \n");
+    spdlog::info("Available present modes:");
 
     for (auto& mode : m_modes)
     {
-        printf("\t- %s\n", present_mode_to_string(mode).c_str());
+        spdlog::info("\t- {}", present_mode_to_string(mode));
     }
 
     VkPresentModeKHR present_mode = VK_PRESENT_MODE_FIFO_KHR;
@@ -332,7 +334,7 @@ auto VulkanRenderer::SetupWindow(Vulkan_Window* window, VkSurfaceKHR surface, ui
     if (relaxed != m_modes.end() && mailbox == m_modes.end())
         present_mode = VK_PRESENT_MODE_FIFO_RELAXED_KHR;
 
-    printf("Selected: %s\n", present_mode_to_string(present_mode).c_str());
+    spdlog::info("Selected: [{}]", present_mode_to_string(present_mode));
 
     window->surface_format = surface_format;
     window->present_mode = present_mode;
@@ -993,7 +995,7 @@ auto VulkanRenderer::RenderOverlay(ImDrawData* draw_data, VrOverlay*& overlay) -
     }
     catch (std::exception& ex)
     {
-        printf("Failed to set overlay texture\n%s\n\n", ex.what());
+        spdlog::error("[OpenVR] Failed to set overlay texture: {}", ex.what());
         return;
     }
 

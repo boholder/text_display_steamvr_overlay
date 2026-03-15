@@ -14,10 +14,12 @@
 #include <vulkan/vulkan.h>
 #include <openvr.h>
 
-#define VK_VALIDATE_RESULT(e)                                  \
-    if (e != VK_SUCCESS)                                       \
-        fprintf(stderr, "[Vulkan] Error: VkResult = %d\n", e); \
-    if (e > 0)                                                 \
+#include <spdlog/spdlog.h>
+
+#define VK_VALIDATE_RESULT(e)                            \
+    if (e != VK_SUCCESS)                                 \
+        spdlog::error("[Vulkan] Error: VkResult = {}", (int)e); \
+    if (e > 0)                                           \
         assert(e);
 
 static auto IsVulkanInstanceExtensionAvailable(std::string extension) -> bool
@@ -102,7 +104,7 @@ static auto GetVulkanInstanceExtensionsRequiredByOpenVR() -> std::vector<std::st
             }
             else
             {
-                printf("ERROR! %s instance extension asked by OpenVR was NOT available\n", token.c_str());
+                spdlog::error("[{}] instance extension asked by OpenVR was NOT available, exit", token);
                 std::exit(EXIT_FAILURE);
             }
         }
@@ -141,7 +143,7 @@ static auto GetVulkanDeviceExtensionsRequiredByOpenVR(const VkPhysicalDevice& de
             }
             else
             {
-                printf("ERROR! %s device extension asked by OpenVR was NOT available\n", token.c_str());
+                spdlog::error("[{}] device extension asked by OpenVR was NOT available, exit", token);
                 std::exit(EXIT_FAILURE);
             }
         }
