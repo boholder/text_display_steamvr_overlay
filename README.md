@@ -10,10 +10,10 @@ An OpenVR overlay that displays text sent from other software.
 > [!IMPORTANT]
 > This project uses CMake to copy all the required resources from `resources` to the build directory, if you're using custom build environment you need to copy them manually.
 
-Fetch dependencies through `git submodule`:
+Fetch dependencies through `scripts/update_third_libs.sh`:
 
 ```sh
-git submodule init && git submodule update
+./scripts/update_third_libs.sh
 ```
 
 Directly build it in Visual Studio or JetBrains Clion with [CMake presets](CMakePresets.json).
@@ -30,4 +30,4 @@ Run the binary file from the build directory.
 
 - This project is based on Nyabsi's [SteamVR Overlay Example](https://github.com/Nyabsi/text_display_steamvr_overlay), which is licensed under [Mozilla Public License Version 2.0](licenses/NYABSI_LICENSE).
 - The rest of the project is licensed under [Mozilla Public License Version 2.0](LICENSE).
-- Libraries that this project depends on are listed in [.gitmodules](.gitmodules), we respect their licenses.
+- Libraries that this project depends on are listed in the [3rdparty](3rdparty) directory, we respect their licenses.
