@@ -36,7 +36,6 @@ public:
     auto Destroy(VulkanRenderer*& renderer) -> void;
 
 private:
-
     SDL_Window* window_;
     Vulkan_Window window_data_;
     bool window_shown_;

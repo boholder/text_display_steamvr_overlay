@@ -20,21 +20,22 @@
 #include <cstdint>
 #ifndef IMGUI_DISABLE
 
-namespace vr {
-	struct VREvent_t;
+namespace vr
+{
+    struct VREvent_t;
 }
 
 struct ImGui_ImplOpenVR_InitInfo
 {
-	uintptr_t handle;
-	int width;
-	int height;
+    uintptr_t handle;
+    int width;
+    int height;
 };
 
 // Follow "Getting Started" link and check examples/ folder to learn about using backends!
-IMGUI_IMPL_API bool     ImGui_ImplOpenVR_Init(ImGui_ImplOpenVR_InitInfo* initInfo);
-IMGUI_IMPL_API bool		ImGui_ImplOpenVR_ProcessOverlayEvent(const vr::VREvent_t& event);
-IMGUI_IMPL_API void     ImGui_ImplOpenVR_Shutdown();
-IMGUI_IMPL_API void     ImGui_ImplOpenVR_NewFrame();
+IMGUI_IMPL_API bool ImGui_ImplOpenVR_Init(ImGui_ImplOpenVR_InitInfo* initInfo);
+IMGUI_IMPL_API bool ImGui_ImplOpenVR_ProcessOverlayEvent(const vr::VREvent_t& event);
+IMGUI_IMPL_API void ImGui_ImplOpenVR_Shutdown();
+IMGUI_IMPL_API void ImGui_ImplOpenVR_NewFrame();
 
 #endif // #ifndef IMGUI_DISABLE

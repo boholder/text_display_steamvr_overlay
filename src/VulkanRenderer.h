@@ -67,7 +67,7 @@ struct Vulkan_Window
     }
 };
 
-struct Vulkan_Overlay 
+struct Vulkan_Overlay
 {
     uint32_t width;
     uint32_t height;
@@ -88,7 +88,8 @@ struct Vulkan_Overlay
     }
 };
 
-class VulkanRenderer {
+class VulkanRenderer
+{
 public:
     explicit VulkanRenderer();
     auto Initialize() -> void;
@@ -116,8 +117,8 @@ public:
     auto DestroyWindow(Vulkan_Window* window) const -> void;
     auto DestroyOverlay(Vulkan_Overlay* vulkan_overlay) const -> void;
     auto Destroy() -> void;
+
 private:
-    
     auto DestroyFrames(Vulkan_Window* window) const -> void;
 
     VkInstance vulkan_instance_;

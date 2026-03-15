@@ -35,7 +35,7 @@ static auto OpenVRManifestInstalled(const char* appKey) -> bool
     return vr::VRApplications()->IsApplicationInstalled(appKey);
 }
 
-static auto OpenVRManifestInstall() -> void 
+static auto OpenVRManifestInstall() -> void
 {
     std::string manifestPath = {};
     manifestPath += SDL_GetCurrentDirectory();
@@ -46,24 +46,29 @@ static auto OpenVRManifestInstall() -> void
         throw std::runtime_error(std::format("Failed to add manifest from \"{}\" ({})", manifestPath, static_cast<int>(result)));
 }
 
-class VrTrackedDeviceProperties {
-  public:
-    [[maybe_unused]] static auto FromDeviceIndex(uint32_t deviceIndex) -> VrTrackedDeviceProperties {
+class VrTrackedDeviceProperties
+{
+public:
+    [[maybe_unused]] static auto FromDeviceIndex(uint32_t deviceIndex) -> VrTrackedDeviceProperties
+    {
         return VrTrackedDeviceProperties{deviceIndex};
     }
 
     [[nodiscard]] auto Handle() const -> vr::TrackedDeviceIndex_t { return handle; }
 
-    [[maybe_unused]] auto CheckConnection() const -> void {
+    [[maybe_unused]] auto CheckConnection() const -> void
+    {
         if (!vr::VRSystem()->IsTrackedDeviceConnected(handle))
             throw std::runtime_error("The device must be connected to use VrTrackedDeviceProperties!");
     }
 
-    [[maybe_unused]] auto GetString(const vr::ETrackedDeviceProperty property) const -> std::string { 
+    [[maybe_unused]] auto GetString(const vr::ETrackedDeviceProperty property) const -> std::string
+    {
         vr::ETrackedPropertyError result = {};
         std::vector<char> buffer(vr::k_unMaxPropertyStringSize);
         auto buffer_len = vr::VRSystem()->GetStringTrackedDeviceProperty(handle, property, buffer.data(), vr::k_unMaxPropertyStringSize, &result);
-        if (result != vr::TrackedProp_Success || buffer_len == 0) {
+        if (result != vr::TrackedProp_Success || buffer_len == 0)
+        {
             throw std::runtime_error(std::format(
                 "Failed to get string prop \"{}\" for {} (err={})",
                 static_cast<int>(property),
@@ -75,7 +80,8 @@ class VrTrackedDeviceProperties {
         return buffer.data();
     }
 
-    [[maybe_unused]] auto GetBool(const vr::ETrackedDeviceProperty property) -> bool {
+    [[maybe_unused]] auto GetBool(const vr::ETrackedDeviceProperty property) -> bool
+    {
         vr::ETrackedPropertyError result = {};
         auto value = vr::VRSystem()->GetBoolTrackedDeviceProperty(handle, property, &result);
         if (result > vr::TrackedProp_Success)
@@ -89,7 +95,8 @@ class VrTrackedDeviceProperties {
         return value;
     }
 
-    [[maybe_unused]] auto GetFloat(const vr::ETrackedDeviceProperty property) -> float {
+    [[maybe_unused]] auto GetFloat(const vr::ETrackedDeviceProperty property) -> float
+    {
         vr::ETrackedPropertyError result = {};
         auto value = vr::VRSystem()->GetFloatTrackedDeviceProperty(handle, property, &result);
         if (result > vr::TrackedProp_Success)
@@ -103,7 +110,8 @@ class VrTrackedDeviceProperties {
         return value;
     }
 
-    [[maybe_unused]] auto GetInt32(const vr::ETrackedDeviceProperty property) -> int32_t {
+    [[maybe_unused]] auto GetInt32(const vr::ETrackedDeviceProperty property) -> int32_t
+    {
         vr::ETrackedPropertyError result = {};
         auto value = vr::VRSystem()->GetInt32TrackedDeviceProperty(handle, property, &result);
         if (result > vr::TrackedProp_Success)
@@ -120,8 +128,10 @@ class VrTrackedDeviceProperties {
     // TODO: implement
     // [[maybe_unused]] auto GetArray(const vr::ETrackedDeviceProperty property) -> void { }
 
-  private:
-    explicit VrTrackedDeviceProperties(const vr::TrackedDeviceIndex_t handle) : handle{handle} {}
+private:
+    explicit VrTrackedDeviceProperties(const vr::TrackedDeviceIndex_t handle) : handle{handle}
+    {
+    }
 
     vr::TrackedDeviceIndex_t handle;
 };

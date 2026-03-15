@@ -17,7 +17,7 @@
 
 #include <openvr.h>
 
-VulkanRenderer::VulkanRenderer() 
+VulkanRenderer::VulkanRenderer()
 {
     vulkan_instance_ = VK_NULL_HANDLE;
     vulkan_physical_device_ = VK_NULL_HANDLE;
@@ -41,11 +41,12 @@ VulkanRenderer::VulkanRenderer()
     vulkan_overlay_ = std::make_unique<Vulkan_Overlay>();
 }
 
-auto VulkanRenderer::Initialize()  -> void
+auto VulkanRenderer::Initialize() -> void
 {
     VkResult vk_result = {};
 
-    auto get_instance_extensions = [](const std::vector<std::string>& extensions) -> std::vector<const char*> {
+    auto get_instance_extensions = [](const std::vector<std::string>& extensions) -> std::vector<const char*>
+    {
         std::vector<const char*> result;
         for (auto& extension : extensions)
             result.push_back(extension.data());
@@ -67,9 +68,9 @@ auto VulkanRenderer::Initialize()  -> void
     };
 
 #ifdef ENABLE_VULKAN_VALIDATION
-    const char* enabled_layers[] = 
-    { 
-        "VK_LAYER_KHRONOS_validation" 
+    const char* enabled_layers[] =
+    {
+        "VK_LAYER_KHRONOS_validation"
     };
     instance_create_info.enabledLayerCount = 1;
     instance_create_info.ppEnabledLayerNames = enabled_layers;
@@ -79,13 +80,14 @@ auto VulkanRenderer::Initialize()  -> void
     VK_VALIDATE_RESULT(vk_result);
 
 #ifdef ENABLE_VULKAN_VALIDATION
-    auto DebugReport = [](VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64_t object, size_t location, int32_t messageCode, const char* pLayerPrefix, const char* pMessage, void* pUserData) -> VkBool32
+    auto DebugReport = [](VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64_t object, size_t location, int32_t messageCode,
+                          const char* pLayerPrefix, const char* pMessage, void* pUserData) -> VkBool32
     {
-        (void)flags; 
+        (void)flags;
         (void)object;
-        (void)location; 
-        (void)messageCode; 
-        (void)pUserData; 
+        (void)location;
+        (void)messageCode;
+        (void)pUserData;
         (void)pLayerPrefix;
 
         fprintf(stderr, "[Vulkan] Debug report from ObjectType: %i\nMessage: %s\n\n", objectType, pMessage);
@@ -122,12 +124,14 @@ auto VulkanRenderer::Initialize()  -> void
         VkPhysicalDeviceProperties properties = {};
         vkGetPhysicalDeviceProperties(device, &properties);
 
-        if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU) {
+        if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)
+        {
             vulkan_physical_device_ = device;
             continue;
         }
 
-        if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+        if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+        {
             vulkan_physical_device_ = device;
             break;
         }
@@ -149,16 +153,18 @@ auto VulkanRenderer::Initialize()  -> void
 
     for (auto [idx, property] : std::views::enumerate(queues_properties))
     {
-        if (property.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+        if (property.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+        {
             vulkan_queue_family_ = static_cast<uint32_t>(idx);
             break;
         }
     }
 
     queues_properties.clear();
-    assert(vulkan_queue_family_ != (uint32_t)-1);
+    assert(vulkan_queue_family_ != (uint32_t) - 1);
 
-    auto get_device_extensions = [&](const std::vector<std::string>& extensions) -> std::vector<const char*> {
+    auto get_device_extensions = [&](const std::vector<std::string>& extensions) -> std::vector<const char*>
+    {
         std::vector<const char*> result = {};
         for (auto& extension : vulkan_device_extensions_)
             result.push_back(extension.c_str());
@@ -188,11 +194,11 @@ auto VulkanRenderer::Initialize()  -> void
     if (!should_enable_dynamic_rendering_)
         std::exit(EXIT_FAILURE);
 
-    vulkan_device_extensions_.insert(vulkan_device_extensions_.end(), { 
-        VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME, 
-        VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, 
-        VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME 
-    });
+    vulkan_device_extensions_.insert(vulkan_device_extensions_.end(), {
+                                         VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
+                                         VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME,
+                                         VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME
+                                     });
 
     auto device_extensions = get_device_extensions(vulkan_device_extensions_);
 
@@ -211,7 +217,7 @@ auto VulkanRenderer::Initialize()  -> void
         .dynamicRendering = true,
     };
 
-    VkDeviceCreateInfo device_create_info = 
+    VkDeviceCreateInfo device_create_info =
     {
         .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
         .pNext = &dynamic_rendering_features,
@@ -228,12 +234,12 @@ auto VulkanRenderer::Initialize()  -> void
 
     VkDescriptorPoolSize pool_sizes[] = {
         {
-            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 
+            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
             IMGUI_IMPL_VULKAN_MINIMUM_IMAGE_SAMPLER_POOL_SIZE
         },
     };
 
-    VkDescriptorPoolCreateInfo pool_info = 
+    VkDescriptorPoolCreateInfo pool_info =
     {
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
         .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
@@ -255,7 +261,7 @@ auto VulkanRenderer::Initialize()  -> void
     assert(f_vkCmdEndRenderingKHR != nullptr);
 }
 
-auto VulkanRenderer::SetupWindow(Vulkan_Window* window, VkSurfaceKHR surface, uint32_t width, uint32_t height)  -> void
+auto VulkanRenderer::SetupWindow(Vulkan_Window* window, VkSurfaceKHR surface, uint32_t width, uint32_t height) -> void
 {
     VkResult vk_result = {};
 
@@ -265,7 +271,8 @@ auto VulkanRenderer::SetupWindow(Vulkan_Window* window, VkSurfaceKHR surface, ui
     vk_result = vkGetPhysicalDeviceSurfaceSupportKHR(vulkan_physical_device_, vulkan_queue_family_, window->surface, &result); // Check for WSI support
     VK_VALIDATE_RESULT(vk_result);
 
-    if (result != VK_TRUE) {
+    if (result != VK_TRUE)
+    {
         fprintf(stderr, "Error no WSI support on physical device 0\n");
         exit(-1);
     }
@@ -287,28 +294,31 @@ auto VulkanRenderer::SetupWindow(Vulkan_Window* window, VkSurfaceKHR surface, ui
     m_modes.resize(mode_count);
     vkGetPhysicalDeviceSurfacePresentModesKHR(vulkan_physical_device_, window->surface, &mode_count, m_modes.data());
 
-    auto present_mode_to_string = [](VkPresentModeKHR& mode) -> std::string {
-        switch (mode) {
-            case VK_PRESENT_MODE_IMMEDIATE_KHR:
-                return "VK_PRESENT_MODE_IMMEDIATE_KHR";
-            case VK_PRESENT_MODE_MAILBOX_KHR:
-                return "VK_PRESENT_MODE_MAILBOX_KHR";
-            case VK_PRESENT_MODE_FIFO_KHR:
-                return "VK_PRESENT_MODE_FIFO_KHR";
-            case VK_PRESENT_MODE_FIFO_RELAXED_KHR:
-                return "VK_PRESENT_MODE_FIFO_RELAXED_KHR";
-            case VK_PRESENT_MODE_SHARED_DEMAND_REFRESH_KHR:
-                return "VK_PRESENT_MODE_SHARED_DEMAND_REFRESH_KHR";
-            case VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR:
-                return "VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR";
-            default:
-                return "N/A";
+    auto present_mode_to_string = [](VkPresentModeKHR& mode) -> std::string
+    {
+        switch (mode)
+        {
+        case VK_PRESENT_MODE_IMMEDIATE_KHR:
+            return "VK_PRESENT_MODE_IMMEDIATE_KHR";
+        case VK_PRESENT_MODE_MAILBOX_KHR:
+            return "VK_PRESENT_MODE_MAILBOX_KHR";
+        case VK_PRESENT_MODE_FIFO_KHR:
+            return "VK_PRESENT_MODE_FIFO_KHR";
+        case VK_PRESENT_MODE_FIFO_RELAXED_KHR:
+            return "VK_PRESENT_MODE_FIFO_RELAXED_KHR";
+        case VK_PRESENT_MODE_SHARED_DEMAND_REFRESH_KHR:
+            return "VK_PRESENT_MODE_SHARED_DEMAND_REFRESH_KHR";
+        case VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR:
+            return "VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR";
+        default:
+            return "N/A";
         }
     };
 
     printf("Available present modes: \n");
 
-    for (auto& mode : m_modes) {
+    for (auto& mode : m_modes)
+    {
         printf("\t- %s\n", present_mode_to_string(mode).c_str());
     }
 
@@ -410,12 +420,15 @@ auto VulkanRenderer::SetupOverlay(uint32_t width, uint32_t height, VkSurfaceForm
     vk_result = vkCreateImage(vulkan_device_, &image_create_info, nullptr, &vulkan_overlay_->texture);
     VK_VALIDATE_RESULT(vk_result);
 
-    auto find_memory_type_index = [&](uint32_t type, VkMemoryPropertyFlags properties) -> uint32_t {
+    auto find_memory_type_index = [&](uint32_t type, VkMemoryPropertyFlags properties) -> uint32_t
+    {
         VkPhysicalDeviceMemoryProperties memory_requirements = {};
         vkGetPhysicalDeviceMemoryProperties(vulkan_physical_device_, &memory_requirements);
 
-        for (uint32_t i = 0; i < memory_requirements.memoryTypeCount; i++) {
-            if ((type & (1 << i)) && (memory_requirements.memoryTypes[i].propertyFlags & properties) == properties) {
+        for (uint32_t i = 0; i < memory_requirements.memoryTypeCount; i++)
+        {
+            if ((type & (1 << i)) && (memory_requirements.memoryTypes[i].propertyFlags & properties) == properties)
+            {
                 return i;
             }
         }
@@ -483,7 +496,8 @@ auto VulkanRenderer::SetupOverlay(uint32_t width, uint32_t height, VkSurfaceForm
         },
     };
 
-    vkCmdPipelineBarrier(vulkan_overlay_->command_buffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+    vkCmdPipelineBarrier(vulkan_overlay_->command_buffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0,
+                         nullptr, 1, &barrier);
 
     vk_result = vkEndCommandBuffer(vulkan_overlay_->command_buffer);
     VK_VALIDATE_RESULT(vk_result);
@@ -523,8 +537,10 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
     vk_result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkan_physical_device_, window->surface, &surface_capabilities);
     VK_VALIDATE_RESULT(vk_result);
 
-    auto set_minimum_concurrent_image_count = [](VkPresentModeKHR mode) {
-        switch (mode) {
+    auto set_minimum_concurrent_image_count = [](VkPresentModeKHR mode)
+    {
+        switch (mode)
+        {
         case VK_PRESENT_MODE_MAILBOX_KHR:
             return 3;
         case VK_PRESENT_MODE_FIFO_KHR:
@@ -538,13 +554,15 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
         }
     };
 
-    if (minimum_concurrent_image_count_ == 0) {
+    if (minimum_concurrent_image_count_ == 0)
+    {
         minimum_concurrent_image_count_ = set_minimum_concurrent_image_count(window->present_mode);
     }
 
     uint32_t min_image_count = minimum_concurrent_image_count_;
 
-    if (window->present_mode != VK_PRESENT_MODE_SHARED_DEMAND_REFRESH_KHR && window->present_mode != VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR && surface_capabilities.minImageCount > min_image_count)
+    if (window->present_mode != VK_PRESENT_MODE_SHARED_DEMAND_REFRESH_KHR && window->present_mode != VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR &&
+        surface_capabilities.minImageCount > min_image_count)
         min_image_count = surface_capabilities.minImageCount;
 
     if (min_image_count > surface_capabilities.maxImageCount)
@@ -556,14 +574,16 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
     // (0xFFFFFFFF, 0xFFFFFFFF) indicating that the surface size will be determined by the extent of a swapchain targeting the surface.
     if (surface_capabilities.currentExtent.width != 0xffffffff &&
         surface_capabilities.currentExtent.height != 0xffffffff
-        ) {
+    )
+    {
         window->width = surface_capabilities.currentExtent.width;
         window->height = surface_capabilities.currentExtent.height;
     }
 
     VkSurfaceTransformFlagBitsKHR surface_transform_flags =
-        surface_capabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR ?
-        VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR : surface_capabilities.currentTransform;
+        surface_capabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
+            ? VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
+            : surface_capabilities.currentTransform;
 
     VkSwapchainCreateInfoKHR swapchain_create_info =
     {
@@ -611,7 +631,8 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
     if (old_swapchain)
         vkDestroySwapchainKHR(vulkan_device_, old_swapchain, vulkan_allocator_);
 
-    for (uint32_t idx = 0; idx < window->semaphore_count; idx++) {
+    for (uint32_t idx = 0; idx < window->semaphore_count; idx++)
+    {
         Vulkan_FrameSemaphore* fsd = &window->semaphores[idx];
 
         VkSemaphoreCreateInfo semaphore_create_info = {
@@ -625,7 +646,8 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
         VK_VALIDATE_RESULT(vk_result);
     }
 
-    for (uint32_t idx = 0; idx < window->image_count; idx++) {
+    for (uint32_t idx = 0; idx < window->image_count; idx++)
+    {
         Vulkan_Frame* fd = &window->frames[idx];
 
         fd->backbuffer = backbuffers[idx];
@@ -711,7 +733,8 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
             },
         };
 
-        vkCmdPipelineBarrier(fd->command_buffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+        vkCmdPipelineBarrier(fd->command_buffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr,
+                             1, &barrier);
 
         vk_result = vkEndCommandBuffer(fd->command_buffer);
         VK_VALIDATE_RESULT(vk_result);
@@ -788,7 +811,7 @@ auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, Vulkan_Window* window) 
         .sType = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR,
         .flags = 0,
         .renderArea =
-         {
+        {
             .extent =
             {
                 .width = window->width,
@@ -876,7 +899,7 @@ auto VulkanRenderer::RenderOverlay(ImDrawData* draw_data, VrOverlay*& overlay) -
         .sType = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR,
         .flags = 0,
         .renderArea =
-         {
+        {
             .extent =
             {
                 .width = vulkan_overlay_->width,
@@ -927,7 +950,8 @@ auto VulkanRenderer::RenderOverlay(ImDrawData* draw_data, VrOverlay*& overlay) -
         },
     };
 
-    vkCmdPipelineBarrier(vulkan_overlay_->command_buffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier_optimal);
+    vkCmdPipelineBarrier(vulkan_overlay_->command_buffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0,
+                         nullptr, 1, &barrier_optimal);
 
     vk_result = vkEndCommandBuffer(vulkan_overlay_->command_buffer);
     VK_VALIDATE_RESULT(vk_result);
@@ -963,10 +987,12 @@ auto VulkanRenderer::RenderOverlay(ImDrawData* draw_data, VrOverlay*& overlay) -
         .eColorSpace = vr::ColorSpace_Auto,
     };
 
-    try {
+    try
+    {
         overlay->SetTexture(vrTexture);
     }
-    catch (std::exception& ex) {
+    catch (std::exception& ex)
+    {
         printf("Failed to set overlay texture\n%s\n\n", ex.what());
         return;
     }
@@ -1003,7 +1029,8 @@ auto VulkanRenderer::RenderOverlay(ImDrawData* draw_data, VrOverlay*& overlay) -
         },
     };
 
-    vkCmdPipelineBarrier(vulkan_overlay_->command_buffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier_restore);
+    vkCmdPipelineBarrier(vulkan_overlay_->command_buffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0,
+                         nullptr, 1, &barrier_restore);
 
     vk_result = vkEndCommandBuffer(vulkan_overlay_->command_buffer);
     VK_VALIDATE_RESULT(vk_result);
@@ -1012,7 +1039,7 @@ auto VulkanRenderer::RenderOverlay(ImDrawData* draw_data, VrOverlay*& overlay) -
     VK_VALIDATE_RESULT(vk_result);
 }
 
-auto VulkanRenderer::Present(Vulkan_Window* window)  -> void
+auto VulkanRenderer::Present(Vulkan_Window* window) -> void
 {
     if (should_rebuild_swapchain_ || window->is_minimized)
         return;
@@ -1021,8 +1048,8 @@ auto VulkanRenderer::Present(Vulkan_Window* window)  -> void
 
     VkSemaphore render_complete_semaphore = window->semaphores[window->semaphore_index].render_complete_semaphore;
 
-    VkPresentInfoKHR info = 
-    { 
+    VkPresentInfoKHR info =
+    {
         .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
         .waitSemaphoreCount = 1,
         .pWaitSemaphores = &render_complete_semaphore,
@@ -1062,7 +1089,8 @@ auto VulkanRenderer::DestroyFrames(Vulkan_Window* window) const -> void
     vk_result = vkQueueWaitIdle(vulkan_queue_);
     VK_VALIDATE_RESULT(vk_result);
 
-    for (uint32_t idx = 0; idx < window->semaphore_count; idx++) {
+    for (uint32_t idx = 0; idx < window->semaphore_count; idx++)
+    {
         Vulkan_FrameSemaphore* fsd = &window->semaphores[idx];
 
         vkDestroySemaphore(vulkan_device_, fsd->image_acquired_semaphore, vulkan_allocator_);
@@ -1072,7 +1100,8 @@ auto VulkanRenderer::DestroyFrames(Vulkan_Window* window) const -> void
         fsd->render_complete_semaphore = VK_NULL_HANDLE;
     }
 
-    for (uint32_t idx = 0; idx < window->image_count; idx++) {
+    for (uint32_t idx = 0; idx < window->image_count; idx++)
+    {
         Vulkan_Frame* fd = &window->frames[idx];
 
         vkDestroyFence(vulkan_device_, fd->fence, vulkan_allocator_);

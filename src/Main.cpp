@@ -62,12 +62,14 @@ static bool g_ticking = true;
 
 static auto UpdateApplicationRefreshRate() -> void
 {
-    try {
+    try
+    {
         auto hmd_properties = VrTrackedDeviceProperties::FromDeviceIndex(vr::k_unTrackedDeviceIndex_Hmd);
         hmd_properties.CheckConnection();
         g_hmd_refresh_rate = hmd_properties.GetFloat(vr::Prop_DisplayFrequency_Float);
     }
-    catch (std::exception& ex) {
+    catch (std::exception& ex)
+    {
         printf("%s\n\n", ex.what());
         if (g_hmd_refresh_rate == 24.0f)
             std::exit(EXIT_FAILURE);
@@ -75,32 +77,38 @@ static auto UpdateApplicationRefreshRate() -> void
 }
 
 int main(
-    [[maybe_unused]] int argc, 
+    [[maybe_unused]] int argc,
     [[maybe_unused]] char** argv
-) {
+)
+{
     std::srand(std::time(nullptr));
 
     // Initialize the overlay as "VRApplication_Background" instead of "VRApplication_Overlay"
     // This makes sure that the overlay *cannot* run while SteamVR is not running.
-    try {
+    try
+    {
         OpenVRInit(vr::VRApplication_Background);
     }
-    catch (std::exception& ex) {
+    catch (std::exception& ex)
+    {
         printf("%s\n\n", ex.what());
         return EXIT_FAILURE;
     }
 
     UpdateApplicationRefreshRate();
 
-    try {
+    try
+    {
         if (!OpenVRManifestInstalled(APP_KEY)) OpenVRManifestInstall();
     }
-    catch (std::exception& ex) {
+    catch (std::exception& ex)
+    {
         printf("%s\n\n", ex.what());
         return EXIT_FAILURE;
     }
-    
-    try {
+
+    try
+    {
         char overlay_key[100];
         snprintf(overlay_key, 100, "%s-%d", APP_KEY, std::rand() % 1024); // chances of overlap? Slim.
 
@@ -131,7 +139,7 @@ int main(
         g_overlay->EnableFlag(vr::VROverlayFlags_MakeOverlaysInteractiveIfVisible);
 
         // Device relative offset
-        glm::vec3 position = { -0.10, 0, 0.10 };
+        glm::vec3 position = {-0.10, 0, 0.10};
         glm::quat rotation = glm::angleAxis(glm::half_pi<float>(), glm::vec3(0, 1, 0)) * glm::angleAxis(-glm::half_pi<float>(), glm::vec3(1, 0, 0));
         rotation *= glm::angleAxis(glm::radians(10.0f), glm::vec3(0, 1, 0));
         rotation = glm::normalize(rotation);
@@ -151,21 +159,23 @@ int main(
         g_overlay->EnableFlag(vr::VROverlayFlags_MakeOverlaysInteractiveIfVisible);
 
         // Origin relative offset
-        glm::vec3 position = { 0.0f, 1.5f, -1.0f };
+        glm::vec3 position = {0.0f, 1.5f, -1.0f};
         glm::quat rotation = glm::quat_identity<float, glm::defaultp>();
 
         g_overlay->SetTransformWorldRelative(vr::TrackingUniverseStanding, position, rotation);
         g_overlay->Show();
 #endif
     }
-    catch (std::exception& ex) {
+    catch (std::exception& ex)
+    {
         printf("%s\n\n", ex.what());
         return EXIT_FAILURE;
     }
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
     auto sdl_init_flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO;
-    if (!SDL_Init(sdl_init_flags)) {
+    if (!SDL_Init(sdl_init_flags))
+    {
         printf("SDL_Init\n%s\n\n", SDL_GetError());
         return EXIT_FAILURE;
     }
@@ -199,38 +209,41 @@ int main(
                 g_ticking = false;
         }
 #endif
-        while (vr::VROverlay()->PollNextOverlayEvent(g_overlay->Handle(), &vr_event, sizeof(vr_event))) 
+        while (vr::VROverlay()->PollNextOverlayEvent(g_overlay->Handle(), &vr_event, sizeof(vr_event)))
         {
             ImGui_ImplOpenVR_ProcessOverlayEvent(vr_event);
 
-            switch (vr_event.eventType) 
+            switch (vr_event.eventType)
             {
-                case vr::VREvent_PropertyChanged:
+            case vr::VREvent_PropertyChanged:
                 {
                     // Some drivers such as lighthouse or vrlink are capable of changing
                     // vr::Prop_DisplayFrequency_Float without restarting SteamVR
-                    if (vr_event.data.property.prop == vr::Prop_DisplayFrequency_Float) {
+                    if (vr_event.data.property.prop == vr::Prop_DisplayFrequency_Float)
+                    {
                         UpdateApplicationRefreshRate();
                     }
                     break;
                 }
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
-                case vr::VREvent_OverlayShown:
+            case vr::VREvent_OverlayShown:
                 {
-                    if (g_overlay->IsVisible() && g_imGuiWindow->Shown()) {
+                    if (g_overlay->IsVisible() && g_imGuiWindow->Shown())
+                    {
                         g_imGuiWindow->Hide();
                     }
                     break;
                 }
-                case vr::VREvent_OverlayHidden:
+            case vr::VREvent_OverlayHidden:
                 {
-                    if (!g_overlay->IsVisible() && g_imGuiWindow->Shown()) {
+                    if (!g_overlay->IsVisible() && g_imGuiWindow->Shown())
+                    {
                         g_imGuiWindow->Show();
                     }
                     break;
                 }
 #endif
-                case vr::VREvent_Quit:
+            case vr::VREvent_Quit:
                 {
                     g_ticking = false;
                     return false;
@@ -246,11 +259,13 @@ int main(
         {
             ImGuiIO& io = ImGui::GetIO();
 
-            if (!io.WantTextInput) {
+            if (!io.WantTextInput)
+            {
                 g_imGuiWindow->SetKeyboardActiveState(false);
             }
 
-            if (g_overlay->IsVisible() && !g_imGuiWindow->KeyboardActive() && io.WantTextInput) {
+            if (g_overlay->IsVisible() && !g_imGuiWindow->KeyboardActive() && io.WantTextInput)
+            {
                 g_overlay->ShowKeyboard(vr::k_EGamepadTextInputModeNormal);
                 g_imGuiWindow->SetKeyboardActiveState(true);
             }
@@ -263,7 +278,8 @@ int main(
         fb_width *= static_cast<int>(dpiScale);
         fb_height *= static_cast<int>(dpiScale);
 
-        if ((fb_width != 0 && fb_height != 0) && (g_vulkanRenderer->ShouldRebuildSwapchain() || g_imGuiWindow->WindowData()->width != fb_width || g_imGuiWindow->WindowData()->height != fb_height))
+        if ((fb_width != 0 && fb_height != 0) && (g_vulkanRenderer->ShouldRebuildSwapchain() || g_imGuiWindow->WindowData()->width != fb_width || g_imGuiWindow
+            ->WindowData()->height != fb_height))
         {
             ImGui_ImplVulkan_SetMinImageCount(g_vulkanRenderer->MinimumConcurrentImageCount());
 
@@ -295,17 +311,19 @@ int main(
         const bool is_minimized = g_imGuiWindow->Shown() && g_imGuiWindow->Minimized();
         g_imGuiWindow->WindowData()->is_minimized = is_minimized;
 
-        if (!is_minimized) {
+        if (!is_minimized)
+        {
             g_vulkanRenderer->RenderWindow(draw_data, g_imGuiWindow->WindowData());
             g_vulkanRenderer->Present(g_imGuiWindow->WindowData());
         }
-        
+
         g_vulkanRenderer->RenderOverlay(draw_data, g_overlay);
 #endif
         uint64_t target_time = static_cast<uint64_t>((static_cast<float>(1000000000) / g_hmd_refresh_rate));
         const uint64_t frame_duration = (SDL_GetTicksNS() - g_last_frame_time);
 
-        if (frame_duration < target_time) {
+        if (frame_duration < target_time)
+        {
             SDL_DelayPrecise(target_time - frame_duration);
         }
 

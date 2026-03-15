@@ -32,13 +32,15 @@ auto ImGuiWindow::Initialize(VulkanRenderer*& renderer, const char* name, int wi
 {
     auto sdl_window_flags = SDL_WINDOW_VULKAN | SDL_WINDOW_HIDDEN | SDL_WINDOW_MOUSE_FOCUS | SDL_WINDOW_HIGH_PIXEL_DENSITY;
     window_ = SDL_CreateWindow(name, width * static_cast<int>(dpiScale), height * static_cast<int>(dpiScale), sdl_window_flags);
-    if (window_ == nullptr) {
+    if (window_ == nullptr)
+    {
         printf("SDL_CreateWindow(): %s\n", SDL_GetError());
         return;
     }
 
     VkSurfaceKHR surface = {};
-    if (SDL_Vulkan_CreateSurface(window_, renderer->Instance(), renderer->Allocator(), &surface) == 0) {
+    if (SDL_Vulkan_CreateSurface(window_, renderer->Instance(), renderer->Allocator(), &surface) == 0)
+    {
         printf("SDL_Vulkan_CreateSurface(): %s\n", SDL_GetError());
         return;
     }
@@ -56,7 +58,8 @@ auto ImGuiWindow::Initialize(VulkanRenderer*& renderer, const char* name, int wi
 
     window_shown_ = show;
 
-    if (show) {
+    if (show)
+    {
         SDL_ShowWindow(window_);
     }
 
@@ -79,13 +82,15 @@ auto ImGuiWindow::Initialize(VulkanRenderer*& renderer, const char* name, int wi
     style.ScaleAllSizes(dpiScale);
     style.FontScaleDpi = dpiScale;
 
-    if (io.ConfigFlags & ImGuiConfigFlags_IsSRGB) {
+    if (io.ConfigFlags & ImGuiConfigFlags_IsSRGB)
+    {
         // hack: ImGui doesn't handle sRGB colour spaces properly so convert from Linear -> sRGB
         // https://github.com/ocornut/imgui/issues/8271#issuecomment-2564954070
         // remove when these are merged:
         //  https://github.com/ocornut/imgui/pull/8110
         //  https://github.com/ocornut/imgui/pull/8111
-        for (int i = 0; i < ImGuiCol_COUNT; i++) {
+        for (int i = 0; i < ImGuiCol_COUNT; i++)
+        {
             ImVec4& col = style.Colors[i];
             col.x = col.x <= 0.04045f ? col.x / 12.92f : pow((col.x + 0.055f) / 1.055f, 2.4f);
             col.y = col.y <= 0.04045f ? col.y / 12.92f : pow((col.y + 0.055f) / 1.055f, 2.4f);
@@ -93,7 +98,7 @@ auto ImGuiWindow::Initialize(VulkanRenderer*& renderer, const char* name, int wi
         }
     }
 
-    VkPipelineRenderingCreateInfoKHR pipeline_rendering_create_info = 
+    VkPipelineRenderingCreateInfoKHR pipeline_rendering_create_info =
     {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
         .viewMask = 0,

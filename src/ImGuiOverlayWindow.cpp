@@ -17,7 +17,6 @@
 
 ImGuiOverlayWindow::ImGuiOverlayWindow()
 {
-
 }
 
 auto ImGuiOverlayWindow::Initialize(VulkanRenderer*& renderer, VrOverlay*& overlay, int width, int height) -> void
@@ -29,7 +28,7 @@ auto ImGuiOverlayWindow::Initialize(VulkanRenderer*& renderer, VrOverlay*& overl
     (void)io;
 
     io.BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
-    io.ConfigFlags  |= ImGuiConfigFlags_IsSRGB; // NOTE: ImGuiConfigFlags_IsSRGB is not used by ImGui, used to communicate state.
+    io.ConfigFlags |= ImGuiConfigFlags_IsSRGB; // NOTE: ImGuiConfigFlags_IsSRGB is not used by ImGui, used to communicate state.
 
     io.IniFilename = nullptr;
 
@@ -40,13 +39,15 @@ auto ImGuiOverlayWindow::Initialize(VulkanRenderer*& renderer, VrOverlay*& overl
     style.ScaleAllSizes(1.0f);
     style.FontScaleDpi = 1.0f;
 
-    if (io.ConfigFlags & ImGuiConfigFlags_IsSRGB) {
+    if (io.ConfigFlags & ImGuiConfigFlags_IsSRGB)
+    {
         // hack: ImGui doesn't handle sRGB colour spaces properly so convert from Linear -> sRGB
         // https://github.com/ocornut/imgui/issues/8271#issuecomment-2564954070
         // remove when these are merged:
         //  https://github.com/ocornut/imgui/pull/8110
         //  https://github.com/ocornut/imgui/pull/8111
-        for (int i = 0; i < ImGuiCol_COUNT; i++) {
+        for (int i = 0; i < ImGuiCol_COUNT; i++)
+        {
             ImVec4& col = style.Colors[i];
             col.x = col.x <= 0.04045f ? col.x / 12.92f : pow((col.x + 0.055f) / 1.055f, 2.4f);
             col.y = col.y <= 0.04045f ? col.y / 12.92f : pow((col.y + 0.055f) / 1.055f, 2.4f);
@@ -69,7 +70,7 @@ auto ImGuiOverlayWindow::Initialize(VulkanRenderer*& renderer, VrOverlay*& overl
         .colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
     };
 
-    VkPipelineRenderingCreateInfoKHR pipeline_rendering_create_info = 
+    VkPipelineRenderingCreateInfoKHR pipeline_rendering_create_info =
     {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
         .viewMask = 0,

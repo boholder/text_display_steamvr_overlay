@@ -18,36 +18,40 @@
     if (e != VK_SUCCESS)                                       \
         fprintf(stderr, "[Vulkan] Error: VkResult = %d\n", e); \
     if (e > 0)                                                 \
-        assert(e);                                             \
+        assert(e);
 
-static auto IsVulkanInstanceExtensionAvailable(std::string extension) -> bool 
+static auto IsVulkanInstanceExtensionAvailable(std::string extension) -> bool
 {
-    auto IsExtensionAvailable = [](const std::vector<VkExtensionProperties>& properties, std::string extension) {
+    auto IsExtensionAvailable = [](const std::vector<VkExtensionProperties>& properties, std::string extension)
+    {
         for (const VkExtensionProperties& p : properties)
             if (strcmp(p.extensionName, extension.c_str()) == 0)
                 return true;
         return false;
-        };
+    };
 
     uint32_t extension_properties_count = {};
     std::vector<VkExtensionProperties> extension_properties = {};
 
     vkEnumerateInstanceExtensionProperties(nullptr, &extension_properties_count, nullptr);
 
-    if (extension_properties_count > 0) {
+    if (extension_properties_count > 0)
+    {
         extension_properties.resize(extension_properties_count);
         vkEnumerateInstanceExtensionProperties(nullptr, &extension_properties_count, extension_properties.data());
     }
-    else {
+    else
+    {
         std::exit(EXIT_FAILURE);
     }
 
     return IsExtensionAvailable(extension_properties, extension);
 }
 
-static auto IsVulkanDeviceExtensionAvailable(const VkPhysicalDevice& physical_device, std::string extension) -> bool 
+static auto IsVulkanDeviceExtensionAvailable(const VkPhysicalDevice& physical_device, std::string extension) -> bool
 {
-    auto IsExtensionAvailable = [](const std::vector<VkExtensionProperties>& properties, std::string extension) {
+    auto IsExtensionAvailable = [](const std::vector<VkExtensionProperties>& properties, std::string extension)
+    {
         for (const VkExtensionProperties& p : properties)
             if (strcmp(p.extensionName, extension.c_str()) == 0)
                 return true;
@@ -59,11 +63,13 @@ static auto IsVulkanDeviceExtensionAvailable(const VkPhysicalDevice& physical_de
 
     vkEnumerateDeviceExtensionProperties(physical_device, nullptr, &extension_properties_count, nullptr);
 
-    if (extension_properties_count > 0) {
+    if (extension_properties_count > 0)
+    {
         extension_properties.resize(extension_properties_count);
         vkEnumerateDeviceExtensionProperties(physical_device, nullptr, &extension_properties_count, extension_properties.data());
     }
-    else {
+    else
+    {
         std::exit(EXIT_FAILURE);
     }
 
@@ -80,7 +86,7 @@ static auto GetVulkanInstanceExtensionsRequiredByOpenVR() -> std::vector<std::st
     }
 
     uint32_t buffer_len = vr::VRCompositor()->GetVulkanInstanceExtensionsRequired(nullptr, 0);
-    if (buffer_len > 0) 
+    if (buffer_len > 0)
     {
         std::vector<char> buffer(buffer_len + 1);
         vr::VRCompositor()->GetVulkanInstanceExtensionsRequired(buffer.data(), buffer_len);
@@ -88,46 +94,60 @@ static auto GetVulkanInstanceExtensionsRequiredByOpenVR() -> std::vector<std::st
 
         std::string token{};
         std::istringstream token_stream(buffer.data());
-        while (std::getline(token_stream, token, ' ')) {
-            if (IsVulkanInstanceExtensionAvailable(token)) {
+        while (std::getline(token_stream, token, ' '))
+        {
+            if (IsVulkanInstanceExtensionAvailable(token))
+            {
                 result.push_back(token);
-            } else {
+            }
+            else
+            {
                 printf("ERROR! %s instance extension asked by OpenVR was NOT available\n", token.c_str());
                 std::exit(EXIT_FAILURE);
             }
         }
-    } else {
+    }
+    else
+    {
         std::exit(EXIT_FAILURE);
     }
 
     return result;
 }
 
-static auto GetVulkanDeviceExtensionsRequiredByOpenVR(const VkPhysicalDevice& device) -> std::vector<std::string> 
+static auto GetVulkanDeviceExtensionsRequiredByOpenVR(const VkPhysicalDevice& device) -> std::vector<std::string>
 {
     std::vector<std::string> result{};
 
-    if (!vr::VRCompositor()) {
+    if (!vr::VRCompositor())
+    {
         std::exit(EXIT_FAILURE);
     }
 
     uint32_t buffer_len = vr::VRCompositor()->GetVulkanDeviceExtensionsRequired(device, nullptr, 0);
-    if (buffer_len > 0) {
+    if (buffer_len > 0)
+    {
         std::vector<char> buffer(buffer_len + 1);
         vr::VRCompositor()->GetVulkanDeviceExtensionsRequired(device, buffer.data(), buffer_len);
         buffer[buffer_len] = '\0';
 
         std::string token{};
         std::istringstream token_stream(buffer.data());
-        while (std::getline(token_stream, token, ' ')) {
-            if (IsVulkanDeviceExtensionAvailable(device, token.data())) {
+        while (std::getline(token_stream, token, ' '))
+        {
+            if (IsVulkanDeviceExtensionAvailable(device, token.data()))
+            {
                 result.push_back(token);
-            } else {
+            }
+            else
+            {
                 printf("ERROR! %s device extension asked by OpenVR was NOT available\n", token.c_str());
                 std::exit(EXIT_FAILURE);
             }
         }
-    } else {
+    }
+    else
+    {
         std::exit(EXIT_FAILURE);
     }
 

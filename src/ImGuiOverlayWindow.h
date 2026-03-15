@@ -25,6 +25,5 @@ public:
     auto Destroy() -> void;
 
 private:
-
     Vulkan_Overlay overlay_data_;
 };
