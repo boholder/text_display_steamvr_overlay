@@ -24,10 +24,8 @@ function update_spdlog() {
 }
 
 function update_openvr() {
-    git clone --no-checkout --depth=1 --filter=tree:0 https://github.com/ValveSoftware/openvr.git "$OPENVR_DIR"
+    git clone --depth=1 --branch "$OPENVR_VERSION_TAG" https://github.com/ValveSoftware/openvr.git "$OPENVR_DIR"
     cd "$OPENVR_DIR" || exit
-    git sparse-checkout set --no-cone /bin /headers /lib /LICENSE
-    git checkout "$OPENVR_VERSION_TAG"
     rm -rf .git
 }
 
