@@ -100,7 +100,6 @@ WarningsAsErrors:           '*,
     -readability-redundant-member-init,
     -readability-static-accessed-through-instance'
 HeaderFilterRegex: '^((?!qt).)*h$'
-AnalyzeTemporaryDtors: false
 FormatStyle:     none
 CheckOptions:
   - key:             bugprone-argument-comment.StrictMode
