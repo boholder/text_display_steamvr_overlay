@@ -6,8 +6,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 #include <sstream>
 #include <fstream>
@@ -40,6 +40,8 @@
 #include "VrOverlay.h"
 #include "VrUtils.h"
 
+#include "constants.h"
+
 #include "backends/imgui_impl_openvr.h"
 
 #ifdef _WIN32
@@ -50,19 +52,17 @@ extern "C" __declspec(dllexport) unsigned long AmdPowerXpressRequestHighPerforma
 static VulkanRenderer* g_vulkanRenderer = new VulkanRenderer();
 static ImGuiWindow* g_imGuiWindow = new ImGuiWindow();
 static ImGuiOverlayWindow* g_ImGuiOverlayWindow = new ImGuiOverlayWindow();
-static VrOverlay* g_overlay = new VrOverlay();
+static VrOverlay* g_window_overlay = new VrOverlay();
+static VrOverlay* g_dashboard_overlay = new VrOverlay();
 
 static uint64_t g_last_frame_time = SDL_GetTicksNS();
-static float g_hmd_refresh_rate = 24.0f;
+static float g_hmd_refresh_rate = 24.0F;
 static bool g_ticking = true;
-
-#define APP_KEY "github.VulkanOverlayExample"
-#define APP_NAME "Vulkan Overlay Example"
 
 #define WIN_WIDTH 1280
 #define WIN_HEIGHT 720
 
-static auto UpdateApplicationRefreshRate() -> void
+static void UpdateApplicationRefreshRate()
 {
     try
     {
@@ -73,15 +73,81 @@ static auto UpdateApplicationRefreshRate() -> void
     catch (std::exception& ex)
     {
         spdlog::error("Failed to update HMD refresh rate: {}", ex.what());
-        if (g_hmd_refresh_rate == 24.0f)
+        if (g_hmd_refresh_rate == 24.0F)
             std::exit(EXIT_FAILURE);
     }
 }
 
+static void create_window_overlay()
+{
+    g_window_overlay->Create(vr::VROverlayType_World, WINDOW_KEY, WINDOW_NAME);
+
+    g_window_overlay->SetInputMethod(vr::VROverlayInputMethod_Mouse);
+    g_window_overlay->SetWidth(1.0F);
+
+    g_window_overlay->EnableFlag(vr::VROverlayFlags_SendVRDiscreteScrollEvents);
+    g_window_overlay->EnableFlag(vr::VROverlayFlags_EnableClickStabilization);
+    g_window_overlay->EnableFlag(vr::VROverlayFlags_MakeOverlaysInteractiveIfVisible);
+
+    // Origin relative offset
+    glm::vec3 const position = { 0.0F, 1.5F, -1.0F };
+    glm::quat const rotation = glm::quat_identity<float, glm::defaultp>();
+
+    g_window_overlay->SetTransformWorldRelative(vr::TrackingUniverseStanding, position, rotation);
+    g_window_overlay->Show();
+}
+
+static void create_dashboard_overlay()
+{
+    g_dashboard_overlay->Create(vr::VROverlayType_Dashboard, DASHBOARD_KEY, DASHBOARD_NAME);
+
+    // when overlay is VROverlayType_Dashboard we should set a thumbnail for the dashboard
+    std::string thumbnail_path = {};
+    thumbnail_path += SDL_GetCurrentDirectory();
+    thumbnail_path += "icon.png";
+    g_dashboard_overlay->SetThumbnail(thumbnail_path);
+
+    g_dashboard_overlay->SetInputMethod(vr::VROverlayInputMethod_Mouse);
+    g_dashboard_overlay->SetWidth(2.5F);
+
+    g_dashboard_overlay->EnableFlag(vr::VROverlayFlags_SendVRDiscreteScrollEvents);
+    g_dashboard_overlay->EnableFlag(vr::VROverlayFlags_EnableClickStabilization);
+}
+
+/** Returns true if the application should quit */
+static bool handle_vr_event(const VrOverlay* overlay)
+{
+    vr::VREvent_t vr_event = {};
+    while (vr::VROverlay()->PollNextOverlayEvent(overlay->Handle(), &vr_event, sizeof(vr_event)))
+    {
+        ImGui_ImplOpenVR_ProcessOverlayEvent(vr_event);
+
+        switch (vr_event.eventType)
+        {
+        case vr::VREvent_PropertyChanged:
+        {
+            // Some drivers such as lighthouse or vrlink are capable of changing
+            // vr::Prop_DisplayFrequency_Float without restarting SteamVR
+            if (vr_event.data.property.prop == vr::Prop_DisplayFrequency_Float)
+            {
+                UpdateApplicationRefreshRate();
+            }
+            break;
+        }
+        case vr::VREvent_Quit:
+        {
+            g_ticking = false;
+            return true;
+        }
+        default:
+            break;
+        }
+    }
+    return false;
+}
+
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
-    std::srand(std::time(nullptr));
-
     // Initialize the overlay as "VRApplication_Background" instead of "VRApplication_Overlay"
     // This makes sure that the overlay *cannot* run while SteamVR is not running.
     try
@@ -109,63 +175,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 
     try
     {
-        char overlay_key[100];
-        snprintf(overlay_key, 100, "%s-%d", APP_KEY, std::rand() % 1024); // chances of overlap? Slim.
-
-#ifdef EXAMPLE_OVERLAY_TYPE_DASHBOARD
-        g_overlay->Create(vr::VROverlayType_Dashboard, overlay_key, APP_NAME);
-
-        // when overlay is VROverlayType_Dashboard we should set a thumbnail for the dashboard
-        std::string thumbnail_path = {};
-        thumbnail_path += SDL_GetCurrentDirectory();
-        thumbnail_path += "icon.png";
-        g_overlay->SetThumbnail(thumbnail_path);
-
-        g_overlay->SetInputMethod(vr::VROverlayInputMethod_Mouse);
-        g_overlay->SetWidth(2.5f);
-
-        g_overlay->EnableFlag(vr::VROverlayFlags_SendVRDiscreteScrollEvents);
-        g_overlay->EnableFlag(vr::VROverlayFlags_EnableClickStabilization);
-#endif
-
-#ifdef EXAMPLE_OVERLAY_DEVICE_RELATIVE
-        g_overlay->Create(vr::VROverlayType_World, overlay_key, APP_NAME);
-
-        g_overlay->SetInputMethod(vr::VROverlayInputMethod_Mouse);
-        g_overlay->SetWidth(0.15f);
-
-        g_overlay->EnableFlag(vr::VROverlayFlags_SendVRDiscreteScrollEvents);
-        g_overlay->EnableFlag(vr::VROverlayFlags_EnableClickStabilization);
-        g_overlay->EnableFlag(vr::VROverlayFlags_MakeOverlaysInteractiveIfVisible);
-
-        // Device relative offset
-        glm::vec3 position = { -0.10, 0, 0.10 };
-        glm::quat rotation
-            = glm::angleAxis(glm::half_pi<float>(), glm::vec3(0, 1, 0)) * glm::angleAxis(-glm::half_pi<float>(), glm::vec3(1, 0, 0));
-        rotation *= glm::angleAxis(glm::radians(10.0f), glm::vec3(0, 1, 0));
-        rotation = glm::normalize(rotation);
-
-        g_overlay->SetTransformDeviceRelative(vr::TrackedControllerRole_LeftHand, position, rotation);
-        g_overlay->Show();
-#endif
-
-#ifdef EXAMPLE_OVERLAY_ORIGIN_RELATIVE
-        g_overlay->Create(vr::VROverlayType_World, overlay_key, APP_NAME);
-
-        g_overlay->SetInputMethod(vr::VROverlayInputMethod_Mouse);
-        g_overlay->SetWidth(1.0f);
-
-        g_overlay->EnableFlag(vr::VROverlayFlags_SendVRDiscreteScrollEvents);
-        g_overlay->EnableFlag(vr::VROverlayFlags_EnableClickStabilization);
-        g_overlay->EnableFlag(vr::VROverlayFlags_MakeOverlaysInteractiveIfVisible);
-
-        // Origin relative offset
-        glm::vec3 position = { 0.0f, 1.5f, -1.0f };
-        glm::quat rotation = glm::quat_identity<float, glm::defaultp>();
-
-        g_overlay->SetTransformWorldRelative(vr::TrackingUniverseStanding, position, rotation);
-        g_overlay->Show();
-#endif
+        create_dashboard_overlay();
+        create_window_overlay();
     }
     catch (std::exception& ex)
     {
@@ -175,43 +186,29 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 
     g_vulkanRenderer->Initialize();
 
-    g_ImGuiOverlayWindow->Initialize(g_vulkanRenderer, g_overlay, WIN_WIDTH, WIN_HEIGHT);
-
-    vr::VREvent_t vr_event = {};
+    g_ImGuiOverlayWindow->Initialize(g_vulkanRenderer, g_window_overlay, WIN_WIDTH, WIN_HEIGHT);
+    g_ImGuiOverlayWindow->Initialize(g_vulkanRenderer, g_dashboard_overlay, WIN_WIDTH, WIN_HEIGHT);
 
     while (g_ticking)
     {
-        while (vr::VROverlay()->PollNextOverlayEvent(g_overlay->Handle(), &vr_event, sizeof(vr_event)))
+        if (handle_vr_event(g_window_overlay))
         {
-            ImGui_ImplOpenVR_ProcessOverlayEvent(vr_event);
-
-            switch (vr_event.eventType)
-            {
-            case vr::VREvent_PropertyChanged:
-            {
-                // Some drivers such as lighthouse or vrlink are capable of changing
-                // vr::Prop_DisplayFrequency_Float without restarting SteamVR
-                if (vr_event.data.property.prop == vr::Prop_DisplayFrequency_Float)
-                {
-                    UpdateApplicationRefreshRate();
-                }
-                break;
-            }
-            case vr::VREvent_Quit:
-            {
-                g_ticking = false;
-                return false;
-            }
-            }
+            return 0;
+        }
+        if (handle_vr_event(g_dashboard_overlay))
+        {
+            return 0;
         }
 
         g_ImGuiOverlayWindow->Draw();
 
         ImDrawData* draw_data = ImGui::GetDrawData();
 
-        g_vulkanRenderer->RenderOverlay(draw_data, g_overlay);
+        g_vulkanRenderer->RenderOverlay(draw_data, g_window_overlay);
+        g_vulkanRenderer->RenderOverlay(draw_data, g_dashboard_overlay);
 
-        uint64_t target_time = static_cast<uint64_t>((static_cast<float>(1000000000) / g_hmd_refresh_rate));
+        const auto target_time = static_cast<uint64_t>((static_cast<float>(1000000000) / g_hmd_refresh_rate));
+        // ReSharper disable once CppTooWideScopeInitStatement
         const uint64_t frame_duration = (SDL_GetTicksNS() - g_last_frame_time);
 
         if (frame_duration < target_time)
@@ -222,7 +219,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
         g_last_frame_time = SDL_GetTicksNS();
     }
 
-    VkResult vk_result = vkDeviceWaitIdle(g_vulkanRenderer->Device());
+    const VkResult vk_result = vkDeviceWaitIdle(g_vulkanRenderer->Device());
     VK_VALIDATE_RESULT(vk_result);
 
     g_ImGuiOverlayWindow->Destroy();
