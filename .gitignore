@@ -35,3 +35,8 @@ cmake-build*
 
 # Build Artifacts
 build
+
+# Third party libraries
+3rdparty/**
+!3rdparty/
+!3rdparty/CMakeLists.txt
