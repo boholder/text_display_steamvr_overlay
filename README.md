@@ -16,7 +16,7 @@ An OpenVR overlay that displays text sent from other software.
 Fetch dependencies through [scripts/update_third_libs.sh](scripts/update_third_libs.sh):
 
 ```sh
-scripts/update_third_libs.sh
+scripts/update_third_libs.sh y
 ```
 
 Directly build it in Visual Studio or JetBrains Clion with [CMake presets](CMakePresets.json).
