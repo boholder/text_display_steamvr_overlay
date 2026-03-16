@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.26)
 
 if (POLICY CMP0141)
-  cmake_policy(SET CMP0141 NEW)
-  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
-endif()
+    cmake_policy(SET CMP0141 NEW)
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
+endif ()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
@@ -14,21 +14,21 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(NOT DEFINED ENABLE_VULKAN_VALIDATION)
+if (NOT DEFINED ENABLE_VULKAN_VALIDATION)
     set(ENABLE_VULKAN_VALIDATION OFF CACHE BOOL "Enable Vulkan validation layers" FORCE)
-endif()
+endif ()
 
-if(NOT DEFINED ENABLE_VULKAN_DYNAMIC_RENDERING)
+if (NOT DEFINED ENABLE_VULKAN_DYNAMIC_RENDERING)
     set(ENABLE_VULKAN_DYNAMIC_RENDERING OFF CACHE BOOL "Enable Vulkan dynamic rendering" FORCE)
-endif()
+endif ()
 
-if(NOT DEFINED EXAMPLE_OVERLAY_TYPE_DASHBOARD)
+if (NOT DEFINED EXAMPLE_OVERLAY_TYPE_DASHBOARD)
     set(EXAMPLE_OVERLAY_TYPE_DASHBOARD OFF CACHE BOOL "Example Dashboard Overlay" FORCE)
-endif()
+endif ()
 
-if(NOT DEFINED EXAMPLE_OVERLAY_DEVICE_RELATIVE)
+if (NOT DEFINED EXAMPLE_OVERLAY_DEVICE_RELATIVE)
     set(EXAMPLE_OVERLAY_DEVICE_RELATIVE OFF CACHE BOOL "Example Device Relative World Overlay" FORCE)
-endif()
+endif ()
 
 # Renderer configuration
 
@@ -59,16 +59,16 @@ message(STATUS "ENABLE_VULKAN_DYNAMIC_RENDERING = ${ENABLE_VULKAN_DYNAMIC_RENDER
 message(STATUS "IMGUI_OPENVR_PLATFORM_BACKEND = ${IMGUI_OPENVR_PLATFORM_BACKEND}")
 
 add_executable(${PNAME}
-    "src/Main.cpp"
-    "src/VulkanRenderer.cpp"
-    "src/ImGuiWindow.cpp"
-    "src/ImGuiOverlayWindow.cpp"
+        "src/Main.cpp"
+        "src/VulkanRenderer.cpp"
+        "src/ImGuiWindow.cpp"
+        "src/ImGuiOverlayWindow.cpp"
 )
 
 target_compile_features(${PNAME} PUBLIC cxx_std_23)
 
 target_link_libraries(${PNAME}
-    PRIVATE
+        PRIVATE
         OpenVR::API
         ImGui
         glm::glm
@@ -77,40 +77,40 @@ target_link_libraries(${PNAME}
 
 if (ENABLE_VULKAN_VALIDATION)
     add_definitions(-DENABLE_VULKAN_VALIDATION)
-endif()
+endif ()
 
 if (ENABLE_VULKAN_DYNAMIC_RENDERING)
     add_definitions(-DENABLE_VULKAN_DYNAMIC_RENDERING)
-endif()
+endif ()
 
 if (IMGUI_OPENVR_PLATFORM_BACKEND)
     add_definitions(-DIMGUI_OPENVR_PLATFORM_BACKEND)
-endif()
+endif ()
 
 if (EXAMPLE_OVERLAY_TYPE_DASHBOARD)
     add_definitions(-DEXAMPLE_OVERLAY_TYPE_DASHBOARD)
-endif()
+endif ()
 
 if (EXAMPLE_OVERLAY_DEVICE_RELATIVE)
     add_definitions(-DEXAMPLE_OVERLAY_DEVICE_RELATIVE)
-endif()
+endif ()
 
 if (EXAMPLE_OVERLAY_ORIGIN_RELATIVE)
     add_definitions(-DEXAMPLE_OVERLAY_ORIGIN_RELATIVE)
-endif()
+endif ()
 
 add_custom_target(${PNAME}_resources)
 
 add_custom_command(
-    TARGET ${PNAME}_resources POST_BUILD
-    COMMENT "Copying Resources & Manifest"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CMAKE_SOURCE_DIR}/resources ${CMAKE_BINARY_DIR}
+        TARGET ${PNAME}_resources POST_BUILD
+        COMMENT "Copying Resources & Manifest"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CMAKE_SOURCE_DIR}/resources ${CMAKE_BINARY_DIR}
 )
 add_dependencies(${PNAME} ${PNAME}_resources)
 
 add_custom_command(
-    TARGET ${PNAME} POST_BUILD
-    COMMENT "Copying DLLs"
-    COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${PNAME}> $<TARGET_RUNTIME_DLLS:${PNAME}>
-    COMMAND_EXPAND_LISTS
+        TARGET ${PNAME} POST_BUILD
+        COMMENT "Copying DLLs"
+        COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${PNAME}> $<TARGET_RUNTIME_DLLS:${PNAME}>
+        COMMAND_EXPAND_LISTS
 )

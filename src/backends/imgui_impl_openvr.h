@@ -16,13 +16,13 @@
 // - Introduction, links and more at the top of imgui.cpp
 
 #pragma once
-#include <imgui.h>      // IMGUI_IMPL_API
+#include <imgui.h> // IMGUI_IMPL_API
 #include <cstdint>
 #ifndef IMGUI_DISABLE
 
 namespace vr
 {
-    struct VREvent_t;
+struct VREvent_t;
 }
 
 struct ImGui_ImplOpenVR_InitInfo

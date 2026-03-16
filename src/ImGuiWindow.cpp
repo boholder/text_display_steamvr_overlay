@@ -69,7 +69,7 @@ auto ImGuiWindow::Initialize(VulkanRenderer*& renderer, const char* name, int wi
 
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    (void)io;
+    ( void ) io;
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_IsSRGB; // NOTE: ImGuiConfigFlags_IsSRGB is not used by ImGui, used to communicate state.
@@ -100,8 +100,7 @@ auto ImGuiWindow::Initialize(VulkanRenderer*& renderer, const char* name, int wi
         }
     }
 
-    VkPipelineRenderingCreateInfoKHR pipeline_rendering_create_info =
-    {
+    VkPipelineRenderingCreateInfoKHR pipeline_rendering_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
         .viewMask = 0,
         .colorAttachmentCount = 1,
@@ -143,14 +142,10 @@ auto ImGuiWindow::Show() -> void
 }
 
 auto ImGuiWindow::SetMinimizedFromEvent(bool state) -> void
-{
-    window_minimized_ = state;
-}
+{ window_minimized_ = state; }
 
 auto ImGuiWindow::SetKeyboardActiveState(bool state) -> void
-{
-    keyboard_active_ = state;
-}
+{ keyboard_active_ = state; }
 
 auto ImGuiWindow::Hide() -> void
 {

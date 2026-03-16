@@ -19,7 +19,8 @@ public:
     explicit ImGuiOverlayWindow();
     auto Initialize(VulkanRenderer*& renderer, VrOverlay*& overlay, int width, int height) -> void;
 
-    [[nodiscard]] auto OverlayData() -> Vulkan_Overlay* { return reinterpret_cast<Vulkan_Overlay*>(&overlay_data_); };
+    [[nodiscard]] auto OverlayData() -> Vulkan_Overlay*
+    { return reinterpret_cast<Vulkan_Overlay*>(&overlay_data_); };
 
     auto Draw() -> void;
     auto Destroy() -> void;

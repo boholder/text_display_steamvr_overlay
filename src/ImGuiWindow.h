@@ -21,11 +21,20 @@ public:
     explicit ImGuiWindow();
     auto Initialize(VulkanRenderer*& renderer, const char* name, int width, int height, float dpiScale, bool show = true) -> void;
 
-    [[nodiscard]] auto Window() const -> SDL_Window* { return window_; };
-    [[nodiscard]] auto WindowData() -> Vulkan_Window* { return reinterpret_cast<Vulkan_Window*>(&window_data_); };
-    [[nodiscard]] auto Shown() const -> bool { return window_shown_; };
-    [[nodiscard]] auto Minimized() const -> bool { return window_minimized_; };
-    [[nodiscard]] auto KeyboardActive() const -> bool { return keyboard_active_; };
+    [[nodiscard]] auto Window() const -> SDL_Window*
+    { return window_; };
+
+    [[nodiscard]] auto WindowData() -> Vulkan_Window*
+    { return reinterpret_cast<Vulkan_Window*>(&window_data_); };
+
+    [[nodiscard]] auto Shown() const -> bool
+    { return window_shown_; };
+
+    [[nodiscard]] auto Minimized() const -> bool
+    { return window_minimized_; };
+
+    [[nodiscard]] auto KeyboardActive() const -> bool
+    { return keyboard_active_; };
 
     auto Hide() -> void;
     auto Show() -> void;
