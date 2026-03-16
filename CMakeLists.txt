@@ -22,10 +22,6 @@ if(NOT DEFINED ENABLE_VULKAN_DYNAMIC_RENDERING)
     set(ENABLE_VULKAN_DYNAMIC_RENDERING OFF CACHE BOOL "Enable Vulkan dynamic rendering" FORCE)
 endif()
 
-if(NOT DEFINED IMGUI_OPENVR_PLATFORM_BACKEND)
-    set(IMGUI_OPENVR_PLATFORM_BACKEND OFF CACHE BOOL "Headless OpenVR backend for ImGui" FORCE)
-endif()
-
 if(NOT DEFINED EXAMPLE_OVERLAY_TYPE_DASHBOARD)
     set(EXAMPLE_OVERLAY_TYPE_DASHBOARD OFF CACHE BOOL "Example Dashboard Overlay" FORCE)
 endif()
@@ -38,11 +34,6 @@ endif()
 
 # Vulkan validation layer adds extra reporting that may also catch validation layers orginating from external sources, ie. SteamVR
 set(ENABLE_VULKAN_VALIDATION ON)
-
-# ImGui backend configuration
-
-# Custom OpenVR backend built for headless overlay rendering, this is the most performant option if you don't need physical Window as it does not present a swapchain
-set(IMGUI_OPENVR_PLATFORM_BACKEND ON)
 
 # Example configuration
 

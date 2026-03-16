@@ -176,15 +176,8 @@ int main(
 
     g_vulkanRenderer->Initialize();
 
-#ifdef IMGUI_OPENVR_PLATFORM_BACKEND
     g_ImGuiOverlayWindow->Initialize(g_vulkanRenderer, g_overlay, WIN_WIDTH, WIN_HEIGHT);
-#else
-    float dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
-    g_imGuiWindow->Initialize(g_vulkanRenderer, APP_NAME, WIN_WIDTH, WIN_HEIGHT, dpiScale);
-    g_vulkanRenderer->SetupOverlay(WIN_WIDTH, WIN_HEIGHT, g_imGuiWindow->WindowData()->surface_format);
-#endif
 
-    SDL_Event event = {};
     vr::VREvent_t vr_event = {};
 
     while (g_ticking)
@@ -213,15 +206,11 @@ int main(
             }
         }
 
-#ifdef IMGUI_OPENVR_PLATFORM_BACKEND
         g_ImGuiOverlayWindow->Draw();
-#endif
 
         ImDrawData* draw_data = ImGui::GetDrawData();
 
-#ifdef IMGUI_OPENVR_PLATFORM_BACKEND
         g_vulkanRenderer->RenderOverlay(draw_data, g_overlay);
-#endif
 
         uint64_t target_time = static_cast<uint64_t>((static_cast<float>(1000000000) / g_hmd_refresh_rate));
         const uint64_t frame_duration = (SDL_GetTicksNS() - g_last_frame_time);
