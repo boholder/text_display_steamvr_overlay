@@ -350,4 +350,8 @@ CheckOptions:
     value:           '0'
   - key:             readability-static-accessed-through-instance.NameSpecifierNestingThreshold
     value:           '3'
+  - key:             readability-magic-numbers.IgnoreAllFloatingPointValues
+    value:           'true'
+  - key:             readability-magic-numbers.IgnoreUserDefinedLiterals
+    value:           'true'
 ...
