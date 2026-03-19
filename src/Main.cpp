@@ -128,7 +128,7 @@ static void create_window_overlay()
     g_overlay->Show();
 }
 
-/** Returns true if the application should quit */
+/** @return whether the application should quit */
 static bool handle_openvr_events(const VrOverlay* overlay)
 {
     static vr::VREvent_t vr_event = {};
@@ -222,7 +222,7 @@ bool init_resources()
     auto sdl_init_flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO;
     if (!SDL_Init(sdl_init_flags))
     {
-        printf("SDL_Init\n%s\n\n", SDL_GetError());
+        spdlog::error("Failed to initialize SDL: {}", SDL_GetError());
         return false;
     }
 #endif
@@ -255,8 +255,10 @@ void clean_resources()
     SDL_Quit();
 }
 
-void main_loop(bool& ticking)
+bool main_loop()
 {
+    bool ticking = true;
+
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
     static SDL_Event event = {};
     while (SDL_PollEvent(&event))
@@ -355,6 +357,8 @@ void main_loop(bool& ticking)
     }
 
     g_last_frame_time = SDL_GetTicksNS();
+
+    return ticking;
 }
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
@@ -366,7 +370,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
     bool ticking = true;
     while (ticking)
     {
-        main_loop(ticking);
+        ticking = main_loop();
     }
 
     spdlog::info("Quit event received, shutting down...");
