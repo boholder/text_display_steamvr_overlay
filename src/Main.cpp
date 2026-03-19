@@ -54,7 +54,9 @@ static ImGuiWindow* g_imGuiWindow = new ImGuiWindow();
 static ImGuiOverlayWindow* g_ImGuiOverlayWindow = new ImGuiOverlayWindow();
 static VrOverlay* g_overlay = new VrOverlay();
 
-static uint64_t g_last_frame_time = SDL_GetTicksNS();
+/**
+ * current refresh rate of the headset. retrieved at every frame
+ */
 static float g_hmd_refresh_rate = 24.0f;
 static float g_dpiScale = 0.0f;
 
@@ -348,15 +350,17 @@ bool main_loop()
 
     g_vulkanRenderer->RenderOverlay(draw_data, g_overlay);
 #endif
-    uint64_t target_time = static_cast<uint64_t>((static_cast<float>(1000000000) / g_hmd_refresh_rate));
-    const uint64_t frame_duration = (SDL_GetTicksNS() - g_last_frame_time);
 
-    if (frame_duration < target_time)
+    // If we rendered this frame faster than the headset needs, pause a little
+    static uint64_t last_frame_time = SDL_GetTicksNS();
+    const uint64_t device_frame_duration = static_cast<float>(1'000'000'000) / g_hmd_refresh_rate;
+    const uint64_t frame_duration = (SDL_GetTicksNS() - last_frame_time);
+    if (frame_duration < device_frame_duration)
     {
-        SDL_DelayPrecise(target_time - frame_duration);
+        SDL_DelayPrecise(device_frame_duration - frame_duration);
     }
 
-    g_last_frame_time = SDL_GetTicksNS();
+    last_frame_time = SDL_GetTicksNS();
 
     return ticking;
 }
