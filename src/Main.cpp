@@ -6,8 +6,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 #include <sstream>
 #include <fstream>
@@ -42,6 +42,8 @@
 
 #include "backends/imgui_impl_openvr.h"
 
+#include "constants.h"
+
 #ifdef _WIN32
 extern "C" __declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
 extern "C" __declspec(dllexport) unsigned long AmdPowerXpressRequestHighPerformance = 0x00000001;
@@ -55,9 +57,6 @@ static VrOverlay* g_overlay = new VrOverlay();
 static uint64_t g_last_frame_time = SDL_GetTicksNS();
 static float g_hmd_refresh_rate = 24.0f;
 static bool g_ticking = true;
-
-#define APP_KEY "github.VulkanOverlayExample"
-#define APP_NAME "Vulkan Overlay Example"
 
 #define WIN_WIDTH 1280
 #define WIN_HEIGHT 720
@@ -109,11 +108,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 
     try
     {
-        char overlay_key[100];
-        snprintf(overlay_key, 100, "%s-%d", APP_KEY, std::rand() % 1024); // chances of overlap? Slim.
-
 #ifdef EXAMPLE_OVERLAY_TYPE_DASHBOARD
-        g_overlay->Create(vr::VROverlayType_Dashboard, overlay_key, APP_NAME);
+        g_overlay->Create(vr::VROverlayType_Dashboard, DASHBOARD_KEY, DASHBOARD_NAME);
 
         // when overlay is VROverlayType_Dashboard we should set a thumbnail for the dashboard
         std::string thumbnail_path = {};
@@ -129,7 +125,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 #endif
 
 #ifdef EXAMPLE_OVERLAY_DEVICE_RELATIVE
-        g_overlay->Create(vr::VROverlayType_World, overlay_key, APP_NAME);
+        g_overlay->Create(vr::VROverlayType_World, WINDOW_KEY, WINDOW_NAME);
 
         g_overlay->SetInputMethod(vr::VROverlayInputMethod_Mouse);
         g_overlay->SetWidth(0.15f);
@@ -150,7 +146,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 #endif
 
 #ifdef EXAMPLE_OVERLAY_ORIGIN_RELATIVE
-        g_overlay->Create(vr::VROverlayType_World, overlay_key, APP_NAME);
+        g_overlay->Create(vr::VROverlayType_World, WINDOW_KEY, WINDOW_NAME);
 
         g_overlay->SetInputMethod(vr::VROverlayInputMethod_Mouse);
         g_overlay->SetWidth(1.0f);

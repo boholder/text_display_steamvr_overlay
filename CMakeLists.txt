@@ -79,10 +79,11 @@ message(STATUS "IMGUI_OPENVR_PLATFORM_BACKEND = ${IMGUI_OPENVR_PLATFORM_BACKEND}
 message(STATUS "IMGUI_SDL_PLATFORM_BACKEND = ${IMGUI_SDL_PLATFORM_BACKEND}")
 
 add_executable(${PNAME}
-    "src/Main.cpp"
-    "src/VulkanRenderer.cpp"
-    "src/ImGuiWindow.cpp"
-    "src/ImGuiOverlayWindow.cpp"
+        "src/Main.cpp"
+        "src/VulkanRenderer.cpp"
+        "src/ImGuiWindow.cpp"
+        "src/ImGuiOverlayWindow.cpp"
+        "src/constants.h"
 )
 
 target_compile_features(${PNAME} PUBLIC cxx_std_23)
