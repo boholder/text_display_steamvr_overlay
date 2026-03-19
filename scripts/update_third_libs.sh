@@ -1,5 +1,5 @@
-#!/bin/bash
-
+#!/usr/bin/env bash
+``
 INIT=$1
 
 OPENVR_VERSION_TAG="v2.12.14"

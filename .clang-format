@@ -1,7 +1,7 @@
 ---
 Language:        Cpp
 AccessModifierOffset: -4
-AlignAfterOpenBracket: Align
+AlignAfterOpenBracket: BlockIndent
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
 AlignEscapedNewlines: Right
@@ -91,12 +91,14 @@ SpaceAfterCStyleCast: true
 SpaceAfterTemplateKeyword: true
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeParens: ControlStatements
-SpaceInEmptyParentheses: false
 SpacesBeforeTrailingComments: 1
 SpacesInAngles:  false
 SpacesInContainerLiterals: true
-SpacesInCStyleCastParentheses: true
-SpacesInParentheses: false
+SpacesInParens: Custom
+SpacesInParensOptions:
+  InConditionalStatements: false
+  InCStyleCasts: true
+  InEmptyParentheses: false
 SpacesInSquareBrackets: false
 Standard:        c++20
 TabWidth:        4
