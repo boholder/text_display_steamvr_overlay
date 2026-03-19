@@ -62,9 +62,7 @@ struct Vulkan_Window
     bool is_minimized;
 
     Vulkan_Window()
-    {
-        memset((void*)this, 0, sizeof(*this));
-    }
+    { memset(( void* ) this, 0, sizeof(*this)); }
 };
 
 struct Vulkan_Overlay
@@ -83,9 +81,7 @@ struct Vulkan_Overlay
     VkClearValue clear_value;
 
     Vulkan_Overlay()
-    {
-        memset((void*)this, 0, sizeof(*this));
-    }
+    { memset(( void* ) this, 0, sizeof(*this)); }
 };
 
 class VulkanRenderer
@@ -94,16 +90,35 @@ public:
     explicit VulkanRenderer();
     auto Initialize() -> void;
 
-    [[nodiscard]] auto Instance() const -> VkInstance { return vulkan_instance_; }
-    [[nodiscard]] auto PhysicalDevice() const -> VkPhysicalDevice { return vulkan_physical_device_; }
-    [[nodiscard]] auto QueueFamily() const -> uint32_t { return vulkan_queue_family_; }
-    [[nodiscard]] auto Allocator() const -> VkAllocationCallbacks* { return vulkan_allocator_; }
-    [[nodiscard]] auto Device() const -> VkDevice { return vulkan_device_; }
-    [[nodiscard]] auto Queue() const -> VkQueue { return vulkan_queue_; }
-    [[nodiscard]] auto DescriptorPool() const -> VkDescriptorPool { return vulkan_descriptor_pool_; }
-    [[nodiscard]] auto PipelineCache() const -> VkPipelineCache { return vulkan_pipeline_cache_; }
-    [[nodiscard]] auto MinimumConcurrentImageCount() const -> uint32_t { return minimum_concurrent_image_count_; }
-    [[nodiscard]] auto ShouldRebuildSwapchain() const -> bool { return should_rebuild_swapchain_; }
+    [[nodiscard]] auto Instance() const -> VkInstance
+    { return vulkan_instance_; }
+
+    [[nodiscard]] auto PhysicalDevice() const -> VkPhysicalDevice
+    { return vulkan_physical_device_; }
+
+    [[nodiscard]] auto QueueFamily() const -> uint32_t
+    { return vulkan_queue_family_; }
+
+    [[nodiscard]] auto Allocator() const -> VkAllocationCallbacks*
+    { return vulkan_allocator_; }
+
+    [[nodiscard]] auto Device() const -> VkDevice
+    { return vulkan_device_; }
+
+    [[nodiscard]] auto Queue() const -> VkQueue
+    { return vulkan_queue_; }
+
+    [[nodiscard]] auto DescriptorPool() const -> VkDescriptorPool
+    { return vulkan_descriptor_pool_; }
+
+    [[nodiscard]] auto PipelineCache() const -> VkPipelineCache
+    { return vulkan_pipeline_cache_; }
+
+    [[nodiscard]] auto MinimumConcurrentImageCount() const -> uint32_t
+    { return minimum_concurrent_image_count_; }
+
+    [[nodiscard]] auto ShouldRebuildSwapchain() const -> bool
+    { return should_rebuild_swapchain_; }
 
     auto SetupWindow(Vulkan_Window* window, VkSurfaceKHR surface, uint32_t width, uint32_t height) -> void;
     auto SetupOverlay(uint32_t width, uint32_t height, VkSurfaceFormatKHR format) -> void;

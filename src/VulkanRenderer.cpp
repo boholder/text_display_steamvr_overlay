@@ -62,18 +62,14 @@ auto VulkanRenderer::Initialize() -> void
     instance_extensions.push_back("VK_EXT_debug_report");
 #endif
 
-    VkInstanceCreateInfo instance_create_info =
-    {
+    VkInstanceCreateInfo instance_create_info = {
         .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-        .enabledExtensionCount = (uint32_t)instance_extensions.size(),
+        .enabledExtensionCount = ( uint32_t ) instance_extensions.size(),
         .ppEnabledExtensionNames = instance_extensions.data(),
     };
 
 #ifdef ENABLE_VULKAN_VALIDATION
-    const char* enabled_layers[] =
-    {
-        "VK_LAYER_KHRONOS_validation"
-    };
+    const char* enabled_layers[] = { "VK_LAYER_KHRONOS_validation" };
     instance_create_info.enabledLayerCount = 1;
     instance_create_info.ppEnabledLayerNames = enabled_layers;
 #endif
@@ -82,28 +78,33 @@ auto VulkanRenderer::Initialize() -> void
     VK_VALIDATE_RESULT(vk_result);
 
 #ifdef ENABLE_VULKAN_VALIDATION
-    auto DebugReport = [](VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64_t object, size_t location, int32_t messageCode,
-                          const char* pLayerPrefix, const char* pMessage, void* pUserData) -> VkBool32
+    auto DebugReport = [](VkDebugReportFlagsEXT flags,
+                          VkDebugReportObjectTypeEXT objectType,
+                          uint64_t object,
+                          size_t location,
+                          int32_t messageCode,
+                          const char* pLayerPrefix,
+                          const char* pMessage,
+                          void* pUserData) -> VkBool32
     {
-        (void)flags;
-        (void)object;
-        (void)location;
-        (void)messageCode;
-        (void)pUserData;
-        (void)pLayerPrefix;
+        ( void ) flags;
+        ( void ) object;
+        ( void ) location;
+        ( void ) messageCode;
+        ( void ) pUserData;
+        ( void ) pLayerPrefix;
 
-        spdlog::error("[Vulkan] Debug report from ObjectType: [{}], message: {}", (int)objectType, pMessage);
+        spdlog::error("[Vulkan] Debug report from ObjectType: [{}], message: {}", ( int ) objectType, pMessage);
         return VK_FALSE;
     };
 
-    auto f_vkCreateDebugReportCallbackEXT = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(vulkan_instance_, "vkCreateDebugReportCallbackEXT");
-    VkDebugReportCallbackCreateInfoEXT debug_report_create_info =
-    {
-        .sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT,
-        .flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT,
-        .pfnCallback = DebugReport,
-        .pUserData = nullptr
-    };
+    auto f_vkCreateDebugReportCallbackEXT
+        = ( PFN_vkCreateDebugReportCallbackEXT ) vkGetInstanceProcAddr(vulkan_instance_, "vkCreateDebugReportCallbackEXT");
+    VkDebugReportCallbackCreateInfoEXT debug_report_create_info
+        = { .sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT,
+            .flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT,
+            .pfnCallback = DebugReport,
+            .pUserData = nullptr };
 
     vk_result = f_vkCreateDebugReportCallbackEXT(vulkan_instance_, &debug_report_create_info, vulkan_allocator_, &debug_report_);
     VK_VALIDATE_RESULT(vk_result);
@@ -142,7 +143,11 @@ auto VulkanRenderer::Initialize() -> void
     VkPhysicalDeviceProperties properties = {};
     vkGetPhysicalDeviceProperties(vulkan_physical_device_, &properties);
 
-    spdlog::info("Using device [{}], Discrete: [{}]", properties.deviceName, properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ? "Yes" : "No");
+    spdlog::info(
+        "Using device [{}], Discrete: [{}]",
+        properties.deviceName,
+        properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ? "Yes" : "No"
+    );
     assert(vulkan_physical_device_ != VK_NULL_HANDLE);
 
     uint32_t family_prop_count = {};
@@ -163,7 +168,7 @@ auto VulkanRenderer::Initialize() -> void
     }
 
     queues_properties.clear();
-    assert(vulkan_queue_family_ != (uint32_t) - 1);
+    assert(vulkan_queue_family_ != ( uint32_t ) -1);
 
     auto get_device_extensions = [&](const std::vector<std::string>& extensions) -> std::vector<const char*>
     {
@@ -196,36 +201,30 @@ auto VulkanRenderer::Initialize() -> void
     if (!should_enable_dynamic_rendering_)
         std::exit(EXIT_FAILURE);
 
-    vulkan_device_extensions_.insert(vulkan_device_extensions_.end(), {
-                                         VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
-                                         VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME,
-                                         VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME
-                                     });
+    vulkan_device_extensions_.insert(
+        vulkan_device_extensions_.end(),
+        { VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME }
+    );
 
     auto device_extensions = get_device_extensions(vulkan_device_extensions_);
 
     constexpr float queue_priority = 1.0f;
-    VkDeviceQueueCreateInfo device_queue_info =
-    {
-        .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-        .queueFamilyIndex = vulkan_queue_family_,
-        .queueCount = 1,
-        .pQueuePriorities = &queue_priority
-    };
+    VkDeviceQueueCreateInfo device_queue_info = { .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+                                                  .queueFamilyIndex = vulkan_queue_family_,
+                                                  .queueCount = 1,
+                                                  .pQueuePriorities = &queue_priority };
 
-    VkPhysicalDeviceDynamicRenderingFeaturesKHR dynamic_rendering_features =
-    {
+    VkPhysicalDeviceDynamicRenderingFeaturesKHR dynamic_rendering_features = {
         .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR,
         .dynamicRendering = true,
     };
 
-    VkDeviceCreateInfo device_create_info =
-    {
+    VkDeviceCreateInfo device_create_info = {
         .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
         .pNext = &dynamic_rendering_features,
         .queueCreateInfoCount = 1,
         .pQueueCreateInfos = &device_queue_info,
-        .enabledExtensionCount = (uint32_t)device_extensions.size(),
+        .enabledExtensionCount = ( uint32_t ) device_extensions.size(),
         .ppEnabledExtensionNames = device_extensions.data(),
     };
 
@@ -235,14 +234,10 @@ auto VulkanRenderer::Initialize() -> void
     vkGetDeviceQueue(vulkan_device_, vulkan_queue_family_, 0, &vulkan_queue_);
 
     VkDescriptorPoolSize pool_sizes[] = {
-        {
-            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            IMGUI_IMPL_VULKAN_MINIMUM_IMAGE_SAMPLER_POOL_SIZE
-        },
+        { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, IMGUI_IMPL_VULKAN_MINIMUM_IMAGE_SAMPLER_POOL_SIZE },
     };
 
-    VkDescriptorPoolCreateInfo pool_info =
-    {
+    VkDescriptorPoolCreateInfo pool_info = {
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
         .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
         .maxSets = 0,
@@ -251,15 +246,15 @@ auto VulkanRenderer::Initialize() -> void
     for (VkDescriptorPoolSize& pool_size : pool_sizes)
         pool_info.maxSets += pool_size.descriptorCount;
 
-    pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
+    pool_info.poolSizeCount = ( uint32_t ) IM_ARRAYSIZE(pool_sizes);
     pool_info.pPoolSizes = pool_sizes;
 
     vk_result = vkCreateDescriptorPool(vulkan_device_, &pool_info, vulkan_allocator_, &vulkan_descriptor_pool_);
     VK_VALIDATE_RESULT(vk_result);
 
-    this->f_vkCmdBeginRenderingKHR = (PFN_vkCmdBeginRenderingKHR)vkGetInstanceProcAddr(vulkan_instance_, "vkCmdBeginRenderingKHR");
+    this->f_vkCmdBeginRenderingKHR = ( PFN_vkCmdBeginRenderingKHR ) vkGetInstanceProcAddr(vulkan_instance_, "vkCmdBeginRenderingKHR");
     assert(f_vkCmdBeginRenderingKHR != nullptr);
-    this->f_vkCmdEndRenderingKHR = (PFN_vkCmdEndRenderingKHR)vkGetInstanceProcAddr(vulkan_instance_, "vkCmdEndRenderingKHR");
+    this->f_vkCmdEndRenderingKHR = ( PFN_vkCmdEndRenderingKHR ) vkGetInstanceProcAddr(vulkan_instance_, "vkCmdEndRenderingKHR");
     assert(f_vkCmdEndRenderingKHR != nullptr);
 }
 
@@ -270,7 +265,9 @@ auto VulkanRenderer::SetupWindow(Vulkan_Window* window, VkSurfaceKHR surface, ui
     window->surface = surface;
 
     VkBool32 result = {};
-    vk_result = vkGetPhysicalDeviceSurfaceSupportKHR(vulkan_physical_device_, vulkan_queue_family_, window->surface, &result); // Check for WSI support
+    vk_result = vkGetPhysicalDeviceSurfaceSupportKHR(
+        vulkan_physical_device_, vulkan_queue_family_, window->surface, &result
+    ); // Check for WSI support
     VK_VALIDATE_RESULT(vk_result);
 
     if (result != VK_TRUE)
@@ -281,8 +278,7 @@ auto VulkanRenderer::SetupWindow(Vulkan_Window* window, VkSurfaceKHR surface, ui
 
     // request R8G8B8A8 (RGBA, instead of ARGB) format for OpenVR
     // All compatible formats can be found at https://github.com/ValveSoftware/openvr/wiki/Vulkan#image-formats
-    VkSurfaceFormatKHR surface_format =
-    {
+    VkSurfaceFormatKHR surface_format = {
         .format = VK_FORMAT_R8G8B8A8_SRGB,
         .colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR // make sure colour space is non linear otherwise it will not render on AMD GPUs
     };
@@ -354,8 +350,7 @@ auto VulkanRenderer::SetupOverlay(uint32_t width, uint32_t height, VkSurfaceForm
     vulkan_overlay_->texture_format = format;
     vulkan_overlay_->clear_enable = true;
 
-    VkCommandPoolCreateInfo command_pool_create_info =
-    {
+    VkCommandPoolCreateInfo command_pool_create_info = {
         .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
         .flags = 0,
         .queueFamilyIndex = vulkan_queue_family_,
@@ -374,8 +369,7 @@ auto VulkanRenderer::SetupOverlay(uint32_t width, uint32_t height, VkSurfaceForm
     vk_result = vkAllocateCommandBuffers(vulkan_device_, &command_buffer_allocate_info, &vulkan_overlay_->command_buffer);
     VK_VALIDATE_RESULT(vk_result);
 
-    VkFenceCreateInfo fence_create_info =
-    {
+    VkFenceCreateInfo fence_create_info = {
         .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
         .flags = VK_FENCE_CREATE_SIGNALED_BIT,
     };
@@ -391,11 +385,8 @@ auto VulkanRenderer::SetupOverlay(uint32_t width, uint32_t height, VkSurfaceForm
 
     vkGetDeviceQueue(vulkan_device_, vulkan_queue_family_, 0, &vulkan_overlay_->queue);
 
-    VkCommandBufferBeginInfo begin_info =
-    {
-        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-        .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT
-    };
+    VkCommandBufferBeginInfo begin_info
+        = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO, .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT };
 
     vk_result = vkBeginCommandBuffer(vulkan_overlay_->command_buffer, &begin_info);
     VK_VALIDATE_RESULT(vk_result);
@@ -440,8 +431,7 @@ auto VulkanRenderer::SetupOverlay(uint32_t width, uint32_t height, VkSurfaceForm
     VkMemoryRequirements memory_requirements = {};
     vkGetImageMemoryRequirements(vulkan_device_, vulkan_overlay_->texture, &memory_requirements);
 
-    VkMemoryAllocateInfo memory_alloc_info =
-    {
+    VkMemoryAllocateInfo memory_alloc_info = {
         .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
         .allocationSize = memory_requirements.size,
         .memoryTypeIndex = find_memory_type_index(memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT),
@@ -452,7 +442,6 @@ auto VulkanRenderer::SetupOverlay(uint32_t width, uint32_t height, VkSurfaceForm
 
     vk_result = vkBindImageMemory(vulkan_device_, vulkan_overlay_->texture, vulkan_overlay_->texture_memory, 0);
     VK_VALIDATE_RESULT(vk_result);
-
 
     VkImageViewCreateInfo image_view_info =
     {
@@ -498,8 +487,18 @@ auto VulkanRenderer::SetupOverlay(uint32_t width, uint32_t height, VkSurfaceForm
         },
     };
 
-    vkCmdPipelineBarrier(vulkan_overlay_->command_buffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0,
-                         nullptr, 1, &barrier);
+    vkCmdPipelineBarrier(
+        vulkan_overlay_->command_buffer,
+        VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        0,
+        0,
+        nullptr,
+        0,
+        nullptr,
+        1,
+        &barrier
+    );
 
     vk_result = vkEndCommandBuffer(vulkan_overlay_->command_buffer);
     VK_VALIDATE_RESULT(vk_result);
@@ -563,8 +562,8 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
 
     uint32_t min_image_count = minimum_concurrent_image_count_;
 
-    if (window->present_mode != VK_PRESENT_MODE_SHARED_DEMAND_REFRESH_KHR && window->present_mode != VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR &&
-        surface_capabilities.minImageCount > min_image_count)
+    if (window->present_mode != VK_PRESENT_MODE_SHARED_DEMAND_REFRESH_KHR
+        && window->present_mode != VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR && surface_capabilities.minImageCount > min_image_count)
         min_image_count = surface_capabilities.minImageCount;
 
     if (min_image_count > surface_capabilities.maxImageCount)
@@ -574,31 +573,23 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
     window->height = height;
 
     // (0xFFFFFFFF, 0xFFFFFFFF) indicating that the surface size will be determined by the extent of a swapchain targeting the surface.
-    if (surface_capabilities.currentExtent.width != 0xffffffff &&
-        surface_capabilities.currentExtent.height != 0xffffffff
-    )
+    if (surface_capabilities.currentExtent.width != 0xffffffff && surface_capabilities.currentExtent.height != 0xffffffff)
     {
         window->width = surface_capabilities.currentExtent.width;
         window->height = surface_capabilities.currentExtent.height;
     }
 
-    VkSurfaceTransformFlagBitsKHR surface_transform_flags =
-        surface_capabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
-            ? VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
-            : surface_capabilities.currentTransform;
+    VkSurfaceTransformFlagBitsKHR surface_transform_flags = surface_capabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
+                                                                ? VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
+                                                                : surface_capabilities.currentTransform;
 
-    VkSwapchainCreateInfoKHR swapchain_create_info =
-    {
+    VkSwapchainCreateInfoKHR swapchain_create_info = {
         .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
         .surface = window->surface,
         .minImageCount = min_image_count,
         .imageFormat = window->surface_format.format,
         .imageColorSpace = window->surface_format.colorSpace,
-        .imageExtent =
-        {
-            .width = window->width,
-            .height = window->height
-        },
+        .imageExtent = { .width = window->width, .height = window->height },
         .imageArrayLayers = 1,
         .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
         .imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
@@ -637,9 +628,7 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
     {
         Vulkan_FrameSemaphore* fsd = &window->semaphores[idx];
 
-        VkSemaphoreCreateInfo semaphore_create_info = {
-            .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
-        };
+        VkSemaphoreCreateInfo semaphore_create_info = { .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
 
         vk_result = vkCreateSemaphore(vulkan_device_, &semaphore_create_info, vulkan_allocator_, &fsd->image_acquired_semaphore);
         VK_VALIDATE_RESULT(vk_result);
@@ -677,8 +666,7 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
         vk_result = vkCreateImageView(vulkan_device_, &image_view_info, vulkan_allocator_, &fd->backbuffer_view);
         VK_VALIDATE_RESULT(vk_result);
 
-        VkCommandPoolCreateInfo command_pool_create_info =
-        {
+        VkCommandPoolCreateInfo command_pool_create_info = {
             .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
             .flags = 0,
             .queueFamilyIndex = vulkan_queue_family_,
@@ -697,8 +685,7 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
         vk_result = vkAllocateCommandBuffers(vulkan_device_, &command_buffer_allocate_info, &fd->command_buffer);
         VK_VALIDATE_RESULT(vk_result);
 
-        VkFenceCreateInfo fence_create_info =
-        {
+        VkFenceCreateInfo fence_create_info = {
             .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
             .flags = VK_FENCE_CREATE_SIGNALED_BIT,
         };
@@ -706,11 +693,8 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
         vk_result = vkCreateFence(vulkan_device_, &fence_create_info, vulkan_allocator_, &fd->fence);
         VK_VALIDATE_RESULT(vk_result);
 
-        VkCommandBufferBeginInfo begin_info =
-        {
-            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-            .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT
-        };
+        VkCommandBufferBeginInfo begin_info
+            = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO, .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT };
 
         vk_result = vkBeginCommandBuffer(fd->command_buffer, &begin_info);
         VK_VALIDATE_RESULT(vk_result);
@@ -735,8 +719,18 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
             },
         };
 
-        vkCmdPipelineBarrier(fd->command_buffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr,
-                             1, &barrier);
+        vkCmdPipelineBarrier(
+            fd->command_buffer,
+            VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+            0,
+            0,
+            nullptr,
+            0,
+            nullptr,
+            1,
+            &barrier
+        );
 
         vk_result = vkEndCommandBuffer(fd->command_buffer);
         VK_VALIDATE_RESULT(vk_result);
@@ -770,7 +764,9 @@ auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, Vulkan_Window* window) 
     VkSemaphore image_acquired_semaphore = window->semaphores[window->semaphore_index].image_acquired_semaphore;
     VkSemaphore render_complete_semaphore = window->semaphores[window->semaphore_index].render_complete_semaphore;
 
-    vk_result = vkAcquireNextImageKHR(vulkan_device_, window->swapchain, UINT64_MAX, image_acquired_semaphore, VK_NULL_HANDLE, &window->frame_index);
+    vk_result = vkAcquireNextImageKHR(
+        vulkan_device_, window->swapchain, UINT64_MAX, image_acquired_semaphore, VK_NULL_HANDLE, &window->frame_index
+    );
     if (vk_result == VK_ERROR_OUT_OF_DATE_KHR || vk_result == VK_SUBOPTIMAL_KHR)
         should_rebuild_swapchain_ = true;
     if (vk_result == VK_ERROR_OUT_OF_DATE_KHR)
@@ -780,14 +776,12 @@ auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, Vulkan_Window* window) 
 
     Vulkan_Frame* fd = &window->frames[window->frame_index];
 
-    VkCommandBufferBeginInfo buffer_begin_info =
-    {
+    VkCommandBufferBeginInfo buffer_begin_info = {
         .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
         .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
     };
 
-    VkRenderingAttachmentInfoKHR color_attachment =
-    {
+    VkRenderingAttachmentInfoKHR color_attachment = {
         .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
         .imageView = fd->backbuffer_view,
         .imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -799,13 +793,11 @@ auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, Vulkan_Window* window) 
         .clearValue = window->clear_value,
     };
 
-    VkRenderingAttachmentInfoKHR depth_attachment =
-    {
+    VkRenderingAttachmentInfoKHR depth_attachment = {
         .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
     };
 
-    VkRenderingAttachmentInfoKHR stencil_attachment =
-    {
+    VkRenderingAttachmentInfoKHR stencil_attachment = {
         .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
     };
 
@@ -878,14 +870,12 @@ auto VulkanRenderer::RenderOverlay(ImDrawData* draw_data, VrOverlay*& overlay) -
     vulkan_overlay_->clear_value.color.float32[2] = background_color.z * background_color.w;
     vulkan_overlay_->clear_value.color.float32[3] = background_color.w;
 
-    VkCommandBufferBeginInfo buffer_begin_info =
-    {
+    VkCommandBufferBeginInfo buffer_begin_info = {
         .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
         .flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT,
     };
 
-    VkRenderingAttachmentInfoKHR color_attachment =
-    {
+    VkRenderingAttachmentInfoKHR color_attachment = {
         .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
         .imageView = vulkan_overlay_->texture_view,
         .imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -952,14 +942,23 @@ auto VulkanRenderer::RenderOverlay(ImDrawData* draw_data, VrOverlay*& overlay) -
         },
     };
 
-    vkCmdPipelineBarrier(vulkan_overlay_->command_buffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0,
-                         nullptr, 1, &barrier_optimal);
+    vkCmdPipelineBarrier(
+        vulkan_overlay_->command_buffer,
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        VK_PIPELINE_STAGE_TRANSFER_BIT,
+        0,
+        0,
+        nullptr,
+        0,
+        nullptr,
+        1,
+        &barrier_optimal
+    );
 
     vk_result = vkEndCommandBuffer(vulkan_overlay_->command_buffer);
     VK_VALIDATE_RESULT(vk_result);
 
-    VkSubmitInfo submit_info_barrier =
-    {
+    VkSubmitInfo submit_info_barrier = {
         .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
         .commandBufferCount = 1,
         .pCommandBuffers = &vulkan_overlay_->command_buffer,
@@ -968,23 +967,21 @@ auto VulkanRenderer::RenderOverlay(ImDrawData* draw_data, VrOverlay*& overlay) -
     vk_result = vkQueueSubmit(vulkan_overlay_->queue, 1, &submit_info_barrier, vulkan_overlay_->fence);
     VK_VALIDATE_RESULT(vk_result);
 
-    vr::VRVulkanTextureData_t vulkanTexure =
-    {
-        .m_nImage = (uintptr_t)vulkan_overlay_->texture,
+    vr::VRVulkanTextureData_t vulkanTexure = {
+        .m_nImage = ( uintptr_t ) vulkan_overlay_->texture,
         .m_pDevice = vulkan_device_,
         .m_pPhysicalDevice = vulkan_physical_device_,
         .m_pInstance = vulkan_instance_,
         .m_pQueue = vulkan_queue_,
-        .m_nQueueFamilyIndex = (uint32_t)vulkan_queue_family_,
+        .m_nQueueFamilyIndex = ( uint32_t ) vulkan_queue_family_,
         .m_nWidth = vulkan_overlay_->width,
         .m_nHeight = vulkan_overlay_->height,
-        .m_nFormat = (uint32_t)vulkan_overlay_->texture_format.format,
+        .m_nFormat = ( uint32_t ) vulkan_overlay_->texture_format.format,
         .m_nSampleCount = VK_SAMPLE_COUNT_1_BIT,
     };
 
-    vr::Texture_t vrTexture =
-    {
-        .handle = (void*)&vulkanTexure,
+    vr::Texture_t vrTexture = {
+        .handle = ( void* ) &vulkanTexure,
         .eType = vr::TextureType_Vulkan,
         .eColorSpace = vr::ColorSpace_Auto,
     };
@@ -1031,8 +1028,18 @@ auto VulkanRenderer::RenderOverlay(ImDrawData* draw_data, VrOverlay*& overlay) -
         },
     };
 
-    vkCmdPipelineBarrier(vulkan_overlay_->command_buffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0,
-                         nullptr, 1, &barrier_restore);
+    vkCmdPipelineBarrier(
+        vulkan_overlay_->command_buffer,
+        VK_PIPELINE_STAGE_TRANSFER_BIT,
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        0,
+        0,
+        nullptr,
+        0,
+        nullptr,
+        1,
+        &barrier_restore
+    );
 
     vk_result = vkEndCommandBuffer(vulkan_overlay_->command_buffer);
     VK_VALIDATE_RESULT(vk_result);
@@ -1050,8 +1057,7 @@ auto VulkanRenderer::Present(Vulkan_Window* window) -> void
 
     VkSemaphore render_complete_semaphore = window->semaphores[window->semaphore_index].render_complete_semaphore;
 
-    VkPresentInfoKHR info =
-    {
+    VkPresentInfoKHR info = {
         .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
         .waitSemaphoreCount = 1,
         .pWaitSemaphores = &render_complete_semaphore,
@@ -1151,7 +1157,8 @@ auto VulkanRenderer::Destroy() -> void
     VK_VALIDATE_RESULT(vk_result);
 
 #ifdef ENABLE_VULKAN_VALIDATION
-    auto f_vkDestroyDebugReportCallbackEXT = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr(vulkan_instance_, "vkDestroyDebugReportCallbackEXT");
+    auto f_vkDestroyDebugReportCallbackEXT
+        = ( PFN_vkDestroyDebugReportCallbackEXT ) vkGetInstanceProcAddr(vulkan_instance_, "vkDestroyDebugReportCallbackEXT");
     f_vkDestroyDebugReportCallbackEXT(vulkan_instance_, nullptr, vulkan_allocator_);
 #endif
 

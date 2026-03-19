@@ -56,11 +56,11 @@ static uint64_t g_last_frame_time = SDL_GetTicksNS();
 static float g_hmd_refresh_rate = 24.0f;
 static bool g_ticking = true;
 
-#define APP_KEY     "github.VulkanOverlayExample"
-#define APP_NAME    "Vulkan Overlay Example"
+#define APP_KEY "github.VulkanOverlayExample"
+#define APP_NAME "Vulkan Overlay Example"
 
-#define WIN_WIDTH   1280
-#define WIN_HEIGHT  720
+#define WIN_WIDTH 1280
+#define WIN_HEIGHT 720
 
 static auto UpdateApplicationRefreshRate() -> void
 {
@@ -78,10 +78,7 @@ static auto UpdateApplicationRefreshRate() -> void
     }
 }
 
-int main(
-    [[maybe_unused]] int argc,
-    [[maybe_unused]] char** argv
-)
+int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
     std::srand(std::time(nullptr));
 
@@ -101,7 +98,8 @@ int main(
 
     try
     {
-        if (!OpenVRManifestInstalled(APP_KEY)) OpenVRManifestInstall();
+        if (!OpenVRManifestInstalled(APP_KEY))
+            OpenVRManifestInstall();
     }
     catch (std::exception& ex)
     {
@@ -141,8 +139,9 @@ int main(
         g_overlay->EnableFlag(vr::VROverlayFlags_MakeOverlaysInteractiveIfVisible);
 
         // Device relative offset
-        glm::vec3 position = {-0.10, 0, 0.10};
-        glm::quat rotation = glm::angleAxis(glm::half_pi<float>(), glm::vec3(0, 1, 0)) * glm::angleAxis(-glm::half_pi<float>(), glm::vec3(1, 0, 0));
+        glm::vec3 position = { -0.10, 0, 0.10 };
+        glm::quat rotation
+            = glm::angleAxis(glm::half_pi<float>(), glm::vec3(0, 1, 0)) * glm::angleAxis(-glm::half_pi<float>(), glm::vec3(1, 0, 0));
         rotation *= glm::angleAxis(glm::radians(10.0f), glm::vec3(0, 1, 0));
         rotation = glm::normalize(rotation);
 
@@ -161,7 +160,7 @@ int main(
         g_overlay->EnableFlag(vr::VROverlayFlags_MakeOverlaysInteractiveIfVisible);
 
         // Origin relative offset
-        glm::vec3 position = {0.0f, 1.5f, -1.0f};
+        glm::vec3 position = { 0.0f, 1.5f, -1.0f };
         glm::quat rotation = glm::quat_identity<float, glm::defaultp>();
 
         g_overlay->SetTransformWorldRelative(vr::TrackingUniverseStanding, position, rotation);
@@ -218,38 +217,38 @@ int main(
             switch (vr_event.eventType)
             {
             case vr::VREvent_PropertyChanged:
+            {
+                // Some drivers such as lighthouse or vrlink are capable of changing
+                // vr::Prop_DisplayFrequency_Float without restarting SteamVR
+                if (vr_event.data.property.prop == vr::Prop_DisplayFrequency_Float)
                 {
-                    // Some drivers such as lighthouse or vrlink are capable of changing
-                    // vr::Prop_DisplayFrequency_Float without restarting SteamVR
-                    if (vr_event.data.property.prop == vr::Prop_DisplayFrequency_Float)
-                    {
-                        UpdateApplicationRefreshRate();
-                    }
-                    break;
+                    UpdateApplicationRefreshRate();
                 }
+                break;
+            }
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
             case vr::VREvent_OverlayShown:
+            {
+                if (g_overlay->IsVisible() && g_imGuiWindow->Shown())
                 {
-                    if (g_overlay->IsVisible() && g_imGuiWindow->Shown())
-                    {
-                        g_imGuiWindow->Hide();
-                    }
-                    break;
+                    g_imGuiWindow->Hide();
                 }
+                break;
+            }
             case vr::VREvent_OverlayHidden:
+            {
+                if (!g_overlay->IsVisible() && g_imGuiWindow->Shown())
                 {
-                    if (!g_overlay->IsVisible() && g_imGuiWindow->Shown())
-                    {
-                        g_imGuiWindow->Show();
-                    }
-                    break;
+                    g_imGuiWindow->Show();
                 }
+                break;
+            }
 #endif
             case vr::VREvent_Quit:
-                {
-                    g_ticking = false;
-                    return false;
-                }
+            {
+                g_ticking = false;
+                return false;
+            }
             }
         }
 
@@ -280,8 +279,9 @@ int main(
         fb_width *= static_cast<int>(dpiScale);
         fb_height *= static_cast<int>(dpiScale);
 
-        if ((fb_width != 0 && fb_height != 0) && (g_vulkanRenderer->ShouldRebuildSwapchain() || g_imGuiWindow->WindowData()->width != fb_width || g_imGuiWindow
-            ->WindowData()->height != fb_height))
+        if ((fb_width != 0 && fb_height != 0)
+            && (g_vulkanRenderer->ShouldRebuildSwapchain() || g_imGuiWindow->WindowData()->width != fb_width
+                || g_imGuiWindow->WindowData()->height != fb_height))
         {
             ImGui_ImplVulkan_SetMinImageCount(g_vulkanRenderer->MinimumConcurrentImageCount());
 

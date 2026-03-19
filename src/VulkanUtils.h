@@ -16,10 +16,10 @@
 
 #include <spdlog/spdlog.h>
 
-#define VK_VALIDATE_RESULT(e)                            \
-    if (e != VK_SUCCESS)                                 \
-        spdlog::error("[Vulkan] Error: VkResult = {}", (int)e); \
-    if (e > 0)                                           \
+#define VK_VALIDATE_RESULT(e)                                                                                                              \
+    if (e != VK_SUCCESS)                                                                                                                   \
+        spdlog::error("[Vulkan] Error: VkResult = {}", ( int ) e);                                                                         \
+    if (e > 0)                                                                                                                             \
         assert(e);
 
 static auto IsVulkanInstanceExtensionAvailable(std::string extension) -> bool

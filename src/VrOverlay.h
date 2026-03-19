@@ -21,26 +21,25 @@
 
 namespace vr
 {
-    enum VROverlayType
-    {
-        VROverlayType_None = 0,
-        VROverlayType_World = 1,
-        VROverlayType_Dashboard = 2,
-        VROverlayType_Subview = 3,
-    };
+enum VROverlayType
+{
+    VROverlayType_None = 0,
+    VROverlayType_World = 1,
+    VROverlayType_Dashboard = 2,
+    VROverlayType_Subview = 3,
+};
 }
 
 class VrOverlay
 {
 public:
     explicit VrOverlay()
-        : handle(vr::k_ulOverlayHandleInvalid),
-          thumbnail_handle(vr::k_ulOverlayHandleInvalid),
-          type_(vr::VROverlayType_None)
+        : handle(vr::k_ulOverlayHandleInvalid), thumbnail_handle(vr::k_ulOverlayHandleInvalid), type_(vr::VROverlayType_None)
     {
     }
 
-    [[nodiscard]] auto Handle() const -> vr::VROverlayHandle_t { return handle; }
+    [[nodiscard]] auto Handle() const -> vr::VROverlayHandle_t
+    { return handle; }
 
     [[maybe_unused]] auto Create(vr::VROverlayType type, const char* key, const char* name) -> void
     {
@@ -73,9 +72,7 @@ public:
         {
             vr::EVROverlayError result = vr::VROverlay()->SetOverlayFromFile(thumbnail_handle, path.data());
             if (result > vr::VROverlayError_None)
-                throw std::runtime_error(
-                    std::format("Failed to set overlay input method \"{}\": {}", path, static_cast<int>(result))
-                );
+                throw std::runtime_error(std::format("Failed to set overlay input method \"{}\": {}", path, static_cast<int>(result)));
             return;
         }
         throw std::runtime_error(std::format("You should only call SetThumbnail when the overlay type is VROverlayType_Dashboard"));
@@ -135,7 +132,7 @@ public:
 
     [[maybe_unused]] auto SetMouseScale(float x, float y) const -> void
     {
-        vr::HmdVector2_t scale = {x, y};
+        vr::HmdVector2_t scale = { x, y };
         vr::EVROverlayError result = vr::VROverlay()->SetOverlayMouseScale(handle, &scale);
         if (result > vr::VROverlayError_None)
             throw std::runtime_error(std::format("Failed to set mouse scale ({}, {}) {}", x, y, static_cast<int>(result)));
@@ -144,13 +141,21 @@ public:
     [[maybe_unused]] auto ShowKeyboard(vr::EGamepadTextInputMode mode, bool multi_line = false) -> void
     {
         vr::EVROverlayError result = vr::VROverlay()->ShowKeyboardForOverlay(
-            handle, mode, multi_line ? vr::k_EGamepadTextInputLineModeMultipleLines : vr::k_EGamepadTextInputLineModeSingleLine,
-            vr::KeyboardFlag_Minimal | vr::KeyboardFlag_HideDoneKey, "OpenVR Overlay Provided Virtual Keyboard", 1, "", 0);
+            handle,
+            mode,
+            multi_line ? vr::k_EGamepadTextInputLineModeMultipleLines : vr::k_EGamepadTextInputLineModeSingleLine,
+            vr::KeyboardFlag_Minimal | vr::KeyboardFlag_HideDoneKey,
+            "OpenVR Overlay Provided Virtual Keyboard",
+            1,
+            "",
+            0
+        );
         if (result > vr::VROverlayError_None)
             throw std::runtime_error(std::format("Failed to show keyboard {}", static_cast<int>(result)));
     }
 
-    [[maybe_unused]] auto SetTransformWorldRelative(vr::ETrackingUniverseOrigin origin, const glm::vec3& position, const glm::quat& rotation) const -> void
+    [[maybe_unused]] auto
+        SetTransformWorldRelative(vr::ETrackingUniverseOrigin origin, const glm::vec3& position, const glm::quat& rotation) const -> void
     {
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::toMat4(rotation);
 
@@ -167,7 +172,8 @@ public:
         vr::VROverlay()->SetOverlayTransformAbsolute(handle, origin, &m);
     }
 
-    [[maybe_unused]] auto SetTransformDeviceRelative(vr::ETrackedControllerRole role, const glm::vec3& position, const glm::quat& rotation) const -> void
+    [[maybe_unused]] auto
+        SetTransformDeviceRelative(vr::ETrackedControllerRole role, const glm::vec3& position, const glm::quat& rotation) const -> void
     {
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::toMat4(rotation);
 
@@ -194,29 +200,19 @@ public:
     }
 
     [[maybe_unused]] auto HideKeyboard() -> void
-    {
-        vr::VROverlay()->HideKeyboard();
-    }
+    { vr::VROverlay()->HideKeyboard(); }
 
     [[maybe_unused]] auto IsVisible() const -> bool
-    {
-        return vr::VROverlay()->IsOverlayVisible(handle);
-    }
+    { return vr::VROverlay()->IsOverlayVisible(handle); }
 
     [[maybe_unused]] auto Show() const -> void
-    {
-        vr::VROverlay()->ShowOverlay(handle);
-    }
+    { vr::VROverlay()->ShowOverlay(handle); }
 
     [[maybe_unused]] auto Hide() const -> void
-    {
-        vr::VROverlay()->HideOverlay(handle);
-    }
+    { vr::VROverlay()->HideOverlay(handle); }
 
     [[maybe_unused]] auto Destroy() const -> void
-    {
-        vr::VROverlay()->DestroyOverlay(handle);
-    }
+    { vr::VROverlay()->DestroyOverlay(handle); }
 
 private:
     vr::VROverlayHandle_t handle;

@@ -31,9 +31,7 @@ static auto OpenVRInit(vr::EVRApplicationType type) -> void
 }
 
 static auto OpenVRManifestInstalled(const char* appKey) -> bool
-{
-    return vr::VRApplications()->IsApplicationInstalled(appKey);
-}
+{ return vr::VRApplications()->IsApplicationInstalled(appKey); }
 
 static auto OpenVRManifestInstall() -> void
 {
@@ -50,11 +48,10 @@ class VrTrackedDeviceProperties
 {
 public:
     [[maybe_unused]] static auto FromDeviceIndex(uint32_t deviceIndex) -> VrTrackedDeviceProperties
-    {
-        return VrTrackedDeviceProperties{deviceIndex};
-    }
+    { return VrTrackedDeviceProperties{ deviceIndex }; }
 
-    [[nodiscard]] auto Handle() const -> vr::TrackedDeviceIndex_t { return handle; }
+    [[nodiscard]] auto Handle() const -> vr::TrackedDeviceIndex_t
+    { return handle; }
 
     [[maybe_unused]] auto CheckConnection() const -> void
     {
@@ -66,15 +63,18 @@ public:
     {
         vr::ETrackedPropertyError result = {};
         std::vector<char> buffer(vr::k_unMaxPropertyStringSize);
-        auto buffer_len = vr::VRSystem()->GetStringTrackedDeviceProperty(handle, property, buffer.data(), vr::k_unMaxPropertyStringSize, &result);
+        auto buffer_len
+            = vr::VRSystem()->GetStringTrackedDeviceProperty(handle, property, buffer.data(), vr::k_unMaxPropertyStringSize, &result);
         if (result != vr::TrackedProp_Success || buffer_len == 0)
         {
-            throw std::runtime_error(std::format(
-                "Failed to get string prop \"{}\" for {} (err={})",
-                static_cast<int>(property),
-                static_cast<int>(handle),
-                static_cast<int>(result)
-            ));
+            throw std::runtime_error(
+                std::format(
+                    "Failed to get string prop \"{}\" for {} (err={})",
+                    static_cast<int>(property),
+                    static_cast<int>(handle),
+                    static_cast<int>(result)
+                )
+            );
         }
 
         return buffer.data();
@@ -91,7 +91,8 @@ public:
                     static_cast<int>(property),
                     static_cast<int>(handle),
                     static_cast<int>(result)
-                ));
+                )
+            );
         return value;
     }
 
@@ -106,7 +107,8 @@ public:
                     static_cast<int>(property),
                     static_cast<int>(handle),
                     static_cast<int>(result)
-                ));
+                )
+            );
         return value;
     }
 
@@ -121,7 +123,8 @@ public:
                     static_cast<int>(property),
                     static_cast<int>(handle),
                     static_cast<int>(result)
-                ));
+                )
+            );
         return value;
     }
 
@@ -129,9 +132,7 @@ public:
     // [[maybe_unused]] auto GetArray(const vr::ETrackedDeviceProperty property) -> void { }
 
 private:
-    explicit VrTrackedDeviceProperties(const vr::TrackedDeviceIndex_t handle) : handle{handle}
-    {
-    }
+    explicit VrTrackedDeviceProperties(const vr::TrackedDeviceIndex_t handle) : handle{ handle } {}
 
     vr::TrackedDeviceIndex_t handle;
 };
