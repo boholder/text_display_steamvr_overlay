@@ -94,6 +94,40 @@ static void create_dashboard_overlay()
     g_overlay->EnableFlag(vr::VROverlayFlags_EnableClickStabilization);
 }
 
+static void create_window_overlay()
+{
+    g_overlay->Create(vr::VROverlayType_World, WINDOW_KEY, WINDOW_NAME);
+
+    g_overlay->SetInputMethod(vr::VROverlayInputMethod_Mouse);
+
+    g_overlay->EnableFlag(vr::VROverlayFlags_SendVRDiscreteScrollEvents);
+    g_overlay->EnableFlag(vr::VROverlayFlags_EnableClickStabilization);
+    g_overlay->EnableFlag(vr::VROverlayFlags_MakeOverlaysInteractiveIfVisible);
+
+#ifdef WINDOW_SET_DEVICE_RELATIVE
+    g_overlay->SetWidth(0.15f);
+
+    // Device relative offset
+    glm::vec3 position = { -0.10, 0, 0.10 };
+    glm::quat rotation
+        = glm::angleAxis(glm::half_pi<float>(), glm::vec3(0, 1, 0)) * glm::angleAxis(-glm::half_pi<float>(), glm::vec3(1, 0, 0));
+    rotation *= glm::angleAxis(glm::radians(10.0f), glm::vec3(0, 1, 0));
+    rotation = glm::normalize(rotation);
+
+    g_overlay->SetTransformDeviceRelative(vr::TrackedControllerRole_LeftHand, position, rotation);
+#elif WINDOW_SET_WORLD_RELATIVE
+    g_overlay->SetWidth(1.0f);
+
+    // Origin relative offset
+    glm::vec3 position = { 0.0f, 1.5f, -1.0f };
+    glm::quat rotation = glm::quat_identity<float, glm::defaultp>();
+
+    g_overlay->SetTransformWorldRelative(vr::TrackingUniverseStanding, position, rotation);
+#endif
+
+    g_overlay->Show();
+}
+
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
     // Initialize the overlay as "VRApplication_Background" instead of "VRApplication_Overlay"
@@ -124,45 +158,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
     try
     {
         create_dashboard_overlay();
-
-#ifdef EXAMPLE_OVERLAY_DEVICE_RELATIVE
-        g_overlay->Create(vr::VROverlayType_World, WINDOW_KEY, WINDOW_NAME);
-
-        g_overlay->SetInputMethod(vr::VROverlayInputMethod_Mouse);
-        g_overlay->SetWidth(0.15f);
-
-        g_overlay->EnableFlag(vr::VROverlayFlags_SendVRDiscreteScrollEvents);
-        g_overlay->EnableFlag(vr::VROverlayFlags_EnableClickStabilization);
-        g_overlay->EnableFlag(vr::VROverlayFlags_MakeOverlaysInteractiveIfVisible);
-
-        // Device relative offset
-        glm::vec3 position = { -0.10, 0, 0.10 };
-        glm::quat rotation
-            = glm::angleAxis(glm::half_pi<float>(), glm::vec3(0, 1, 0)) * glm::angleAxis(-glm::half_pi<float>(), glm::vec3(1, 0, 0));
-        rotation *= glm::angleAxis(glm::radians(10.0f), glm::vec3(0, 1, 0));
-        rotation = glm::normalize(rotation);
-
-        g_overlay->SetTransformDeviceRelative(vr::TrackedControllerRole_LeftHand, position, rotation);
-        g_overlay->Show();
-#endif
-
-#ifdef EXAMPLE_OVERLAY_ORIGIN_RELATIVE
-        g_overlay->Create(vr::VROverlayType_World, WINDOW_KEY, WINDOW_NAME);
-
-        g_overlay->SetInputMethod(vr::VROverlayInputMethod_Mouse);
-        g_overlay->SetWidth(1.0f);
-
-        g_overlay->EnableFlag(vr::VROverlayFlags_SendVRDiscreteScrollEvents);
-        g_overlay->EnableFlag(vr::VROverlayFlags_EnableClickStabilization);
-        g_overlay->EnableFlag(vr::VROverlayFlags_MakeOverlaysInteractiveIfVisible);
-
-        // Origin relative offset
-        glm::vec3 position = { 0.0f, 1.5f, -1.0f };
-        glm::quat rotation = glm::quat_identity<float, glm::defaultp>();
-
-        g_overlay->SetTransformWorldRelative(vr::TrackingUniverseStanding, position, rotation);
-        g_overlay->Show();
-#endif
+        create_window_overlay();
     }
     catch (std::exception& ex)
     {
