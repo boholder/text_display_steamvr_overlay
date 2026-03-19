@@ -56,6 +56,7 @@ static VrOverlay* g_overlay = new VrOverlay();
 
 static uint64_t g_last_frame_time = SDL_GetTicksNS();
 static float g_hmd_refresh_rate = 24.0f;
+static float g_dpiScale = 0.0f;
 
 #define WIN_WIDTH 1280
 #define WIN_HEIGHT 720
@@ -128,7 +129,7 @@ static void create_window_overlay()
 }
 
 /** Returns true if the application should quit */
-static bool handle_vr_event(const VrOverlay* overlay)
+static bool handle_openvr_events(const VrOverlay* overlay)
 {
     static vr::VREvent_t vr_event = {};
     while (vr::VROverlay()->PollNextOverlayEvent(overlay->Handle(), &vr_event, sizeof(vr_event))) // NOLINT(*-unroll-loops)
@@ -176,7 +177,10 @@ static bool handle_vr_event(const VrOverlay* overlay)
     return false;
 }
 
-int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
+/**
+ * @return whether initialization was successful
+ */
+bool init_resources()
 {
     // Initialize the overlay as "VRApplication_Background" instead of "VRApplication_Overlay"
     // This makes sure that the overlay *cannot* run while SteamVR is not running.
@@ -187,7 +191,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
     catch (std::exception& ex)
     {
         spdlog::error("Failed to initialize OpenVR: {}", ex.what());
-        return EXIT_FAILURE;
+        return false;
     }
 
     UpdateApplicationRefreshRate();
@@ -200,7 +204,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
     catch (std::exception& ex)
     {
         spdlog::error("Failed to install OpenVR manifest: {}", ex.what());
-        return EXIT_FAILURE;
+        return false;
     }
 
     try
@@ -211,7 +215,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
     catch (std::exception& ex)
     {
         spdlog::error("Failed to create or setup overlay: {}", ex.what());
-        return EXIT_FAILURE;
+        return false;
     }
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
@@ -219,7 +223,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
     if (!SDL_Init(sdl_init_flags))
     {
         printf("SDL_Init\n%s\n\n", SDL_GetError());
-        return EXIT_FAILURE;
+        return false;
     }
 #endif
 
@@ -228,114 +232,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
     g_ImGuiOverlayWindow->Initialize(g_vulkanRenderer, g_overlay, WIN_WIDTH, WIN_HEIGHT);
 #else
-    float dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
-    g_imGuiWindow->Initialize(g_vulkanRenderer, APP_NAME, WIN_WIDTH, WIN_HEIGHT, dpiScale);
+    g_dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+    g_imGuiWindow->Initialize(g_vulkanRenderer, APP_NAME, WIN_WIDTH, WIN_HEIGHT, g_dpiScale);
     g_vulkanRenderer->SetupOverlay(WIN_WIDTH, WIN_HEIGHT, g_imGuiWindow->WindowData()->surface_format);
 #endif
 
-    bool ticking = true;
-    while (ticking)
-    {
-#ifdef IMGUI_SDL_PLATFORM_BACKEND
-        static SDL_Event event = {};
-        while (SDL_PollEvent(&event))
-        {
-            ImGui_ImplSDL3_ProcessEvent(&event);
+    return true;
+}
 
-            if (event.type == SDL_EVENT_WINDOW_MINIMIZED && event.window.windowID == SDL_GetWindowID(g_imGuiWindow->Window()))
-                g_imGuiWindow->SetMinimizedFromEvent(true);
-            if (event.type == SDL_EVENT_WINDOW_RESTORED && event.window.windowID == SDL_GetWindowID(g_imGuiWindow->Window()))
-                g_imGuiWindow->SetMinimizedFromEvent(false);
-            if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(g_imGuiWindow->Window()))
-                ticking = false;
-        }
-#endif
-
-        if (handle_vr_event(g_overlay))
-        {
-            ticking = false;
-        }
-
-#ifdef IMGUI_OPENVR_PLATFORM_BACKEND
-        g_ImGuiOverlayWindow->Draw();
-#endif
-
-#ifdef IMGUI_SDL_PLATFORM_BACKEND
-        {
-            ImGuiIO& io = ImGui::GetIO();
-
-            if (!io.WantTextInput)
-            {
-                g_imGuiWindow->SetKeyboardActiveState(false);
-            }
-
-            if (g_overlay->IsVisible() && !g_imGuiWindow->KeyboardActive() && io.WantTextInput)
-            {
-                g_overlay->ShowKeyboard(vr::k_EGamepadTextInputModeNormal);
-                g_imGuiWindow->SetKeyboardActiveState(true);
-            }
-        }
-
-        int fb_width = {};
-        int fb_height = {};
-        SDL_GetWindowSize(g_imGuiWindow->Window(), &fb_width, &fb_height);
-
-        fb_width *= static_cast<int>(dpiScale);
-        fb_height *= static_cast<int>(dpiScale);
-
-        if ((fb_width != 0 && fb_height != 0)
-            && (g_vulkanRenderer->ShouldRebuildSwapchain() || g_imGuiWindow->WindowData()->width != fb_width
-                || g_imGuiWindow->WindowData()->height != fb_height))
-        {
-            ImGui_ImplVulkan_SetMinImageCount(g_vulkanRenderer->MinimumConcurrentImageCount());
-
-            g_imGuiWindow->WindowData()->width = fb_width;
-            g_imGuiWindow->WindowData()->width = fb_height;
-
-            g_vulkanRenderer->SetupSwapchain(g_imGuiWindow->WindowData(), fb_width, fb_height);
-            g_imGuiWindow->WindowData()->frame_index = 0;
-        }
-
-        g_overlay->SetMouseScale(fb_width, fb_height);
-        g_imGuiWindow->Draw();
-#endif
-
-        ImDrawData* draw_data = ImGui::GetDrawData();
-
-#ifdef IMGUI_OPENVR_PLATFORM_BACKEND
-        g_vulkanRenderer->RenderOverlay(draw_data, g_overlay);
-#endif
-
-#ifdef IMGUI_SDL_PLATFORM_BACKEND
-        const ImVec4 background_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-        g_imGuiWindow->WindowData()->clear_value.color.float32[0] = background_color.x * background_color.w;
-        g_imGuiWindow->WindowData()->clear_value.color.float32[1] = background_color.y * background_color.w;
-        g_imGuiWindow->WindowData()->clear_value.color.float32[2] = background_color.z * background_color.w;
-        g_imGuiWindow->WindowData()->clear_value.color.float32[3] = background_color.w;
-
-        const bool is_minimized = g_imGuiWindow->Shown() && g_imGuiWindow->Minimized();
-        g_imGuiWindow->WindowData()->is_minimized = is_minimized;
-
-        if (!is_minimized)
-        {
-            g_vulkanRenderer->RenderWindow(draw_data, g_imGuiWindow->WindowData());
-            g_vulkanRenderer->Present(g_imGuiWindow->WindowData());
-        }
-
-        g_vulkanRenderer->RenderOverlay(draw_data, g_overlay);
-#endif
-        uint64_t target_time = static_cast<uint64_t>((static_cast<float>(1000000000) / g_hmd_refresh_rate));
-        const uint64_t frame_duration = (SDL_GetTicksNS() - g_last_frame_time);
-
-        if (frame_duration < target_time)
-        {
-            SDL_DelayPrecise(target_time - frame_duration);
-        }
-
-        g_last_frame_time = SDL_GetTicksNS();
-    }
-
+void clean_resources()
+{
     VkResult vk_result = vkDeviceWaitIdle(g_vulkanRenderer->Device());
     VK_VALIDATE_RESULT(vk_result);
 
@@ -347,6 +253,123 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
     ImGui::DestroyContext();
 
     SDL_Quit();
+}
 
-    return 0;
+void main_loop(bool& ticking)
+{
+#ifdef IMGUI_SDL_PLATFORM_BACKEND
+    static SDL_Event event = {};
+    while (SDL_PollEvent(&event))
+    {
+        ImGui_ImplSDL3_ProcessEvent(&event);
+
+        if (event.type == SDL_EVENT_WINDOW_MINIMIZED && event.window.windowID == SDL_GetWindowID(g_imGuiWindow->Window()))
+            g_imGuiWindow->SetMinimizedFromEvent(true);
+        if (event.type == SDL_EVENT_WINDOW_RESTORED && event.window.windowID == SDL_GetWindowID(g_imGuiWindow->Window()))
+            g_imGuiWindow->SetMinimizedFromEvent(false);
+        if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(g_imGuiWindow->Window()))
+            ticking = false;
+    }
+#endif
+
+    if (handle_openvr_events(g_overlay))
+    {
+        ticking = false;
+    }
+
+#ifdef IMGUI_OPENVR_PLATFORM_BACKEND
+    g_ImGuiOverlayWindow->Draw();
+#endif
+
+#ifdef IMGUI_SDL_PLATFORM_BACKEND
+    {
+        ImGuiIO& io = ImGui::GetIO();
+
+        if (!io.WantTextInput)
+        {
+            g_imGuiWindow->SetKeyboardActiveState(false);
+        }
+
+        if (g_overlay->IsVisible() && !g_imGuiWindow->KeyboardActive() && io.WantTextInput)
+        {
+            g_overlay->ShowKeyboard(vr::k_EGamepadTextInputModeNormal);
+            g_imGuiWindow->SetKeyboardActiveState(true);
+        }
+    }
+
+    int fb_width = {};
+    int fb_height = {};
+    SDL_GetWindowSize(g_imGuiWindow->Window(), &fb_width, &fb_height);
+
+    fb_width *= static_cast<int>(g_dpiScale);
+    fb_height *= static_cast<int>(g_dpiScale);
+
+    if ((fb_width != 0 && fb_height != 0)
+        && (g_vulkanRenderer->ShouldRebuildSwapchain() || g_imGuiWindow->WindowData()->width != fb_width
+            || g_imGuiWindow->WindowData()->height != fb_height))
+    {
+        ImGui_ImplVulkan_SetMinImageCount(g_vulkanRenderer->MinimumConcurrentImageCount());
+
+        g_imGuiWindow->WindowData()->width = fb_width;
+        g_imGuiWindow->WindowData()->width = fb_height;
+
+        g_vulkanRenderer->SetupSwapchain(g_imGuiWindow->WindowData(), fb_width, fb_height);
+        g_imGuiWindow->WindowData()->frame_index = 0;
+    }
+
+    g_overlay->SetMouseScale(fb_width, fb_height);
+    g_imGuiWindow->Draw();
+#endif
+
+    ImDrawData* draw_data = ImGui::GetDrawData();
+
+#ifdef IMGUI_OPENVR_PLATFORM_BACKEND
+    g_vulkanRenderer->RenderOverlay(draw_data, g_overlay);
+#endif
+
+#ifdef IMGUI_SDL_PLATFORM_BACKEND
+    const ImVec4 background_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+    g_imGuiWindow->WindowData()->clear_value.color.float32[0] = background_color.x * background_color.w;
+    g_imGuiWindow->WindowData()->clear_value.color.float32[1] = background_color.y * background_color.w;
+    g_imGuiWindow->WindowData()->clear_value.color.float32[2] = background_color.z * background_color.w;
+    g_imGuiWindow->WindowData()->clear_value.color.float32[3] = background_color.w;
+
+    const bool is_minimized = g_imGuiWindow->Shown() && g_imGuiWindow->Minimized();
+    g_imGuiWindow->WindowData()->is_minimized = is_minimized;
+
+    if (!is_minimized)
+    {
+        g_vulkanRenderer->RenderWindow(draw_data, g_imGuiWindow->WindowData());
+        g_vulkanRenderer->Present(g_imGuiWindow->WindowData());
+    }
+
+    g_vulkanRenderer->RenderOverlay(draw_data, g_overlay);
+#endif
+    uint64_t target_time = static_cast<uint64_t>((static_cast<float>(1000000000) / g_hmd_refresh_rate));
+    const uint64_t frame_duration = (SDL_GetTicksNS() - g_last_frame_time);
+
+    if (frame_duration < target_time)
+    {
+        SDL_DelayPrecise(target_time - frame_duration);
+    }
+
+    g_last_frame_time = SDL_GetTicksNS();
+}
+
+int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
+{
+    if (!init_resources())
+        return EXIT_FAILURE;
+    spdlog::info("Successfully initialized");
+
+    bool ticking = true;
+    while (ticking)
+    {
+        main_loop(ticking);
+    }
+
+    spdlog::info("Quit event received, shutting down...");
+    clean_resources();
+    return EXIT_SUCCESS;
 }
