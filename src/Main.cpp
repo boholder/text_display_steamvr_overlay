@@ -96,8 +96,6 @@ static void create_dashboard_overlay()
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
-    std::srand(std::time(nullptr));
-
     // Initialize the overlay as "VRApplication_Background" instead of "VRApplication_Overlay"
     // This makes sure that the overlay *cannot* run while SteamVR is not running.
     try
