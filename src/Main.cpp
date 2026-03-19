@@ -77,6 +77,23 @@ static auto UpdateApplicationRefreshRate() -> void
     }
 }
 
+static void create_dashboard_overlay()
+{
+    g_overlay->Create(vr::VROverlayType_Dashboard, DASHBOARD_KEY, DASHBOARD_NAME);
+
+    // when overlay is VROverlayType_Dashboard we should set a thumbnail for the dashboard
+    std::string thumbnail_path = {};
+    thumbnail_path += SDL_GetCurrentDirectory();
+    thumbnail_path += "icon.png";
+    g_overlay->SetThumbnail(thumbnail_path);
+
+    g_overlay->SetInputMethod(vr::VROverlayInputMethod_Mouse);
+    g_overlay->SetWidth(2.5f);
+
+    g_overlay->EnableFlag(vr::VROverlayFlags_SendVRDiscreteScrollEvents);
+    g_overlay->EnableFlag(vr::VROverlayFlags_EnableClickStabilization);
+}
+
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
     std::srand(std::time(nullptr));
@@ -108,21 +125,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 
     try
     {
-#ifdef EXAMPLE_OVERLAY_TYPE_DASHBOARD
-        g_overlay->Create(vr::VROverlayType_Dashboard, DASHBOARD_KEY, DASHBOARD_NAME);
-
-        // when overlay is VROverlayType_Dashboard we should set a thumbnail for the dashboard
-        std::string thumbnail_path = {};
-        thumbnail_path += SDL_GetCurrentDirectory();
-        thumbnail_path += "icon.png";
-        g_overlay->SetThumbnail(thumbnail_path);
-
-        g_overlay->SetInputMethod(vr::VROverlayInputMethod_Mouse);
-        g_overlay->SetWidth(2.5f);
-
-        g_overlay->EnableFlag(vr::VROverlayFlags_SendVRDiscreteScrollEvents);
-        g_overlay->EnableFlag(vr::VROverlayFlags_EnableClickStabilization);
-#endif
+        create_dashboard_overlay();
 
 #ifdef EXAMPLE_OVERLAY_DEVICE_RELATIVE
         g_overlay->Create(vr::VROverlayType_World, WINDOW_KEY, WINDOW_NAME);

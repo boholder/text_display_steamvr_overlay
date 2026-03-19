@@ -33,6 +33,7 @@ Checks:          '*,
     -llvmlibc-*,
     -misc-string-compare,
     -misc-unused-using-decls,
+    -misc-use-anonymous-namespace,
     -modernize-loop-convert,
     -modernize-make-unique,
     -modernize-use-auto,
@@ -229,4 +230,5 @@ CheckOptions:
   readability-magic-numbers.IgnoreAllFloatingPointValues: true
   readability-magic-numbers.IgnoreUserDefinedLiterals: true
   cppcoreguidelines-macro-usage.AllowedRegexp: '^DEBUG_|^WINDOW_|^APP_|^DASHBOARD_'
+  misc-use-anonymous-namespace: false
 ...
