@@ -3,6 +3,9 @@
 > [!WARNING]
 > Work in progress, not ready for use.
 
+> [!WARNING]
+> This project is made with Vulkan 1.3+ in mind, thus it couldn't run on pre-2016 GPU like GTX 7xx, even if the GPU is supported by SteamVR.
+
 An OpenVR overlay that displays text sent from other software.
 
 ## Build
