@@ -56,7 +56,6 @@ static VrOverlay* g_overlay = new VrOverlay();
 
 static uint64_t g_last_frame_time = SDL_GetTicksNS();
 static float g_hmd_refresh_rate = 24.0f;
-static bool g_ticking = true;
 
 #define WIN_WIDTH 1280
 #define WIN_HEIGHT 720
@@ -128,6 +127,55 @@ static void create_window_overlay()
     g_overlay->Show();
 }
 
+/** Returns true if the application should quit */
+static bool handle_vr_event(const VrOverlay* overlay)
+{
+    static vr::VREvent_t vr_event = {};
+    while (vr::VROverlay()->PollNextOverlayEvent(overlay->Handle(), &vr_event, sizeof(vr_event))) // NOLINT(*-unroll-loops)
+    {
+        ImGui_ImplOpenVR_ProcessOverlayEvent(vr_event);
+
+        switch (vr_event.eventType)
+        {
+        case vr::VREvent_PropertyChanged:
+        {
+            // Some drivers such as lighthouse or vrlink are capable of changing
+            // vr::Prop_DisplayFrequency_Float without restarting SteamVR
+            if (vr_event.data.property.prop == vr::Prop_DisplayFrequency_Float)
+            {
+                UpdateApplicationRefreshRate();
+            }
+            break;
+        }
+#ifdef IMGUI_SDL_PLATFORM_BACKEND
+        case vr::VREvent_OverlayShown:
+        {
+            if (overlay->IsVisible() && g_imGuiWindow->Shown())
+            {
+                g_imGuiWindow->Hide();
+            }
+            break;
+        }
+        case vr::VREvent_OverlayHidden:
+        {
+            if (!overlay->IsVisible() && g_imGuiWindow->Shown())
+            {
+                g_imGuiWindow->Show();
+            }
+            break;
+        }
+#endif
+        case vr::VREvent_Quit:
+        {
+            return true;
+        }
+        default:
+            break;
+        }
+    }
+    return false;
+}
+
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
     // Initialize the overlay as "VRApplication_Background" instead of "VRApplication_Overlay"
@@ -185,12 +233,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
     g_vulkanRenderer->SetupOverlay(WIN_WIDTH, WIN_HEIGHT, g_imGuiWindow->WindowData()->surface_format);
 #endif
 
-    SDL_Event event = {};
-    vr::VREvent_t vr_event = {};
-
-    while (g_ticking)
+    bool ticking = true;
+    while (ticking)
     {
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
+        static SDL_Event event = {};
         while (SDL_PollEvent(&event))
         {
             ImGui_ImplSDL3_ProcessEvent(&event);
@@ -200,49 +247,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
             if (event.type == SDL_EVENT_WINDOW_RESTORED && event.window.windowID == SDL_GetWindowID(g_imGuiWindow->Window()))
                 g_imGuiWindow->SetMinimizedFromEvent(false);
             if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(g_imGuiWindow->Window()))
-                g_ticking = false;
+                ticking = false;
         }
 #endif
-        while (vr::VROverlay()->PollNextOverlayEvent(g_overlay->Handle(), &vr_event, sizeof(vr_event)))
-        {
-            ImGui_ImplOpenVR_ProcessOverlayEvent(vr_event);
 
-            switch (vr_event.eventType)
-            {
-            case vr::VREvent_PropertyChanged:
-            {
-                // Some drivers such as lighthouse or vrlink are capable of changing
-                // vr::Prop_DisplayFrequency_Float without restarting SteamVR
-                if (vr_event.data.property.prop == vr::Prop_DisplayFrequency_Float)
-                {
-                    UpdateApplicationRefreshRate();
-                }
-                break;
-            }
-#ifdef IMGUI_SDL_PLATFORM_BACKEND
-            case vr::VREvent_OverlayShown:
-            {
-                if (g_overlay->IsVisible() && g_imGuiWindow->Shown())
-                {
-                    g_imGuiWindow->Hide();
-                }
-                break;
-            }
-            case vr::VREvent_OverlayHidden:
-            {
-                if (!g_overlay->IsVisible() && g_imGuiWindow->Shown())
-                {
-                    g_imGuiWindow->Show();
-                }
-                break;
-            }
-#endif
-            case vr::VREvent_Quit:
-            {
-                g_ticking = false;
-                return false;
-            }
-            }
+        if (handle_vr_event(g_overlay))
+        {
+            ticking = false;
         }
 
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
