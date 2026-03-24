@@ -29,16 +29,8 @@ enum VulkanExtensionType
 };
 
 static bool
-    IsVulkanExtensionAvailable(const VulkanExtensionType type, const VkPhysicalDevice& physical_device, const std::string& extension)
+IsVulkanExtensionAvailable(const VulkanExtensionType type, const VkPhysicalDevice& physical_device, const std::string& extension)
 {
-    auto is_available = [](const std::vector<VkExtensionProperties>& properties, const std::string& extension)
-    {
-        for (const VkExtensionProperties& p : properties)
-            if (strcmp(p.extensionName, extension.c_str()) == 0)
-                return true;
-        return false;
-    };
-
     auto get_properties = [=](const VkPhysicalDevice& d, uint32_t& c, VkExtensionProperties* p)
     {
         if (type == INSTANCE)
@@ -67,7 +59,12 @@ static bool
         std::exit(EXIT_FAILURE);
     }
 
-    return is_available(extension_properties, extension);
+    for (const VkExtensionProperties& p : extension_properties)
+    {
+        if (strcmp(p.extensionName, extension.c_str()) == 0)
+            return true;
+    }
+    return false;
 }
 
 static std::vector<std::string> GetVulkanExtensionsRequiredByOpenVR(const VulkanExtensionType type, const VkPhysicalDevice& device)
@@ -104,7 +101,7 @@ static std::vector<std::string> GetVulkanExtensionsRequiredByOpenVR(const Vulkan
         std::istringstream token_stream(buffer.data());
         while (std::getline(token_stream, token, ' '))
         {
-            if (IsVulkanExtensionAvailable(type, nullptr, token))
+            if (IsVulkanExtensionAvailable(type, device, token))
             {
                 result.push_back(token);
             }

@@ -222,6 +222,11 @@ CheckOptions:
   readability-function-size.ParameterThreshold: 4294967295
   readability-function-size.StatementThreshold: 800
   readability-identifier-naming.IgnoreFailedSplit: false
+  readability-identifier-length.MinimumExceptionNameLength: 1
+  readability-identifier-length.MinimumLoopCounterNameLength: 1
+  readability-identifier-length.MinimumObjectPointerNameLength: 1
+  readability-identifier-length.MinimumParameterNameLength: 1
+  readability-identifier-length.MinimumVariableNameLength: 1
   readability-implicit-bool-conversion.AllowIntegerConditions: false
   readability-implicit-bool-conversion.AllowPointerConditions: false
   readability-simplify-boolean-expr.ChainedConditionalAssignment: false
