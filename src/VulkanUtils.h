@@ -39,9 +39,9 @@ static bool
         return false;
     };
 
-    auto get_properties = [](const VulkanExtensionType t, const VkPhysicalDevice& d, uint32_t& c, VkExtensionProperties* p)
+    auto get_properties = [=](const VkPhysicalDevice& d, uint32_t& c, VkExtensionProperties* p)
     {
-        if (t == INSTANCE)
+        if (type == INSTANCE)
         {
             vkEnumerateInstanceExtensionProperties(nullptr, &c, p);
         }
@@ -54,12 +54,12 @@ static bool
     uint32_t extension_properties_count = {};
     std::vector<VkExtensionProperties> extension_properties = {};
 
-    get_properties(type, physical_device, extension_properties_count, nullptr);
+    get_properties(physical_device, extension_properties_count, nullptr);
 
     if (extension_properties_count > 0)
     {
         extension_properties.resize(extension_properties_count);
-        get_properties(type, physical_device, extension_properties_count, extension_properties.data());
+        get_properties(physical_device, extension_properties_count, extension_properties.data());
     }
     else
     {
@@ -70,8 +70,20 @@ static bool
     return is_available(extension_properties, extension);
 }
 
-static auto GetVulkanInstanceExtensionsRequiredByOpenVR() -> std::vector<std::string>
+static std::vector<std::string> GetVulkanExtensionsRequiredByOpenVR(const VulkanExtensionType type, const VkPhysicalDevice& device)
 {
+    auto get_extensions = [=](VkPhysicalDevice_T* d, char* b, uint32_t s)
+    {
+        if (type == INSTANCE)
+        {
+            return vr::VRCompositor()->GetVulkanInstanceExtensionsRequired(b, s);
+        }
+        else
+        {
+            return vr::VRCompositor()->GetVulkanDeviceExtensionsRequired(d, b, s);
+        }
+    };
+
     std::vector<std::string> result{};
 
     if (!vr::VRCompositor())
@@ -79,12 +91,12 @@ static auto GetVulkanInstanceExtensionsRequiredByOpenVR() -> std::vector<std::st
         std::exit(EXIT_FAILURE);
     }
 
-    uint32_t buffer_len = vr::VRCompositor()->GetVulkanInstanceExtensionsRequired(nullptr, 0);
+    uint32_t buffer_len = get_extensions(device, nullptr, 0);
     if (buffer_len > 0)
     {
         // get required extensions into buffer
         std::vector<char> buffer(buffer_len + 1);
-        vr::VRCompositor()->GetVulkanInstanceExtensionsRequired(buffer.data(), buffer_len);
+        get_extensions(device, buffer.data(), buffer_len);
         buffer[buffer_len] = '\0';
 
         // check if each extension is available
@@ -92,7 +104,7 @@ static auto GetVulkanInstanceExtensionsRequiredByOpenVR() -> std::vector<std::st
         std::istringstream token_stream(buffer.data());
         while (std::getline(token_stream, token, ' '))
         {
-            if (IsVulkanExtensionAvailable(INSTANCE, nullptr, token))
+            if (IsVulkanExtensionAvailable(type, nullptr, token))
             {
                 result.push_back(token);
             }
@@ -106,46 +118,6 @@ static auto GetVulkanInstanceExtensionsRequiredByOpenVR() -> std::vector<std::st
     else
     {
         spdlog::error("NO Vulkan instance extension asked by OpenVR, exit");
-        std::exit(EXIT_FAILURE);
-    }
-
-    return result;
-}
-
-static auto GetVulkanDeviceExtensionsRequiredByOpenVR(const VkPhysicalDevice& device) -> std::vector<std::string>
-{
-    std::vector<std::string> result{};
-
-    if (!vr::VRCompositor())
-    {
-        std::exit(EXIT_FAILURE);
-    }
-
-    uint32_t buffer_len = vr::VRCompositor()->GetVulkanDeviceExtensionsRequired(device, nullptr, 0);
-    if (buffer_len > 0)
-    {
-        std::vector<char> buffer(buffer_len + 1);
-        vr::VRCompositor()->GetVulkanDeviceExtensionsRequired(device, buffer.data(), buffer_len);
-        buffer[buffer_len] = '\0';
-
-        std::string token{};
-        std::istringstream token_stream(buffer.data());
-        while (std::getline(token_stream, token, ' '))
-        {
-            if (IsVulkanExtensionAvailable(DEVICE, device, token))
-            {
-                result.push_back(token);
-            }
-            else
-            {
-                spdlog::error("[{}] device extension asked by OpenVR was NOT available, exit", token);
-                std::exit(EXIT_FAILURE);
-            }
-        }
-    }
-    else
-    {
-        spdlog::error("NO Vulkan device extension asked by OpenVR, exit");
         std::exit(EXIT_FAILURE);
     }
 

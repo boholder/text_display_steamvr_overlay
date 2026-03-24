@@ -55,7 +55,7 @@ auto VulkanRenderer::Initialize() -> void
         return result;
     };
 
-    vulkan_instance_extensions_ = GetVulkanInstanceExtensionsRequiredByOpenVR();
+    vulkan_instance_extensions_ = GetVulkanExtensionsRequiredByOpenVR(INSTANCE, nullptr);
     auto instance_extensions = get_instance_extensions(vulkan_instance_extensions_);
 
 #ifdef ENABLE_VULKAN_VALIDATION
@@ -178,7 +178,7 @@ auto VulkanRenderer::Initialize() -> void
         return result;
     };
 
-    vulkan_device_extensions_ = GetVulkanDeviceExtensionsRequiredByOpenVR(vulkan_physical_device_);
+    vulkan_device_extensions_ = GetVulkanExtensionsRequiredByOpenVR(DEVICE, vulkan_physical_device_);
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
     if (!IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_SWAPCHAIN_EXTENSION_NAME))
