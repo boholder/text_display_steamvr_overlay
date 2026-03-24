@@ -22,9 +22,16 @@
     if (e > 0)                                                                                                                             \
         assert(e);
 
-static auto IsVulkanInstanceExtensionAvailable(std::string extension) -> bool
+enum VulkanExtensionType
 {
-    auto IsExtensionAvailable = [](const std::vector<VkExtensionProperties>& properties, std::string extension)
+    DEVICE,
+    INSTANCE
+};
+
+static bool
+    IsVulkanExtensionAvailable(const VulkanExtensionType type, const VkPhysicalDevice& physical_device, const std::string& extension)
+{
+    auto is_available = [](const std::vector<VkExtensionProperties>& properties, const std::string& extension)
     {
         for (const VkExtensionProperties& p : properties)
             if (strcmp(p.extensionName, extension.c_str()) == 0)
@@ -32,50 +39,35 @@ static auto IsVulkanInstanceExtensionAvailable(std::string extension) -> bool
         return false;
     };
 
-    uint32_t extension_properties_count = {};
-    std::vector<VkExtensionProperties> extension_properties = {};
-
-    vkEnumerateInstanceExtensionProperties(nullptr, &extension_properties_count, nullptr);
-
-    if (extension_properties_count > 0)
+    auto get_properties = [](const VulkanExtensionType t, const VkPhysicalDevice& d, uint32_t& c, VkExtensionProperties* p)
     {
-        extension_properties.resize(extension_properties_count);
-        vkEnumerateInstanceExtensionProperties(nullptr, &extension_properties_count, extension_properties.data());
-    }
-    else
-    {
-        std::exit(EXIT_FAILURE);
-    }
-
-    return IsExtensionAvailable(extension_properties, extension);
-}
-
-static auto IsVulkanDeviceExtensionAvailable(const VkPhysicalDevice& physical_device, std::string extension) -> bool
-{
-    auto IsExtensionAvailable = [](const std::vector<VkExtensionProperties>& properties, std::string extension)
-    {
-        for (const VkExtensionProperties& p : properties)
-            if (strcmp(p.extensionName, extension.c_str()) == 0)
-                return true;
-        return false;
+        if (t == INSTANCE)
+        {
+            vkEnumerateInstanceExtensionProperties(nullptr, &c, p);
+        }
+        else
+        {
+            vkEnumerateDeviceExtensionProperties(d, nullptr, &c, p);
+        }
     };
 
     uint32_t extension_properties_count = {};
     std::vector<VkExtensionProperties> extension_properties = {};
 
-    vkEnumerateDeviceExtensionProperties(physical_device, nullptr, &extension_properties_count, nullptr);
+    get_properties(type, physical_device, extension_properties_count, nullptr);
 
     if (extension_properties_count > 0)
     {
         extension_properties.resize(extension_properties_count);
-        vkEnumerateDeviceExtensionProperties(physical_device, nullptr, &extension_properties_count, extension_properties.data());
+        get_properties(type, physical_device, extension_properties_count, extension_properties.data());
     }
     else
     {
+        spdlog::error("No Vulkan extension properties found, exit");
         std::exit(EXIT_FAILURE);
     }
 
-    return IsExtensionAvailable(extension_properties, extension);
+    return is_available(extension_properties, extension);
 }
 
 static auto GetVulkanInstanceExtensionsRequiredByOpenVR() -> std::vector<std::string>
@@ -100,7 +92,7 @@ static auto GetVulkanInstanceExtensionsRequiredByOpenVR() -> std::vector<std::st
         std::istringstream token_stream(buffer.data());
         while (std::getline(token_stream, token, ' '))
         {
-            if (IsVulkanInstanceExtensionAvailable(token))
+            if (IsVulkanExtensionAvailable(INSTANCE, nullptr, token))
             {
                 result.push_back(token);
             }
@@ -140,7 +132,7 @@ static auto GetVulkanDeviceExtensionsRequiredByOpenVR(const VkPhysicalDevice& de
         std::istringstream token_stream(buffer.data());
         while (std::getline(token_stream, token, ' '))
         {
-            if (IsVulkanDeviceExtensionAvailable(device, token.data()))
+            if (IsVulkanExtensionAvailable(DEVICE, device, token))
             {
                 result.push_back(token);
             }

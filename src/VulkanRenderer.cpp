@@ -181,7 +181,7 @@ auto VulkanRenderer::Initialize() -> void
     vulkan_device_extensions_ = GetVulkanDeviceExtensionsRequiredByOpenVR(vulkan_physical_device_);
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
-    if (!IsVulkanDeviceExtensionAvailable(vulkan_physical_device_, VK_KHR_SWAPCHAIN_EXTENSION_NAME))
+    if (!IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_SWAPCHAIN_EXTENSION_NAME))
         std::exit(EXIT_FAILURE);
 
     vulkan_device_extensions_.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
@@ -189,13 +189,13 @@ auto VulkanRenderer::Initialize() -> void
 
     should_enable_dynamic_rendering_ = true;
 
-    if (!IsVulkanDeviceExtensionAvailable(vulkan_physical_device_, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME))
+    if (!IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME))
         should_enable_dynamic_rendering_ = false;
 
-    if (!IsVulkanDeviceExtensionAvailable(vulkan_physical_device_, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME))
+    if (!IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME))
         should_enable_dynamic_rendering_ = false;
 
-    if (!IsVulkanDeviceExtensionAvailable(vulkan_physical_device_, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME))
+    if (!IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME))
         should_enable_dynamic_rendering_ = false;
 
     if (!should_enable_dynamic_rendering_)
