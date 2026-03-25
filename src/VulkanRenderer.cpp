@@ -121,7 +121,7 @@ auto VulkanRenderer::Initialize() -> void
     vk_result = vkEnumeratePhysicalDevices(vulkan_instance_, &device_count, device_list_.data());
     VK_VALIDATE_RESULT(vk_result);
 
-    // TODO: multi device support
+    // TO DO: multi device support
     for (VkPhysicalDevice& device : device_list_)
     {
         VkPhysicalDeviceProperties properties = {};
@@ -283,7 +283,7 @@ auto VulkanRenderer::SetupWindow(Vulkan_Window* window, VkSurfaceKHR surface, ui
         .colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR // make sure colour space is non linear otherwise it will not render on AMD GPUs
     };
 
-    // TODO: validate if surface format is available on the current hardware.
+    // TO DO: validate if surface format is available on the current hardware.
 
     uint32_t mode_count = {};
     vkGetPhysicalDeviceSurfacePresentModesKHR(vulkan_physical_device_, window->surface, &mode_count, nullptr);

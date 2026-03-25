@@ -190,7 +190,7 @@ public:
         vr::VROverlay()->SetOverlayTransformTrackedDeviceRelative(handle, vr::VRSystem()->GetTrackedDeviceIndexForControllerRole(role), &m);
     }
 
-    // TODO: SetOverlayTransformTrackedDeviceComponent if needed
+    // TO DO: SetOverlayTransformTrackedDeviceComponent if needed
 
     [[maybe_unused]] auto TriggerLaserMouseHapticVibration(float duration, float frequency, float amplitude) const -> void
     {

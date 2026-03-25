@@ -128,7 +128,7 @@ public:
         return value;
     }
 
-    // TODO: implement
+    // TO DO: implement
     // [[maybe_unused]] auto GetArray(const vr::ETrackedDeviceProperty property) -> void { }
 
 private:
