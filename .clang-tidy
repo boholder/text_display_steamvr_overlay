@@ -176,6 +176,7 @@ CheckOptions:
   misc-suspicious-string-compare.WarnOnImplicitComparison: true
   misc-suspicious-string-compare.WarnOnLogicalNotComparison: false
   misc-throw-by-value-catch-by-reference.CheckThrowTemporaries: true
+  misc-include-cleaner.MissingIncludes: false
   modernize-loop-convert.MaxCopySize: '16'
   modernize-loop-convert.MinConfidence: reasonable
   modernize-loop-convert.NamingStyle: CamelCase
