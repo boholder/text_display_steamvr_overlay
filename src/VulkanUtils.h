@@ -17,9 +17,9 @@
 #include <spdlog/spdlog.h>
 
 #define VK_VALIDATE_RESULT(e)                                                                                                              \
-    if (e != VK_SUCCESS)                                                                                                                   \
-        spdlog::error("[Vulkan] Error: VkResult = {}", ( int ) e);                                                                         \
-    if (e > 0)                                                                                                                             \
+    if ((e) != VK_SUCCESS)                                                                                                                   \
+        spdlog::error("[Vulkan] Vulkan operation result is not VK_SUCCESS: {}", ( int ) (e));                                                                         \
+    if ((e) > 0)                                                                                                                             \
         assert(e);
 
 enum VulkanExtensionType
@@ -55,7 +55,7 @@ IsVulkanExtensionAvailable(const VulkanExtensionType type, const VkPhysicalDevic
     }
     else
     {
-        spdlog::error("No Vulkan {} extension properties found in local, exit", type == INSTANCE ? "instance" : "device");
+        spdlog::error("[Vulkan] No Vulkan {} extension properties found in local, exit", type == INSTANCE ? "instance" : "device");
         std::exit(EXIT_FAILURE);
     }
 
@@ -107,14 +107,14 @@ static std::vector<std::string> GetVulkanExtensionsRequiredByOpenVR(const Vulkan
             }
             else
             {
-                spdlog::error("[{}] {} extension asked by OpenVR was NOT available, exit", type == INSTANCE ? "instance" : "device", token);
+                spdlog::error("[Vulkan] [{}] {} extension asked by OpenVR was NOT available, exit", type == INSTANCE ? "instance" : "device", token);
                 std::exit(EXIT_FAILURE);
             }
         }
     }
     else
     {
-        spdlog::error("NO Vulkan {} extension asked by OpenVR, exit", type == INSTANCE ? "instance" : "device");
+        spdlog::error("[Vulkan] NO Vulkan {} extension asked by OpenVR, exit", type == INSTANCE ? "instance" : "device");
         std::exit(EXIT_FAILURE);
     }
 
