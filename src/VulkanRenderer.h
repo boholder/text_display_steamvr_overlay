@@ -138,9 +138,19 @@ private:
 
     VkInstance vulkan_instance_;
     VkPhysicalDevice vulkan_physical_device_;
+    /**
+     * the index of the queue family,
+     * the graphics queue belongs to the queue family
+     */
     std::atomic<uint32_t> vulkan_queue_family_;
     VkAllocationCallbacks* vulkan_allocator_;
+    /**
+     * logical device
+     */
     VkDevice vulkan_device_;
+    /**
+     * graphics queue handle, from logical device, used for rendering
+     */
     VkQueue vulkan_queue_;
     VkDescriptorPool vulkan_descriptor_pool_;
     VkPipelineCache vulkan_pipeline_cache_;

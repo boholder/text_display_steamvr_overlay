@@ -43,11 +43,18 @@ VulkanRenderer::VulkanRenderer()
     vulkan_overlay_ = std::make_unique<Vulkan_Overlay>();
 }
 
+/**
+ * - create vulkan instance
+ * - choose a physical device
+ * - create vulkan logical device
+ * - get graphics queue
+ * - create descriptor pool
+ */
 auto VulkanRenderer::Initialize() -> void
 {
     VkResult vk_result = {};
 
-    auto get_instance_extensions = [](const std::vector<std::string>& extensions) -> std::vector<const char*>
+    auto convert_str_to_char_arr = [](const std::vector<std::string>& extensions) -> std::vector<const char*>
     {
         std::vector<const char*> result;
         for (auto& extension : extensions)
@@ -55,8 +62,9 @@ auto VulkanRenderer::Initialize() -> void
         return result;
     };
 
+    // prepare instance extensions
     vulkan_instance_extensions_ = GetVulkanExtensionsRequiredByOpenVR(INSTANCE, nullptr);
-    auto instance_extensions = get_instance_extensions(vulkan_instance_extensions_);
+    auto instance_extensions = convert_str_to_char_arr(vulkan_instance_extensions_);
 
 #ifdef ENABLE_VULKAN_VALIDATION
     instance_extensions.push_back("VK_EXT_debug_report");
@@ -74,6 +82,7 @@ auto VulkanRenderer::Initialize() -> void
     instance_create_info.ppEnabledLayerNames = enabled_layers;
 #endif
 
+    // create vulkan instance
     vk_result = vkCreateInstance(&instance_create_info, vulkan_allocator_, &vulkan_instance_);
     VK_VALIDATE_RESULT(vk_result);
 
@@ -110,6 +119,7 @@ auto VulkanRenderer::Initialize() -> void
     VK_VALIDATE_RESULT(vk_result);
 #endif
 
+    // choose a physical device to use
     uint32_t device_count = {};
     vk_result = vkEnumeratePhysicalDevices(vulkan_instance_, &device_count, nullptr);
     VK_VALIDATE_RESULT(vk_result);
@@ -121,6 +131,7 @@ auto VulkanRenderer::Initialize() -> void
     vk_result = vkEnumeratePhysicalDevices(vulkan_instance_, &device_count, device_list_.data());
     VK_VALIDATE_RESULT(vk_result);
 
+    // prefer discrete (i.e., dedicated) GPU
     // TO DO: multi device support
     for (VkPhysicalDevice& device : device_list_)
     {
@@ -144,12 +155,14 @@ auto VulkanRenderer::Initialize() -> void
     vkGetPhysicalDeviceProperties(vulkan_physical_device_, &properties);
 
     spdlog::info(
-        "Using device [{}], Discrete: [{}]",
+        "[Vulkan] Using device [{}], discrete: [{}]",
         properties.deviceName,
         properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ? "Yes" : "No"
     );
     assert(vulkan_physical_device_ != VK_NULL_HANDLE);
 
+    // find a graphics-capable queue family on the selected GPU
+    // queue family is used to indicate how to render
     uint32_t family_prop_count = {};
     vkGetPhysicalDeviceQueueFamilyProperties(vulkan_physical_device_, &family_prop_count, nullptr);
 
@@ -170,14 +183,7 @@ auto VulkanRenderer::Initialize() -> void
     queues_properties.clear();
     assert(vulkan_queue_family_ != ( uint32_t ) -1);
 
-    auto get_device_extensions = [&](const std::vector<std::string>& extensions) -> std::vector<const char*>
-    {
-        std::vector<const char*> result = {};
-        for (auto& extension : vulkan_device_extensions_)
-            result.push_back(extension.c_str());
-        return result;
-    };
-
+    // get device extensions
     vulkan_device_extensions_ = GetVulkanExtensionsRequiredByOpenVR(DEVICE, vulkan_physical_device_);
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
@@ -187,27 +193,23 @@ auto VulkanRenderer::Initialize() -> void
     vulkan_device_extensions_.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 #endif
 
-    should_enable_dynamic_rendering_ = true;
+    const bool has_dynamic_rendering_support
+        = IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)
+          && IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME)
+          && IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME);
 
-    if (!IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME))
-        should_enable_dynamic_rendering_ = false;
-
-    if (!IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME))
-        should_enable_dynamic_rendering_ = false;
-
-    if (!IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME))
-        should_enable_dynamic_rendering_ = false;
-
-    if (!should_enable_dynamic_rendering_)
+    if (!has_dynamic_rendering_support)
         std::exit(EXIT_FAILURE);
 
+    should_enable_dynamic_rendering_ = has_dynamic_rendering_support;
     vulkan_device_extensions_.insert(
         vulkan_device_extensions_.end(),
         { VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME }
     );
 
-    auto device_extensions = get_device_extensions(vulkan_device_extensions_);
+    auto device_extensions = convert_str_to_char_arr(vulkan_device_extensions_);
 
+    // create logical device
     constexpr float queue_priority = 1.0f;
     VkDeviceQueueCreateInfo device_queue_info = { .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
                                                   .queueFamilyIndex = vulkan_queue_family_,
@@ -241,13 +243,12 @@ auto VulkanRenderer::Initialize() -> void
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
         .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
         .maxSets = 0,
+        .poolSizeCount = static_cast<uint32_t>(IM_ARRAYSIZE(pool_sizes)),
+        .pPoolSizes = pool_sizes
     };
 
-    for (VkDescriptorPoolSize& pool_size : pool_sizes)
+    for (VkDescriptorPoolSize const& pool_size : pool_sizes)
         pool_info.maxSets += pool_size.descriptorCount;
-
-    pool_info.poolSizeCount = ( uint32_t ) IM_ARRAYSIZE(pool_sizes);
-    pool_info.pPoolSizes = pool_sizes;
 
     vk_result = vkCreateDescriptorPool(vulkan_device_, &pool_info, vulkan_allocator_, &vulkan_descriptor_pool_);
     VK_VALIDATE_RESULT(vk_result);
