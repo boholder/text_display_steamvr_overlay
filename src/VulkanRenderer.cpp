@@ -257,13 +257,11 @@ auto VulkanRenderer::Initialize() -> void
         { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, IMGUI_IMPL_VULKAN_MINIMUM_IMAGE_SAMPLER_POOL_SIZE },
     };
 
-    VkDescriptorPoolCreateInfo pool_info = {
-        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-        .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
-        .maxSets = 0,
-        .poolSizeCount = static_cast<uint32_t>(IM_ARRAYSIZE(pool_sizes)),
-        .pPoolSizes = pool_sizes
-    };
+    VkDescriptorPoolCreateInfo pool_info = { .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+                                             .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
+                                             .maxSets = 0,
+                                             .poolSizeCount = static_cast<uint32_t>(IM_ARRAYSIZE(pool_sizes)),
+                                             .pPoolSizes = pool_sizes };
 
     for (VkDescriptorPoolSize const& pool_size : pool_sizes)
         pool_info.maxSets += pool_size.descriptorCount;
@@ -364,7 +362,7 @@ auto VulkanRenderer::SetupOverlay(uint32_t index, uint32_t width, uint32_t heigh
 {
     VkResult vk_result = {};
 
-    auto *ovl = overlays_.at(index).get();
+    auto* ovl = overlays_.at(index).get();
 
     ovl->width = width;
     ovl->height = height;
@@ -884,7 +882,7 @@ auto VulkanRenderer::RenderOverlay(uint32_t index, ImDrawData* draw_data, VrOver
 
     VkResult vk_result = {};
 
-    auto *ovl = overlays_.at(index).get();
+    auto* ovl = overlays_.at(index).get();
 
     const ImVec4 background_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     /// NOTE: suboptimal
