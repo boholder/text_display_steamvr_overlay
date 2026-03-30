@@ -65,9 +65,17 @@ auto VulkanRenderer::Initialize() -> void
         return result;
     };
 
+#ifdef NO_VR
+    std::vector instance_extensions = {
+        VK_KHR_SURFACE_EXTENSION_NAME,
+        "VK_KHR_win32_surface",
+        VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
+    };
+#else
     // prepare instance extensions
     vulkan_instance_extensions_ = GetVulkanExtensionsRequiredByOpenVR(INSTANCE, nullptr);
     auto instance_extensions = convert_str_to_char_arr(vulkan_instance_extensions_);
+#endif
 
 #ifdef ENABLE_VULKAN_VALIDATION
     instance_extensions.push_back("VK_EXT_debug_report");
@@ -186,8 +194,15 @@ auto VulkanRenderer::Initialize() -> void
     queues_properties.clear();
     assert(vulkan_queue_family_ != ( uint32_t ) -1);
 
+#ifdef NO_VR
+    vulkan_device_extensions_ = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME,
+        VK_KHR_MULTIVIEW_EXTENSION_NAME, VK_KHR_MAINTENANCE_2_EXTENSION_NAME,
+    };
+#else
     // get device extensions
     vulkan_device_extensions_ = GetVulkanExtensionsRequiredByOpenVR(DEVICE, vulkan_physical_device_);
+#endif
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
     if (!IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_SWAPCHAIN_EXTENSION_NAME))

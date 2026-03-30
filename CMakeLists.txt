@@ -38,6 +38,10 @@ if(NOT DEFINED WINDOW_SET_WORLD_RELATIVE)
     set(IMGUI_SDL_PLATFORM_BACKEND OFF CACHE BOOL "Example Origin Relative World Overlay" FORCE)
 endif()
 
+if(NOT DEFINED NO_VR)
+    set(NO_VR OFF CACHE BOOL "Disable VR for easier debugging" FORCE)
+endif()
+
 # Renderer configuration
 
 # Vulkan validation layer adds extra reporting that may also catch validation layers orginating from external sources, ie. SteamVR
@@ -113,6 +117,10 @@ endif()
 
 if (WINDOW_SET_WORLD_RELATIVE)
     add_definitions(-DWINDOW_SET_WORLD_RELATIVE)
+endif()
+
+if (NO_VR)
+    add_definitions(-DNO_VR)
 endif()
 
 add_custom_target(${PNAME}_resources)

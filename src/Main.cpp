@@ -184,6 +184,9 @@ static bool handle_openvr_events(const VrOverlay* overlay)
  */
 bool init_resources()
 {
+#ifdef NO_VR
+    spdlog::info("Skipping OpenVR initialization");
+#else
     // Initialize the overlay as "VRApplication_Background" instead of "VRApplication_Overlay"
     // This makes sure that the overlay *cannot* run while SteamVR is not running.
     try
@@ -219,6 +222,7 @@ bool init_resources()
         spdlog::error("Failed to create or setup overlay: {}", ex.what());
         return false;
     }
+#endif
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
     auto sdl_init_flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO;
@@ -247,9 +251,13 @@ void clean_resources()
     VkResult vk_result = vkDeviceWaitIdle(g_vulkanRenderer->Device());
     VK_VALIDATE_RESULT(vk_result);
 
-    g_ImGuiOverlayWindow->Destroy();
-    g_vulkanRenderer->DestroyWindow(g_imGuiWindow->WindowData());
-    g_imGuiWindow->Destroy(g_vulkanRenderer);
+    if (g_ImGuiOverlayWindow){}
+        g_ImGuiOverlayWindow->Destroy();
+    if (g_imGuiWindow)
+    {
+        g_vulkanRenderer->DestroyWindow(g_imGuiWindow->WindowData());
+        g_imGuiWindow->Destroy(g_vulkanRenderer);
+    }
     g_vulkanRenderer->Destroy();
 
     ImGui::DestroyContext();
@@ -276,10 +284,12 @@ bool main_loop()
     }
 #endif
 
+#ifndef NO_VR
     if (handle_openvr_events(g_overlay))
     {
         ticking = false;
     }
+#endif
 
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
     g_ImGuiOverlayWindow->Draw();
@@ -294,11 +304,13 @@ bool main_loop()
             g_imGuiWindow->SetKeyboardActiveState(false);
         }
 
-        if (g_overlay->IsVisible() && !g_imGuiWindow->KeyboardActive() && io.WantTextInput)
+#ifndef NO_VR
+        if (g_overlay && g_overlay->IsVisible() && !g_imGuiWindow->KeyboardActive() && io.WantTextInput)
         {
             g_overlay->ShowKeyboard(vr::k_EGamepadTextInputModeNormal);
             g_imGuiWindow->SetKeyboardActiveState(true);
         }
+#endif
     }
 
     int fb_width = {};
@@ -321,14 +333,18 @@ bool main_loop()
         g_imGuiWindow->WindowData()->frame_index = 0;
     }
 
+#ifndef NO_VR
     g_overlay->SetMouseScale(fb_width, fb_height);
+#endif
     g_imGuiWindow->Draw();
 #endif
 
     ImDrawData* draw_data = ImGui::GetDrawData();
 
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
+#ifndef NO_VR
     g_vulkanRenderer->RenderOverlay(0, draw_data, g_overlay);
+#endif
 #endif
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
@@ -348,7 +364,9 @@ bool main_loop()
         g_vulkanRenderer->Present(g_imGuiWindow->WindowData());
     }
 
+#ifndef NO_VR
     g_vulkanRenderer->RenderOverlay(0, draw_data, g_overlay);
+#endif
 #endif
 
     // If we rendered this frame faster than the headset needs, pause a little

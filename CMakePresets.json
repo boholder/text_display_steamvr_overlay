@@ -18,6 +18,19 @@
             }
         },
         {
+            "name": "x64-debug-no-vr",
+            "displayName": "x64 Debug No VR",
+            "inherits": "windows-base",
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "NO_VR": "1"
+            }
+        },
+        {
             "name": "x64-debug",
             "displayName": "x64 Debug",
             "inherits": "windows-base",
