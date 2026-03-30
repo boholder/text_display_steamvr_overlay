@@ -236,7 +236,7 @@ bool init_resources()
 #else
     g_dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
     g_imGuiWindow->Initialize(g_vulkanRenderer, APP_NAME, WIN_WIDTH, WIN_HEIGHT, g_dpiScale);
-    g_vulkanRenderer->SetupOverlay(WIN_WIDTH, WIN_HEIGHT, g_imGuiWindow->WindowData()->surface_format);
+    g_vulkanRenderer->SetupOverlay(0, WIN_WIDTH, WIN_HEIGHT, g_imGuiWindow->WindowData()->surface_format);
 #endif
 
     return true;
@@ -328,7 +328,7 @@ bool main_loop()
     ImDrawData* draw_data = ImGui::GetDrawData();
 
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
-    g_vulkanRenderer->RenderOverlay(draw_data, g_overlay);
+    g_vulkanRenderer->RenderOverlay(0, draw_data, g_overlay);
 #endif
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
@@ -348,7 +348,7 @@ bool main_loop()
         g_vulkanRenderer->Present(g_imGuiWindow->WindowData());
     }
 
-    g_vulkanRenderer->RenderOverlay(draw_data, g_overlay);
+    g_vulkanRenderer->RenderOverlay(0, draw_data, g_overlay);
 #endif
 
     // If we rendered this frame faster than the headset needs, pause a little

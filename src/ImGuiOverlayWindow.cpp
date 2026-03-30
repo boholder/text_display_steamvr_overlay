@@ -89,7 +89,7 @@ auto ImGuiOverlayWindow::Initialize(VulkanRenderer*& renderer, VrOverlay*& overl
     };
 
     ImGui_ImplVulkan_Init(&init_info);
-    renderer->SetupOverlay(width, height, surface_format);
+    renderer->SetupOverlay(0, width, height, surface_format);
 }
 
 auto ImGuiOverlayWindow::Draw() -> void

@@ -121,11 +121,11 @@ public:
     { return should_rebuild_swapchain_; }
 
     auto SetupWindow(Vulkan_Window* window, VkSurfaceKHR surface, uint32_t width, uint32_t height) -> void;
-    auto SetupOverlay(uint32_t width, uint32_t height, VkSurfaceFormatKHR format) -> void;
+    auto SetupOverlay(uint32_t index, uint32_t width, uint32_t height, VkSurfaceFormatKHR format) -> void;
     auto SetupSwapchain(Vulkan_Window* window, uint32_t width, uint32_t height) -> void;
     // ImGui renderer helpers
     auto RenderWindow(ImDrawData* draw_data, Vulkan_Window* window) -> void;
-    auto RenderOverlay(ImDrawData* draw_data, VrOverlay*& overlay) -> void;
+    auto RenderOverlay(uint32_t index, ImDrawData* draw_data, VrOverlay*& overlay) -> void;
 
     auto Present(Vulkan_Window* window) -> void;
 
@@ -161,7 +161,7 @@ private:
     VkDebugReportCallbackEXT debug_report_;
     std::vector<VkPhysicalDevice> device_list_;
     std::atomic<bool> should_enable_dynamic_rendering_;
-    std::unique_ptr<Vulkan_Overlay> vulkan_overlay_;
+    std::vector<std::unique_ptr<Vulkan_Overlay>> overlays_;
 
     // Vulkan function wrappers
     PFN_vkCmdBeginRenderingKHR f_vkCmdBeginRenderingKHR;
