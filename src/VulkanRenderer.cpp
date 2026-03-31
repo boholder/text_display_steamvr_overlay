@@ -66,11 +66,11 @@ auto VulkanRenderer::Initialize() -> void
     };
 
 #ifdef NO_VR
-    std::vector instance_extensions = {
-        VK_KHR_SURFACE_EXTENSION_NAME,
-        "VK_KHR_win32_surface",
-        VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
-    };
+    std::vector instance_extensions = { VK_KHR_SURFACE_EXTENSION_NAME,
+#    ifdef WIN32
+                                        "VK_KHR_win32_surface",
+#    endif
+                                        VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME };
 #else
     // prepare instance extensions
     vulkan_instance_extensions_ = GetVulkanExtensionsRequiredByOpenVR(INSTANCE, nullptr);
