@@ -19,6 +19,17 @@
 
 #include <openvr.h>
 
+static const std::vector<std::string> INSTANCE_EXTS_FOR_NO_VR = { VK_KHR_SURFACE_EXTENSION_NAME,
+#ifdef WIN32
+                                                                  "VK_KHR_win32_surface",
+#endif
+                                                                  VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME };
+
+static const std::vector<std::string> DEVICE_EXTS_FOR_NO_VR = {
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME,
+    VK_KHR_MULTIVIEW_EXTENSION_NAME, VK_KHR_MAINTENANCE_2_EXTENSION_NAME,
+};
+
 VulkanRenderer::VulkanRenderer()
 {
     vulkan_instance_ = VK_NULL_HANDLE;
@@ -66,11 +77,7 @@ auto VulkanRenderer::Initialize() -> void
     };
 
 #ifdef NO_VR
-    std::vector instance_extensions = { VK_KHR_SURFACE_EXTENSION_NAME,
-#    ifdef WIN32
-                                        "VK_KHR_win32_surface",
-#    endif
-                                        VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME };
+    std::vector instance_extensions = convert_str_to_char_arr(INSTANCE_EXTS_FOR_NO_VR);
 #else
     // prepare instance extensions
     vulkan_instance_extensions_ = GetVulkanExtensionsRequiredByOpenVR(INSTANCE, nullptr);
@@ -195,10 +202,7 @@ auto VulkanRenderer::Initialize() -> void
     assert(vulkan_queue_family_ != ( uint32_t ) -1);
 
 #ifdef NO_VR
-    vulkan_device_extensions_ = {
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME,
-        VK_KHR_MULTIVIEW_EXTENSION_NAME, VK_KHR_MAINTENANCE_2_EXTENSION_NAME,
-    };
+    vulkan_device_extensions_ = DEVICE_EXTS_FOR_NO_VR;
 #else
     // get device extensions
     vulkan_device_extensions_ = GetVulkanExtensionsRequiredByOpenVR(DEVICE, vulkan_physical_device_);
