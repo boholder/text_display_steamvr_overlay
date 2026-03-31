@@ -251,8 +251,10 @@ void clean_resources()
     VkResult vk_result = vkDeviceWaitIdle(g_vulkanRenderer->Device());
     VK_VALIDATE_RESULT(vk_result);
 
-    if (g_ImGuiOverlayWindow){}
+    if (g_ImGuiOverlayWindow)
+    {
         g_ImGuiOverlayWindow->Destroy();
+    }
     if (g_imGuiWindow)
     {
         g_vulkanRenderer->DestroyWindow(g_imGuiWindow->WindowData());
@@ -304,13 +306,13 @@ bool main_loop()
             g_imGuiWindow->SetKeyboardActiveState(false);
         }
 
-#ifndef NO_VR
+#    ifndef NO_VR
         if (g_overlay && g_overlay->IsVisible() && !g_imGuiWindow->KeyboardActive() && io.WantTextInput)
         {
             g_overlay->ShowKeyboard(vr::k_EGamepadTextInputModeNormal);
             g_imGuiWindow->SetKeyboardActiveState(true);
         }
-#endif
+#    endif
     }
 
     int fb_width = {};
@@ -333,18 +335,18 @@ bool main_loop()
         g_imGuiWindow->WindowData()->frame_index = 0;
     }
 
-#ifndef NO_VR
+#    ifndef NO_VR
     g_overlay->SetMouseScale(fb_width, fb_height);
-#endif
+#    endif
     g_imGuiWindow->Draw();
 #endif
 
     ImDrawData* draw_data = ImGui::GetDrawData();
 
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
-#ifndef NO_VR
+#    ifndef NO_VR
     g_vulkanRenderer->RenderOverlay(0, draw_data, g_overlay);
-#endif
+#    endif
 #endif
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
@@ -364,9 +366,9 @@ bool main_loop()
         g_vulkanRenderer->Present(g_imGuiWindow->WindowData());
     }
 
-#ifndef NO_VR
+#    ifndef NO_VR
     g_vulkanRenderer->RenderOverlay(0, draw_data, g_overlay);
-#endif
+#    endif
 #endif
 
     // If we rendered this frame faster than the headset needs, pause a little
