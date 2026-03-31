@@ -237,7 +237,9 @@ bool init_resources()
 
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
     g_ImGuiOverlayWindow->Initialize(g_vulkanRenderer, g_overlay, WIN_WIDTH, WIN_HEIGHT);
-#else
+#endif
+
+#ifdef IMGUI_SDL_PLATFORM_BACKEND
     g_dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
     g_imGuiWindow->Initialize(g_vulkanRenderer, APP_NAME, WIN_WIDTH, WIN_HEIGHT, g_dpiScale);
     g_vulkanRenderer->SetupOverlay(0, WIN_WIDTH, WIN_HEIGHT, g_imGuiWindow->WindowData()->surface_format);
