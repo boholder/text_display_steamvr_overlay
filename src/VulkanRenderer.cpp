@@ -818,14 +818,6 @@ auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, Vulkan_Window* window) 
         .clearValue = window->clear_value,
     };
 
-    VkRenderingAttachmentInfoKHR depth_attachment = {
-        .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
-    };
-
-    VkRenderingAttachmentInfoKHR stencil_attachment = {
-        .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
-    };
-
     VkRenderingInfoKHR rendering_info = {
         .sType = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR,
         .flags = 0,
