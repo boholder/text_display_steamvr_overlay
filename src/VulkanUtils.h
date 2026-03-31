@@ -17,9 +17,9 @@
 #include <spdlog/spdlog.h>
 
 #define VK_VALIDATE_RESULT(e)                                                                                                              \
-    if ((e) != VK_SUCCESS)                                                                                                                   \
-        spdlog::error("[Vulkan] Vulkan operation result is not VK_SUCCESS: {}", ( int ) (e));                                                                         \
-    if ((e) > 0)                                                                                                                             \
+    if ((e) != VK_SUCCESS)                                                                                                                 \
+        spdlog::error("[Vulkan] Vulkan operation result is not VK_SUCCESS: {}", ( int ) (e));                                              \
+    if ((e) > 0)                                                                                                                           \
         assert(e);
 
 enum VulkanExtensionType
@@ -29,7 +29,7 @@ enum VulkanExtensionType
 };
 
 static bool
-IsVulkanExtensionAvailable(const VulkanExtensionType type, const VkPhysicalDevice& physical_device, const std::string& extension)
+    IsVulkanExtensionAvailable(const VulkanExtensionType type, const VkPhysicalDevice& physical_device, const std::string& extension)
 {
     auto get_properties = [=](const VkPhysicalDevice& d, uint32_t& c, VkExtensionProperties* p)
     {
@@ -107,7 +107,9 @@ static std::vector<std::string> GetVulkanExtensionsRequiredByOpenVR(const Vulkan
             }
             else
             {
-                spdlog::error("[Vulkan] [{}] {} extension asked by OpenVR was NOT available, exit", type == INSTANCE ? "instance" : "device", token);
+                spdlog::error(
+                    "[Vulkan] [{}] {} extension asked by OpenVR was NOT available, exit", type == INSTANCE ? "instance" : "device", token
+                );
                 std::exit(EXIT_FAILURE);
             }
         }

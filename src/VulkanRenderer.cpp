@@ -19,15 +19,19 @@
 
 #include <openvr.h>
 
-static const std::vector<std::string> INSTANCE_EXTS_FOR_NO_VR = { VK_KHR_SURFACE_EXTENSION_NAME,
+static const std::vector<std::string> INSTANCE_EXTS_FOR_NO_VR
+    = {VK_KHR_SURFACE_EXTENSION_NAME,
 #ifdef WIN32
-                                                                  "VK_KHR_win32_surface",
+       "VK_KHR_win32_surface",
 #endif
-                                                                  VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME };
+       VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME};
 
 static const std::vector<std::string> DEVICE_EXTS_FOR_NO_VR = {
-    VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME,
-    VK_KHR_MULTIVIEW_EXTENSION_NAME, VK_KHR_MAINTENANCE_2_EXTENSION_NAME,
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+    VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
+    VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME,
+    VK_KHR_MULTIVIEW_EXTENSION_NAME,
+    VK_KHR_MAINTENANCE_2_EXTENSION_NAME,
 };
 
 VulkanRenderer::VulkanRenderer()
@@ -95,7 +99,7 @@ auto VulkanRenderer::Initialize() -> void
     };
 
 #ifdef ENABLE_VULKAN_VALIDATION
-    const char* enabled_layers[] = { "VK_LAYER_KHRONOS_validation" };
+    const char* enabled_layers[] = {"VK_LAYER_KHRONOS_validation"};
     instance_create_info.enabledLayerCount = 1;
     instance_create_info.ppEnabledLayerNames = enabled_layers;
 #endif
@@ -128,10 +132,10 @@ auto VulkanRenderer::Initialize() -> void
     auto f_vkCreateDebugReportCallbackEXT
         = ( PFN_vkCreateDebugReportCallbackEXT ) vkGetInstanceProcAddr(vulkan_instance_, "vkCreateDebugReportCallbackEXT");
     VkDebugReportCallbackCreateInfoEXT debug_report_create_info
-        = { .sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT,
-            .flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT,
-            .pfnCallback = DebugReport,
-            .pUserData = nullptr };
+        = {.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT,
+           .flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT,
+           .pfnCallback = DebugReport,
+           .pUserData = nullptr};
 
     vk_result = f_vkCreateDebugReportCallbackEXT(vulkan_instance_, &debug_report_create_info, vulkan_allocator_, &debug_report_);
     VK_VALIDATE_RESULT(vk_result);
@@ -226,17 +230,18 @@ auto VulkanRenderer::Initialize() -> void
     should_enable_dynamic_rendering_ = has_dynamic_rendering_support;
     vulkan_device_extensions_.insert(
         vulkan_device_extensions_.end(),
-        { VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME }
+        {VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME}
     );
 
     auto device_extensions = convert_str_to_char_arr(vulkan_device_extensions_);
 
     // create logical device
     constexpr float queue_priority = 1.0f;
-    VkDeviceQueueCreateInfo device_queue_info = { .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-                                                  .queueFamilyIndex = vulkan_queue_family_,
-                                                  .queueCount = 1,
-                                                  .pQueuePriorities = &queue_priority };
+    VkDeviceQueueCreateInfo device_queue_info
+        = {.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+           .queueFamilyIndex = vulkan_queue_family_,
+           .queueCount = 1,
+           .pQueuePriorities = &queue_priority};
 
     VkPhysicalDeviceDynamicRenderingFeaturesKHR dynamic_rendering_features = {
         .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR,
@@ -258,14 +263,15 @@ auto VulkanRenderer::Initialize() -> void
     vkGetDeviceQueue(vulkan_device_, vulkan_queue_family_, 0, &vulkan_queue_);
 
     VkDescriptorPoolSize pool_sizes[] = {
-        { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, IMGUI_IMPL_VULKAN_MINIMUM_IMAGE_SAMPLER_POOL_SIZE },
+        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, IMGUI_IMPL_VULKAN_MINIMUM_IMAGE_SAMPLER_POOL_SIZE},
     };
 
-    VkDescriptorPoolCreateInfo pool_info = { .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-                                             .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
-                                             .maxSets = 0,
-                                             .poolSizeCount = static_cast<uint32_t>(IM_ARRAYSIZE(pool_sizes)),
-                                             .pPoolSizes = pool_sizes };
+    VkDescriptorPoolCreateInfo pool_info
+        = {.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+           .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
+           .maxSets = 0,
+           .poolSizeCount = static_cast<uint32_t>(IM_ARRAYSIZE(pool_sizes)),
+           .pPoolSizes = pool_sizes};
 
     for (VkDescriptorPoolSize const& pool_size : pool_sizes)
         pool_info.maxSets += pool_size.descriptorCount;
@@ -409,7 +415,7 @@ auto VulkanRenderer::SetupOverlay(uint32_t index, uint32_t width, uint32_t heigh
     vkGetDeviceQueue(vulkan_device_, vulkan_queue_family_, 0, &ovl->queue);
 
     VkCommandBufferBeginInfo begin_info
-        = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO, .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT };
+        = {.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO, .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT};
 
     vk_result = vkBeginCommandBuffer(ovl->command_buffer, &begin_info);
     VK_VALIDATE_RESULT(vk_result);
@@ -490,8 +496,7 @@ auto VulkanRenderer::SetupOverlay(uint32_t index, uint32_t width, uint32_t heigh
     vk_result = vkCreateImageView(vulkan_device_, &image_view_info, vulkan_allocator_, &ovl->texture_view);
     VK_VALIDATE_RESULT(vk_result);
 
-    VkImageMemoryBarrier barrier =
-    {
+    VkImageMemoryBarrier barrier = {
         .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
         .srcAccessMask = 0,
         .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
@@ -500,8 +505,7 @@ auto VulkanRenderer::SetupOverlay(uint32_t index, uint32_t width, uint32_t heigh
         .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
         .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
         .image = ovl->texture,
-        .subresourceRange =
-        {
+        .subresourceRange = {
             .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
             .baseMipLevel = 0,
             .levelCount = 1,
@@ -612,7 +616,7 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
         .minImageCount = min_image_count,
         .imageFormat = window->surface_format.format,
         .imageColorSpace = window->surface_format.colorSpace,
-        .imageExtent = { .width = window->width, .height = window->height },
+        .imageExtent = {.width = window->width, .height = window->height},
         .imageArrayLayers = 1,
         .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
         .imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
@@ -651,7 +655,7 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
     {
         Vulkan_FrameSemaphore* fsd = &window->semaphores[idx];
 
-        VkSemaphoreCreateInfo semaphore_create_info = { .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
+        VkSemaphoreCreateInfo semaphore_create_info = {.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
 
         vk_result = vkCreateSemaphore(vulkan_device_, &semaphore_create_info, vulkan_allocator_, &fsd->image_acquired_semaphore);
         VK_VALIDATE_RESULT(vk_result);
@@ -717,13 +721,12 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
         VK_VALIDATE_RESULT(vk_result);
 
         VkCommandBufferBeginInfo begin_info
-            = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO, .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT };
+            = {.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO, .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT};
 
         vk_result = vkBeginCommandBuffer(fd->command_buffer, &begin_info);
         VK_VALIDATE_RESULT(vk_result);
 
-        VkImageMemoryBarrier barrier =
-        {
+        VkImageMemoryBarrier barrier = {
             .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
             .srcAccessMask = 0,
             .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
@@ -732,8 +735,7 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
             .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
             .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
             .image = fd->backbuffer,
-            .subresourceRange =
-            {
+            .subresourceRange = {
                 .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
                 .baseMipLevel = 0,
                 .levelCount = 1,
@@ -947,8 +949,7 @@ auto VulkanRenderer::RenderOverlay(uint32_t index, ImDrawData* draw_data, VrOver
     ImGui_ImplVulkan_RenderDrawData(draw_data, ovl->command_buffer);
     f_vkCmdEndRenderingKHR(ovl->command_buffer);
 
-    VkImageMemoryBarrier barrier_optimal =
-    {
+    VkImageMemoryBarrier barrier_optimal = {
         .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
         .srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
         .dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
@@ -957,8 +958,7 @@ auto VulkanRenderer::RenderOverlay(uint32_t index, ImDrawData* draw_data, VrOver
         .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
         .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
         .image = ovl->texture,
-        .subresourceRange =
-        {
+        .subresourceRange = {
             .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
             .baseMipLevel = 0,
             .levelCount = 1,
@@ -1033,8 +1033,7 @@ auto VulkanRenderer::RenderOverlay(uint32_t index, ImDrawData* draw_data, VrOver
     vk_result = vkBeginCommandBuffer(ovl->command_buffer, &buffer_begin_info);
     VK_VALIDATE_RESULT(vk_result);
 
-    VkImageMemoryBarrier barrier_restore =
-    {
+    VkImageMemoryBarrier barrier_restore = {
         .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
         .srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
         .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
@@ -1043,8 +1042,7 @@ auto VulkanRenderer::RenderOverlay(uint32_t index, ImDrawData* draw_data, VrOver
         .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
         .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
         .image = ovl->texture,
-        .subresourceRange =
-        {
+        .subresourceRange = {
             .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
             .baseMipLevel = 0,
             .levelCount = 1,

@@ -110,7 +110,7 @@ static void create_window_overlay()
     g_overlay->SetWidth(0.15f);
 
     // Device relative offset
-    glm::vec3 position = { -0.10, 0, 0.10 };
+    glm::vec3 position = {-0.10, 0, 0.10};
     glm::quat rotation
         = glm::angleAxis(glm::half_pi<float>(), glm::vec3(0, 1, 0)) * glm::angleAxis(-glm::half_pi<float>(), glm::vec3(1, 0, 0));
     rotation *= glm::angleAxis(glm::radians(10.0f), glm::vec3(0, 1, 0));
@@ -121,7 +121,7 @@ static void create_window_overlay()
     g_overlay->SetWidth(1.0f);
 
     // Origin relative offset
-    glm::vec3 position = { 0.0f, 1.5f, -1.0f };
+    glm::vec3 position = {0.0f, 1.5f, -1.0f};
     glm::quat rotation = glm::quat_identity<float, glm::defaultp>();
 
     g_overlay->SetTransformWorldRelative(vr::TrackingUniverseStanding, position, rotation);

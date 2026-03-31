@@ -53,11 +53,11 @@ auto ImGuiOverlayWindow::Initialize(VulkanRenderer*& renderer, VrOverlay*& overl
         }
     }
 
-    ImGui_ImplOpenVR_InitInfo openvr_init_info = { .handle = overlay->Handle(), .width = width, .height = height };
+    ImGui_ImplOpenVR_InitInfo openvr_init_info = {.handle = overlay->Handle(), .width = width, .height = height};
 
     ImGui_ImplOpenVR_Init(&openvr_init_info);
 
-    VkSurfaceFormatKHR surface_format = { .format = VK_FORMAT_R8G8B8A8_SRGB, .colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+    VkSurfaceFormatKHR surface_format = {.format = VK_FORMAT_R8G8B8A8_SRGB, .colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR};
 
     VkPipelineRenderingCreateInfoKHR pipeline_rendering_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,

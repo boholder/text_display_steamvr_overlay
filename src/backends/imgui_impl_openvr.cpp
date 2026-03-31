@@ -300,7 +300,7 @@ void ImGui_ImplOpenVR_NewFrame()
     if (bd->width > 0 && bd->height > 0)
     {
         io.DisplayFramebufferScale = ImVec2(1, 1);
-        bd->mouse_scale = { io.DisplaySize.x, io.DisplaySize.y };
+        bd->mouse_scale = {io.DisplaySize.x, io.DisplaySize.y};
         vr::VROverlay()->SetOverlayMouseScale(bd->handle, &bd->mouse_scale);
     }
 

@@ -132,7 +132,7 @@ public:
 
     [[maybe_unused]] auto SetMouseScale(float x, float y) const -> void
     {
-        vr::HmdVector2_t scale = { x, y };
+        vr::HmdVector2_t scale = {x, y};
         vr::EVROverlayError result = vr::VROverlay()->SetOverlayMouseScale(handle, &scale);
         if (result > vr::VROverlayError_None)
             throw std::runtime_error(std::format("Failed to set mouse scale ({}, {}) {}", x, y, static_cast<int>(result)));

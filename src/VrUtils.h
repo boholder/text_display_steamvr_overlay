@@ -48,7 +48,7 @@ class VrTrackedDeviceProperties
 {
 public:
     [[maybe_unused]] static auto FromDeviceIndex(uint32_t deviceIndex) -> VrTrackedDeviceProperties
-    { return VrTrackedDeviceProperties{ deviceIndex }; }
+    { return VrTrackedDeviceProperties{deviceIndex}; }
 
     [[nodiscard]] auto Handle() const -> vr::TrackedDeviceIndex_t
     { return handle; }
@@ -132,7 +132,7 @@ public:
     // [[maybe_unused]] auto GetArray(const vr::ETrackedDeviceProperty property) -> void { }
 
 private:
-    explicit VrTrackedDeviceProperties(const vr::TrackedDeviceIndex_t handle) : handle{ handle } {}
+    explicit VrTrackedDeviceProperties(const vr::TrackedDeviceIndex_t handle) : handle{handle} {}
 
     vr::TrackedDeviceIndex_t handle;
 };
