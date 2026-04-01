@@ -833,7 +833,7 @@ auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, Vulkan_Window* window) 
     vk_result = vkBeginCommandBuffer(fd->command_buffer, &buffer_begin_info);
     VK_VALIDATE_RESULT(vk_result);
 
-    VkRenderingAttachmentInfoKHR const color_attachment = {
+    const VkRenderingAttachmentInfoKHR color_attachment = {
         .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
         .imageView = fd->backbuffer_view,
         .imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -845,7 +845,7 @@ auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, Vulkan_Window* window) 
         .clearValue = window->clear_value,
     };
 
-    VkRenderingInfoKHR const rendering_info = {
+    const VkRenderingInfoKHR rendering_info = {
         .sType = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR,
         .flags = 0,
         .renderArea =
@@ -864,10 +864,75 @@ auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, Vulkan_Window* window) 
         .pStencilAttachment = nullptr,
     };
 
+    // before calling vkCmdBeginRendering, add a barrier to
+    // translate the image layout from PRESENT_SRC_KHR to COLOR_ATTACHMENT_OPTIMAL
+    const VkImageMemoryBarrier render_barrier = {
+        .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+        .srcAccessMask = 0,
+        .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+        .oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+        .newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+        .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+        .image = fd->backbuffer,
+        .subresourceRange = {
+            .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+            .baseMipLevel = 0,
+            .levelCount = 1,
+            .baseArrayLayer = 0,
+            .layerCount = 1,
+        },
+    };
+
+    vkCmdPipelineBarrier(
+        fd->command_buffer,
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        0,
+        0,
+        nullptr,
+        0,
+        nullptr,
+        1,
+        &render_barrier
+    );
+
     f_vkCmdBeginRenderingKHR(fd->command_buffer, &rendering_info);
     // the ImGui backend translates GUI widgets into Vulkan draw commands
     ImGui_ImplVulkan_RenderDrawData(draw_data, fd->command_buffer);
     f_vkCmdEndRenderingKHR(fd->command_buffer);
+
+    // after rendering complete, translate image layout back
+    const VkImageMemoryBarrier present_barrier = {
+        .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+        .srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+        .dstAccessMask = 0,
+        .oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        .newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+        .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+        .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+        .image = fd->backbuffer,
+        .subresourceRange = {
+            .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+            .baseMipLevel = 0,
+            .levelCount = 1,
+            .baseArrayLayer = 0,
+            .layerCount = 1,
+        },
+    };
+
+    vkCmdPipelineBarrier(
+        fd->command_buffer,
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+        0,
+        0,
+        nullptr,
+        0,
+        nullptr,
+        1,
+        &present_barrier
+    );
 
     vk_result = vkEndCommandBuffer(fd->command_buffer);
     VK_VALIDATE_RESULT(vk_result);
