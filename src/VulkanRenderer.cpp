@@ -523,6 +523,18 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
     vk_result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkan_physical_device_, window->surface, &surface_capabilities);
     VK_VALIDATE_RESULT(vk_result);
 
+    // currentExtent will be (0,0) if the surface is minimized,
+    // cause error: vkCreateSwapchainKHR(): pCreateInfo->imageExtent (width = 0,
+    // height = 0) is invalid.
+    if (surface_capabilities.currentExtent.width == 0 ||
+        surface_capabilities.currentExtent.height == 0) {
+      if (old_swapchain) {
+        vkDestroySwapchainKHR(vulkan_device_, old_swapchain, vulkan_allocator_);
+      }
+      should_rebuild_swapchain_ = true;
+      return;
+    }
+
     auto set_minimum_concurrent_image_count = [](VkPresentModeKHR mode) {
         switch (mode) {
         case VK_PRESENT_MODE_MAILBOX_KHR:
