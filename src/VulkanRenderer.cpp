@@ -779,6 +779,18 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
     should_rebuild_swapchain_ = false;
 }
 
+/**
+ *  Render ImDrawData to a Vulkan_Window using Vulkan's dynamic rendering pipeline.
+ *
+ *  - get the next swapchain image (frame)
+ *  - wait until it’s free (waiting for the fence)
+ *  - reset fence and command pool
+ *  - translate ImDrawData into command buffer
+ *  - submit commands to the GPU, use the fence to subscribe the result
+ *
+ *  @param draw_data  ImGui::GetDrawData()
+ *  @param window     ImGuiWindow::WindowData()
+ */
 auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, Vulkan_Window* window) -> void
 {
     if (window->is_minimized)
@@ -789,9 +801,12 @@ auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, Vulkan_Window* window) 
     VkSemaphore image_acquired_semaphore = window->semaphores[window->semaphore_index].image_acquired_semaphore;
     VkSemaphore render_complete_semaphore = window->semaphores[window->semaphore_index].render_complete_semaphore;
 
+    // get the next image from swapchain
+    // vulkan writes the image to window->frames
     vk_result = vkAcquireNextImageKHR(
         vulkan_device_, window->swapchain, UINT64_MAX, image_acquired_semaphore, VK_NULL_HANDLE, &window->frame_index
     );
+    // ref: https://vulkan-tutorial.com/Drawing_a_triangle/Swap_chain_recreation#page_Suboptimal-or-out-of-date-swap-chain
     if (vk_result == VK_ERROR_OUT_OF_DATE_KHR || vk_result == VK_SUBOPTIMAL_KHR)
         should_rebuild_swapchain_ = true;
     if (vk_result == VK_ERROR_OUT_OF_DATE_KHR)
@@ -799,14 +814,26 @@ auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, Vulkan_Window* window) 
     if (vk_result != VK_SUBOPTIMAL_KHR)
         VK_VALIDATE_RESULT(vk_result);
 
-    Vulkan_Frame* fd = &window->frames[window->frame_index];
+    Vulkan_Frame const* fd = &window->frames[window->frame_index];
 
-    VkCommandBufferBeginInfo buffer_begin_info = {
+    vk_result = vkWaitForFences(vulkan_device_, 1, &fd->fence, VK_TRUE, UINT64_MAX);
+    VK_VALIDATE_RESULT(vk_result);
+
+    vk_result = vkResetFences(vulkan_device_, 1, &fd->fence);
+    VK_VALIDATE_RESULT(vk_result);
+
+    vk_result = vkResetCommandPool(vulkan_device_, fd->command_pool, 0);
+    VK_VALIDATE_RESULT(vk_result);
+
+    const VkCommandBufferBeginInfo buffer_begin_info = {
         .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
         .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
     };
 
-    VkRenderingAttachmentInfoKHR color_attachment = {
+    vk_result = vkBeginCommandBuffer(fd->command_buffer, &buffer_begin_info);
+    VK_VALIDATE_RESULT(vk_result);
+
+    VkRenderingAttachmentInfoKHR const color_attachment = {
         .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
         .imageView = fd->backbuffer_view,
         .imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -818,7 +845,7 @@ auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, Vulkan_Window* window) 
         .clearValue = window->clear_value,
     };
 
-    VkRenderingInfoKHR rendering_info = {
+    VkRenderingInfoKHR const rendering_info = {
         .sType = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR,
         .flags = 0,
         .renderArea =
@@ -837,28 +864,18 @@ auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, Vulkan_Window* window) 
         .pStencilAttachment = nullptr,
     };
 
-    vk_result = vkWaitForFences(vulkan_device_, 1, &fd->fence, VK_TRUE, UINT64_MAX);
-    VK_VALIDATE_RESULT(vk_result);
-
-    vk_result = vkResetFences(vulkan_device_, 1, &fd->fence);
-    VK_VALIDATE_RESULT(vk_result);
-
-    vk_result = vkResetCommandPool(vulkan_device_, fd->command_pool, 0);
-    VK_VALIDATE_RESULT(vk_result);
-
-    vk_result = vkBeginCommandBuffer(fd->command_buffer, &buffer_begin_info);
-    VK_VALIDATE_RESULT(vk_result);
-
     f_vkCmdBeginRenderingKHR(fd->command_buffer, &rendering_info);
+    // the ImGui backend translates GUI widgets into Vulkan draw commands
     ImGui_ImplVulkan_RenderDrawData(draw_data, fd->command_buffer);
     f_vkCmdEndRenderingKHR(fd->command_buffer);
 
     vk_result = vkEndCommandBuffer(fd->command_buffer);
     VK_VALIDATE_RESULT(vk_result);
 
-    VkPipelineStageFlags wait_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    // wait at the color attachment output stage before executing the command buffer
+    VkPipelineStageFlags const wait_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
-    VkSubmitInfo submit_info = {
+    const VkSubmitInfo submit_info = {
         .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
         .waitSemaphoreCount = 1,
         .pWaitSemaphores = &image_acquired_semaphore,
