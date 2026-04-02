@@ -40,6 +40,7 @@ Checks:          '*,
     -modernize-use-equals-default,
     -modernize-use-override,
     -modernize-use-using,
+    -modernize-use-trailing-return-type,
     -performance-for-range-copy,
     -performance-unnecessary-value-param,
     -readability-avoid-const-params-in-decls,
@@ -237,5 +238,4 @@ CheckOptions:
   readability-magic-numbers.IgnoreAllFloatingPointValues: true
   readability-magic-numbers.IgnoreUserDefinedLiterals: true
   cppcoreguidelines-macro-usage.AllowedRegexp: '^DEBUG_|^WINDOW_|^APP_|^DASHBOARD_'
-  misc-use-anonymous-namespace: false
 ...

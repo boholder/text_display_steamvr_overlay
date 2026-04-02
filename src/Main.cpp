@@ -131,7 +131,7 @@ static void create_window_overlay()
 }
 
 /** @return whether the application should quit */
-static bool handle_openvr_events(const VrOverlay* overlay)
+static bool handle_openvr_events(const VrOverlay* overlay, ImGuiWindow* window)
 {
     static vr::VREvent_t vr_event = {};
     while (vr::VROverlay()->PollNextOverlayEvent(overlay->Handle(), &vr_event, sizeof(vr_event))) // NOLINT(*-unroll-loops)
@@ -153,17 +153,17 @@ static bool handle_openvr_events(const VrOverlay* overlay)
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
         case vr::VREvent_OverlayShown:
         {
-            if (overlay->IsVisible() && g_imGuiWindow->Shown())
+            if (overlay->IsVisible() && window->Shown())
             {
-                g_imGuiWindow->Hide();
+                window->Hide();
             }
             break;
         }
         case vr::VREvent_OverlayHidden:
         {
-            if (!overlay->IsVisible() && g_imGuiWindow->Shown())
+            if (!overlay->IsVisible() && window->Shown())
             {
-                g_imGuiWindow->Show();
+                window->Show();
             }
             break;
         }
@@ -289,7 +289,7 @@ bool main_loop()
 #endif
 
 #ifndef NO_VR
-    if (handle_openvr_events(g_overlay))
+    if (handle_openvr_events(g_overlay, g_imGuiWindow))
     {
         ticking = false;
     }
