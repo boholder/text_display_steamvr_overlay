@@ -156,7 +156,7 @@ auto ImGuiWindow::Hide() -> void
     window_shown_ = false;
 }
 
-auto ImGuiWindow::Draw() -> void
+auto ImGuiWindow::Draw() -> std::pair<ImGuiViewport*, ImGuiViewport*>
 {
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplSDL3_NewFrame();
@@ -166,17 +166,24 @@ auto ImGuiWindow::Draw() -> void
 
     // == Menu Render Begin
 
-    {
-        static bool show_demo = true;
-        ImGui::ShowDemoWindow(&show_demo);
-    }
+    // {
+    //     static bool show_demo = true;
+    //     ImGui::ShowDemoWindow(&show_demo);
+    // }
+
+    ImGuiViewport* vpA = nullptr;
+    ImGuiViewport* vpB = nullptr;
 
     {
-        static char buffer[128] = "Hello, world!";
+        ImGui::Begin("Window A");
+        vpA = ImGui::GetWindowViewport();
+        ImGui::Text("Viewport A id = %08X", vpA->ID);
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        ImGui::End();
 
-        ImGui::Begin("Hello, world!");
-        ImGui::Text("This is some useful text.");
-        ImGui::InputText("Your input", buffer, IM_ARRAYSIZE(buffer));
+        ImGui::Begin("Window B");
+        vpB = ImGui::GetWindowViewport();
+        ImGui::Text("Viewport B id = %08X", vpB->ID);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::End();
     }
@@ -184,6 +191,8 @@ auto ImGuiWindow::Draw() -> void
     // == Menu Render End
 
     ImGui::Render();
+
+    return {vpA, vpB};
 }
 
 auto ImGuiWindow::Destroy(VulkanRenderer*& renderer) -> void
