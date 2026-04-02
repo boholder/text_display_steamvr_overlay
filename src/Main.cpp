@@ -365,6 +365,14 @@ bool main_loop()
     if (!is_minimized)
     {
         g_vulkanRenderer->RenderWindow(draw_data, g_imGuiWindow->WindowData());
+
+        // Update and Render additional Platform Windows
+        if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+        }
+
         g_vulkanRenderer->Present(g_imGuiWindow->WindowData());
     }
 

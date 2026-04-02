@@ -73,6 +73,7 @@ auto ImGuiWindow::Initialize(VulkanRenderer*& renderer, const char* name, int wi
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_IsSRGB; // NOTE: ImGuiConfigFlags_IsSRGB is not used by ImGui, used to communicate state.
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
     io.IniFilename = nullptr;
     io.DisplaySize = ImVec2(static_cast<float>(width), static_cast<float>(height));
