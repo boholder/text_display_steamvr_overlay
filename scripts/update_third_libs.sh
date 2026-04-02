@@ -30,7 +30,7 @@ function update_openvr() {
 }
 
 function update_imgui() {
-    git clone --depth=1 --branch "$IMGUI_VERSION_TAG" https://github.com/ocornut/imgui.git "$IMGUI_DIR"
+    git clone --depth=1 --branch "${IMGUI_VERSION_TAG}-docking" https://github.com/ocornut/imgui.git "$IMGUI_DIR"
     cd "$IMGUI_DIR" || exit
     rm -rf .git
 }
