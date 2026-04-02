@@ -976,12 +976,8 @@ auto VulkanRenderer::RenderOverlay(uint32_t index, ImDrawData* draw_data, VrOver
 
     auto* ovl = overlays_.at(index).get();
 
-    const ImVec4 background_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     /// NOTE: suboptimal
-    ovl->clear_value.color.float32[0] = background_color.x * background_color.w;
-    ovl->clear_value.color.float32[1] = background_color.y * background_color.w;
-    ovl->clear_value.color.float32[2] = background_color.z * background_color.w;
-    ovl->clear_value.color.float32[3] = background_color.w;
+    set_vk_clear_value_background_color(ovl->clear_value, ImVec4(0.45f, 0.55f, 0.60f, 1.00f));
 
     VkCommandBufferBeginInfo buffer_begin_info = {
         .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -1274,3 +1270,6 @@ auto VulkanRenderer::Destroy() -> void
     vkDestroyDevice(vulkan_device_, vulkan_allocator_);
     vkDestroyInstance(vulkan_instance_, vulkan_allocator_);
 }
+
+void Vulkan_Window::set_background_color(const ImVec4& color)
+{ set_vk_clear_value_background_color(this->clear_value, color); }

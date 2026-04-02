@@ -122,3 +122,11 @@ static std::vector<std::string> GetVulkanExtensionsRequiredByOpenVR(const Vulkan
 
     return result;
 }
+
+static void set_vk_clear_value_background_color(VkClearValue& clear_value, const ImVec4& color)
+{
+    clear_value.color.float32[0] = color.x * color.w;
+    clear_value.color.float32[1] = color.y * color.w;
+    clear_value.color.float32[2] = color.z * color.w;
+    clear_value.color.float32[3] = color.w;
+}

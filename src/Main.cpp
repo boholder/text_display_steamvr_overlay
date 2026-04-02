@@ -353,13 +353,7 @@ bool main_loop()
 #endif
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
-    const ImVec4 background_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-    g_imGuiWindow->WindowData()->clear_value.color.float32[0] = background_color.x * background_color.w;
-    g_imGuiWindow->WindowData()->clear_value.color.float32[1] = background_color.y * background_color.w;
-    g_imGuiWindow->WindowData()->clear_value.color.float32[2] = background_color.z * background_color.w;
-    g_imGuiWindow->WindowData()->clear_value.color.float32[3] = background_color.w;
-
+    g_imGuiWindow->WindowData()->set_background_color(ImVec4(0.45f, 0.55f, 0.60f, 1.00f));
     const bool is_minimized = g_imGuiWindow->Shown() && g_imGuiWindow->Minimized();
     g_imGuiWindow->WindowData()->is_minimized = is_minimized;
 

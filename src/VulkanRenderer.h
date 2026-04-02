@@ -63,6 +63,8 @@ struct Vulkan_Window
 
     Vulkan_Window()
     { memset(( void* ) this, 0, sizeof(*this)); }
+
+    void set_background_color(const ImVec4& color);
 };
 
 struct Vulkan_Overlay
