@@ -213,16 +213,16 @@ auto VulkanRenderer::Initialize() -> void
 #endif
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
-    if (!IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_SWAPCHAIN_EXTENSION_NAME))
+    if (!vk_util::IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_SWAPCHAIN_EXTENSION_NAME))
         std::exit(EXIT_FAILURE);
 
     vulkan_device_extensions_.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 #endif
 
     const bool has_dynamic_rendering_support
-        = IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)
-          && IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME)
-          && IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME);
+        = vk_util::IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME)
+          && vk_util::IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME)
+          && vk_util::IsVulkanExtensionAvailable(DEVICE, vulkan_physical_device_, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME);
 
     if (!has_dynamic_rendering_support)
         std::exit(EXIT_FAILURE);
@@ -977,7 +977,7 @@ auto VulkanRenderer::RenderOverlay(uint32_t index, ImDrawData* draw_data, VrOver
     auto* ovl = overlays_.at(index).get();
 
     /// NOTE: suboptimal
-    set_vk_clear_value_background_color(ovl->clear_value, ImVec4(0.45f, 0.55f, 0.60f, 1.00f));
+    vk_util::set_vk_clear_value_background_color(ovl->clear_value, ImVec4(0.45f, 0.55f, 0.60f, 1.00f));
 
     VkCommandBufferBeginInfo buffer_begin_info = {
         .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -1272,4 +1272,4 @@ auto VulkanRenderer::Destroy() -> void
 }
 
 void Vulkan_Window::set_background_color(const ImVec4& color)
-{ set_vk_clear_value_background_color(this->clear_value, color); }
+{ vk_util::set_vk_clear_value_background_color(this->clear_value, color); }

@@ -28,6 +28,9 @@ enum VulkanExtensionType
     INSTANCE
 };
 
+namespace vk_util
+{
+
 static bool
     IsVulkanExtensionAvailable(const VulkanExtensionType type, const VkPhysicalDevice& physical_device, const std::string& extension)
 {
@@ -130,3 +133,4 @@ static void set_vk_clear_value_background_color(VkClearValue& clear_value, const
     clear_value.color.float32[2] = color.z * color.w;
     clear_value.color.float32[3] = color.w;
 }
+} // namespace vkutil
