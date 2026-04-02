@@ -25,8 +25,8 @@ public:
     [[nodiscard]] auto Window() const -> SDL_Window*
     { return window_; };
 
-    [[nodiscard]] auto WindowData() -> Vulkan_Window*
-    { return reinterpret_cast<Vulkan_Window*>(&window_data_); };
+    [[nodiscard]] auto WindowData() -> VulkanWindow*
+    { return reinterpret_cast<VulkanWindow*>(&window_data_); };
 
     [[nodiscard]] auto Shown() const -> bool
     { return window_shown_; };
@@ -47,7 +47,7 @@ public:
 
 private:
     SDL_Window* window_;
-    Vulkan_Window window_data_;
+    VulkanWindow window_data_;
     bool window_shown_;
     bool window_minimized_;
     bool keyboard_active_;

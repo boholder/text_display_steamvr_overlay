@@ -285,7 +285,7 @@ auto VulkanRenderer::Initialize() -> void
     assert(f_vkCmdEndRenderingKHR != nullptr);
 }
 
-auto VulkanRenderer::SetupWindow(Vulkan_Window* window, VkSurfaceKHR surface, uint32_t width, uint32_t height) -> void
+auto VulkanRenderer::SetupWindow(VulkanWindow* window, VkSurfaceKHR surface, uint32_t width, uint32_t height) -> void
 {
     VkResult vk_result = {};
 
@@ -540,7 +540,7 @@ auto VulkanRenderer::SetupOverlay(uint32_t index, uint32_t width, uint32_t heigh
     VK_VALIDATE_RESULT(vk_result);
 }
 
-auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint32_t height) -> void
+auto VulkanRenderer::SetupSwapchain(VulkanWindow* window, uint32_t width, uint32_t height) -> void
 {
     VkResult vk_result = {};
     VkSwapchainKHR old_swapchain = window->swapchain;
@@ -792,7 +792,7 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
 }
 
 /**
- *  Render ImDrawData to a Vulkan_Window using Vulkan's dynamic rendering pipeline.
+ *  Render ImDrawData to a VulkanWindow using Vulkan's dynamic rendering pipeline.
  *
  *  - get the next swapchain image (frame)
  *  - wait until it’s free (waiting for the fence)
@@ -803,7 +803,7 @@ auto VulkanRenderer::SetupSwapchain(Vulkan_Window* window, uint32_t width, uint3
  *  @param draw_data  ImGui::GetDrawData()
  *  @param window     ImGuiWindow::WindowData()
  */
-auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, Vulkan_Window* window) -> void
+auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, VulkanWindow* window) -> void
 {
     if (window->is_minimized)
         return;
@@ -1153,7 +1153,7 @@ auto VulkanRenderer::RenderOverlay(uint32_t index, ImDrawData* draw_data, VrOver
     VK_VALIDATE_RESULT(vk_result);
 }
 
-auto VulkanRenderer::Present(Vulkan_Window* window) -> void
+auto VulkanRenderer::Present(VulkanWindow* window) -> void
 {
     if (should_rebuild_swapchain_ || window->is_minimized)
         return;
@@ -1185,7 +1185,7 @@ auto VulkanRenderer::Present(Vulkan_Window* window) -> void
     window->semaphore_index = (window->semaphore_index + 1) % window->semaphore_count;
 }
 
-auto VulkanRenderer::DestroyWindow(Vulkan_Window* window) const -> void
+auto VulkanRenderer::DestroyWindow(VulkanWindow* window) const -> void
 {
     this->DestroyFrames(window);
 
@@ -1196,7 +1196,7 @@ auto VulkanRenderer::DestroyWindow(Vulkan_Window* window) const -> void
     vkDestroyDescriptorPool(vulkan_device_, vulkan_descriptor_pool_, vulkan_allocator_);
 }
 
-auto VulkanRenderer::DestroyFrames(Vulkan_Window* window) const -> void
+auto VulkanRenderer::DestroyFrames(VulkanWindow* window) const -> void
 {
     VkResult vk_result = {};
     vk_result = vkQueueWaitIdle(vulkan_queue_);

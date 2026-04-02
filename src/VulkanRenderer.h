@@ -41,8 +41,9 @@ struct Vulkan_FrameSemaphore
     VkSemaphore render_complete_semaphore;
 };
 
-struct Vulkan_Window
+class VulkanWindow
 {
+public:
     uint32_t width;
     uint32_t height;
     VkSwapchainKHR swapchain;
@@ -61,9 +62,7 @@ struct Vulkan_Window
     std::vector<Vulkan_FrameSemaphore> semaphores;
     bool is_minimized;
 
-    Vulkan_Window()
-    { memset(( void* ) this, 0, sizeof(*this)); }
-
+    VulkanWindow();
     void set_background_color(const ImVec4& color);
 };
 
@@ -122,21 +121,21 @@ public:
     [[nodiscard]] auto ShouldRebuildSwapchain() const -> bool
     { return should_rebuild_swapchain_; }
 
-    auto SetupWindow(Vulkan_Window* window, VkSurfaceKHR surface, uint32_t width, uint32_t height) -> void;
+    auto SetupWindow(VulkanWindow* window, VkSurfaceKHR surface, uint32_t width, uint32_t height) -> void;
     auto SetupOverlay(uint32_t index, uint32_t width, uint32_t height, VkSurfaceFormatKHR format) -> void;
-    auto SetupSwapchain(Vulkan_Window* window, uint32_t width, uint32_t height) -> void;
+    auto SetupSwapchain(VulkanWindow* window, uint32_t width, uint32_t height) -> void;
     // ImGui renderer helpers
-    auto RenderWindow(ImDrawData* draw_data, Vulkan_Window* window) -> void;
+    auto RenderWindow(ImDrawData* draw_data, VulkanWindow* window) -> void;
     auto RenderOverlay(uint32_t index, ImDrawData* draw_data, VrOverlay*& overlay) -> void;
 
-    auto Present(Vulkan_Window* window) -> void;
+    auto Present(VulkanWindow* window) -> void;
 
-    auto DestroyWindow(Vulkan_Window* window) const -> void;
+    auto DestroyWindow(VulkanWindow* window) const -> void;
     auto DestroyOverlay(Vulkan_Overlay* vulkan_overlay) const -> void;
     auto Destroy() -> void;
 
 private:
-    auto DestroyFrames(Vulkan_Window* window) const -> void;
+    auto DestroyFrames(VulkanWindow* window) const -> void;
 
     VkInstance vulkan_instance_;
     VkPhysicalDevice vulkan_physical_device_;

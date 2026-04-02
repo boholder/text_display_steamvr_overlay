@@ -51,7 +51,7 @@ auto ImGuiWindow::Initialize(VulkanRenderer*& renderer, const char* name, int wi
     int initial_height = {};
     SDL_GetWindowSize(window_, &initial_width, &initial_height);
 
-    Vulkan_Window* window = &window_data_;
+    VulkanWindow* window = &window_data_;
     renderer->SetupWindow(window, surface, initial_width, initial_height);
 
     SDL_SetWindowPosition(window_, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
