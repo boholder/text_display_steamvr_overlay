@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <utility>
 #include <imgui.h>
 #include <backends/imgui_impl_vulkan.h>
 
@@ -41,7 +40,7 @@ public:
     auto Show() -> void;
     auto SetMinimizedFromEvent(bool state) -> void;
     auto SetKeyboardActiveState(bool state) -> void;
-    auto Draw() -> std::pair<ImGuiViewport*, ImGuiViewport*>;
+    auto Draw() -> void;
 
     auto Destroy(VulkanRenderer*& renderer) -> void;
 

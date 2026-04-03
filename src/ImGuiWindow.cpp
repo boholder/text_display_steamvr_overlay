@@ -73,7 +73,6 @@ auto ImGuiWindow::Initialize(VulkanRenderer*& renderer, const char* name, int wi
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_IsSRGB; // NOTE: ImGuiConfigFlags_IsSRGB is not used by ImGui, used to communicate state.
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
     io.IniFilename = nullptr;
     io.DisplaySize = ImVec2(static_cast<float>(width), static_cast<float>(height));
@@ -156,7 +155,7 @@ auto ImGuiWindow::Hide() -> void
     window_shown_ = false;
 }
 
-auto ImGuiWindow::Draw() -> std::pair<ImGuiViewport*, ImGuiViewport*>
+auto ImGuiWindow::Draw() -> void
 {
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplSDL3_NewFrame();
@@ -166,24 +165,17 @@ auto ImGuiWindow::Draw() -> std::pair<ImGuiViewport*, ImGuiViewport*>
 
     // == Menu Render Begin
 
-    // {
-    //     static bool show_demo = true;
-    //     ImGui::ShowDemoWindow(&show_demo);
-    // }
-
-    ImGuiViewport* vpA = nullptr;
-    ImGuiViewport* vpB = nullptr;
+    {
+        static bool show_demo = true;
+        ImGui::ShowDemoWindow(&show_demo);
+    }
 
     {
-        ImGui::Begin("Window A");
-        vpA = ImGui::GetWindowViewport();
-        ImGui::Text("Viewport A id = %08X", vpA->ID);
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-        ImGui::End();
+        static char buffer[128] = "Hello, world!";
 
-        ImGui::Begin("Window B");
-        vpB = ImGui::GetWindowViewport();
-        ImGui::Text("Viewport B id = %08X", vpB->ID);
+        ImGui::Begin("Hello, world!");
+        ImGui::Text("This is some useful text.");
+        ImGui::InputText("Your input", buffer, IM_ARRAYSIZE(buffer));
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::End();
     }
@@ -191,8 +183,6 @@ auto ImGuiWindow::Draw() -> std::pair<ImGuiViewport*, ImGuiViewport*>
     // == Menu Render End
 
     ImGui::Render();
-
-    return {vpA, vpB};
 }
 
 auto ImGuiWindow::Destroy(VulkanRenderer*& renderer) -> void

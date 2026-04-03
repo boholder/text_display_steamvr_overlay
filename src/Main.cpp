@@ -60,8 +60,8 @@ static VrOverlay* g_overlay = new VrOverlay();
 static float g_hmd_refresh_rate = 24.0f;
 static float g_dpiScale = 0.0f;
 
-#define WIN_WIDTH 1
-#define WIN_HEIGHT 1
+#define WIN_WIDTH 1280
+#define WIN_HEIGHT 720
 
 static auto UpdateApplicationRefreshRate() -> void
 {
@@ -340,8 +340,7 @@ bool main_loop()
 #    ifndef NO_VR
     g_overlay->SetMouseScale(fb_width, fb_height);
 #    endif
-    const auto [fst, snd] = g_imGuiWindow->Draw();
-    assert(fst->DrawData != nullptr && snd->DrawData != nullptr && fst->DrawData != nullptr && snd->DrawData != nullptr);
+    g_imGuiWindow->Draw();
 #endif
 
     ImDrawData* draw_data = ImGui::GetDrawData();
@@ -360,14 +359,6 @@ bool main_loop()
     if (!is_minimized)
     {
         g_vulkanRenderer->RenderWindow(draw_data, g_imGuiWindow->WindowData());
-
-        // Update and Render additional Platform Windows
-        if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        {
-            ImGui::UpdatePlatformWindows();
-            ImGui::RenderPlatformWindowsDefault();
-        }
-
         g_vulkanRenderer->Present(g_imGuiWindow->WindowData());
     }
 
