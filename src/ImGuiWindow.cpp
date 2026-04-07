@@ -191,3 +191,8 @@ auto ImGuiWindow::Destroy(VulkanRenderer*& renderer) -> void
     ImGui_ImplSDL3_Shutdown();
     SDL_DestroyWindow(window_);
 }
+
+auto ImGuiWindow::IsMyEvent(const SDL_Event* event) const -> bool
+{
+    return event->window.windowID == SDL_GetWindowID(window_);
+}

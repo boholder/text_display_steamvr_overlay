@@ -44,6 +44,8 @@ public:
 
     auto Destroy(VulkanRenderer*& renderer) -> void;
 
+    auto IsMyEvent(const SDL_Event* event) const -> bool;
+
 private:
     SDL_Window* window_;
     VulkanWindow window_data_;
