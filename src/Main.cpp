@@ -50,7 +50,8 @@ extern "C" __declspec(dllexport) unsigned long AmdPowerXpressRequestHighPerforma
 #endif
 
 static VulkanRenderer* g_vulkanRenderer = new VulkanRenderer();
-static ImGuiWindow* g_imGuiWindow = new ImGuiWindow();
+static ImGuiWindow* g_window_window = new ImGuiWindow();
+static ImGuiWindow* g_dashboard_window = new ImGuiWindow();
 static ImGuiOverlayWindow* g_ImGuiOverlayWindow = new ImGuiOverlayWindow();
 static VrOverlay* g_overlay = new VrOverlay();
 
@@ -241,8 +242,10 @@ bool init_resources()
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
     g_dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
-    g_imGuiWindow->Initialize(g_vulkanRenderer, APP_NAME, WIN_WIDTH, WIN_HEIGHT, g_dpiScale);
-    g_vulkanRenderer->SetupOverlay(0, WIN_WIDTH, WIN_HEIGHT, g_imGuiWindow->WindowData()->surface_format);
+    g_window_window->Initialize(g_vulkanRenderer, WINDOW_NAME, WIN_WIDTH, WIN_HEIGHT, g_dpiScale);
+    g_vulkanRenderer->SetupOverlay(0, WIN_WIDTH, WIN_HEIGHT, g_window_window->WindowData()->surface_format);
+    g_dashboard_window->Initialize(g_vulkanRenderer, DASHBOARD_NAME, WIN_WIDTH, WIN_HEIGHT, g_dpiScale);
+    g_vulkanRenderer->SetupOverlay(0, WIN_WIDTH, WIN_HEIGHT, g_dashboard_window->WindowData()->surface_format);
 #endif
 
     return true;
@@ -257,16 +260,45 @@ void clean_resources()
     {
         g_ImGuiOverlayWindow->Destroy();
     }
-    if (g_imGuiWindow)
+    if (g_window_window)
     {
-        g_vulkanRenderer->DestroyWindow(g_imGuiWindow->WindowData());
-        g_imGuiWindow->Destroy(g_vulkanRenderer);
+        g_vulkanRenderer->DestroyWindow(g_window_window->WindowData());
+        g_window_window->Destroy(g_vulkanRenderer);
+    }
+    if (g_dashboard_window)
+    {
+        g_vulkanRenderer->DestroyWindow(g_dashboard_window->WindowData());
+        g_dashboard_window->Destroy(g_vulkanRenderer);
     }
     g_vulkanRenderer->Destroy();
 
     ImGui::DestroyContext();
 
     SDL_Quit();
+}
+
+static std::pair<int, int> update_window_size_and_swapchain(ImGuiWindow* window)
+{
+    int fb_width = {};
+    int fb_height = {};
+    SDL_GetWindowSize(window->Window(), &fb_width, &fb_height);
+
+    fb_width *= static_cast<int>(g_dpiScale);
+    fb_height *= static_cast<int>(g_dpiScale);
+
+    if ((fb_width != 0 && fb_height != 0)
+        && (g_vulkanRenderer->ShouldRebuildSwapchain() || window->WindowData()->width != fb_width
+            || window->WindowData()->height != fb_height))
+    {
+        ImGui_ImplVulkan_SetMinImageCount(g_vulkanRenderer->MinimumConcurrentImageCount());
+
+        window->WindowData()->width = fb_width;
+        window->WindowData()->height = fb_height;
+
+        g_vulkanRenderer->SetupSwapchain(window->WindowData(), fb_width, fb_height);
+        window->WindowData()->frame_index = 0;
+    }
+    return {fb_width, fb_height};
 }
 
 bool main_loop()
@@ -279,20 +311,24 @@ bool main_loop()
     {
         ImGui_ImplSDL3_ProcessEvent(&event);
 
-        if (event.type == SDL_EVENT_WINDOW_MINIMIZED && g_imGuiWindow->IsMyEvent(&event))
-            g_imGuiWindow->SetMinimizedFromEvent(true);
-        if (event.type == SDL_EVENT_WINDOW_RESTORED && g_imGuiWindow->IsMyEvent(&event))
-            g_imGuiWindow->SetMinimizedFromEvent(false);
-        if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && g_imGuiWindow->IsMyEvent(&event))
-            ticking = false;
+        auto process_event = [&](ImGuiWindow* window)
+        {
+            if (event.type == SDL_EVENT_WINDOW_MINIMIZED && window->IsMyEvent(&event))
+                window->SetMinimizedFromEvent(true);
+            if (event.type == SDL_EVENT_WINDOW_RESTORED && window->IsMyEvent(&event))
+                window->SetMinimizedFromEvent(false);
+            if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && window->IsMyEvent(&event))
+                ticking = false;
+        };
+
+        process_event(g_window_window);
+        process_event(g_dashboard_window);
     }
 #endif
 
 #ifndef NO_VR
-    if (handle_openvr_events(g_overlay, g_imGuiWindow))
-    {
-        ticking = false;
-    }
+    ticking = !handle_openvr_events(g_overlay, g_window_window);
+    ticking = !handle_openvr_events(g_overlay, g_dashboard_window);
 #endif
 
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
@@ -305,42 +341,33 @@ bool main_loop()
 
         if (!io.WantTextInput)
         {
-            g_imGuiWindow->SetKeyboardActiveState(false);
+            g_window_window->SetKeyboardActiveState(false);
+            g_dashboard_window->SetKeyboardActiveState(false);
         }
 
 #    ifndef NO_VR
-        if (g_overlay && g_overlay->IsVisible() && !g_imGuiWindow->KeyboardActive() && io.WantTextInput)
+        if (g_overlay && g_overlay->IsVisible() && !g_window_window->KeyboardActive() && io.WantTextInput)
         {
             g_overlay->ShowKeyboard(vr::k_EGamepadTextInputModeNormal);
-            g_imGuiWindow->SetKeyboardActiveState(true);
+            g_window_window->SetKeyboardActiveState(true);
+        }
+        if (g_overlay && g_overlay->IsVisible() && !g_dashboard_window->KeyboardActive() && io.WantTextInput)
+        {
+            g_overlay->ShowKeyboard(vr::k_EGamepadTextInputModeNormal);
+            g_dashboard_window->SetKeyboardActiveState(true);
         }
 #    endif
     }
 
-    int fb_width = {};
-    int fb_height = {};
-    SDL_GetWindowSize(g_imGuiWindow->Window(), &fb_width, &fb_height);
-
-    fb_width *= static_cast<int>(g_dpiScale);
-    fb_height *= static_cast<int>(g_dpiScale);
-
-    if ((fb_width != 0 && fb_height != 0)
-        && (g_vulkanRenderer->ShouldRebuildSwapchain() || g_imGuiWindow->WindowData()->width != fb_width
-            || g_imGuiWindow->WindowData()->height != fb_height))
-    {
-        ImGui_ImplVulkan_SetMinImageCount(g_vulkanRenderer->MinimumConcurrentImageCount());
-
-        g_imGuiWindow->WindowData()->width = fb_width;
-        g_imGuiWindow->WindowData()->height = fb_height;
-
-        g_vulkanRenderer->SetupSwapchain(g_imGuiWindow->WindowData(), fb_width, fb_height);
-        g_imGuiWindow->WindowData()->frame_index = 0;
-    }
+    auto [width, height] = update_window_size_and_swapchain(g_window_window);
+    auto [width2, height2] = update_window_size_and_swapchain(g_dashboard_window);
 
 #    ifndef NO_VR
-    g_overlay->SetMouseScale(fb_width, fb_height);
+    g_overlay->SetMouseScale(width, height);
+    g_overlay->SetMouseScale(width2, height2);
 #    endif
-    g_imGuiWindow->Draw();
+    g_window_window->Draw();
+    g_dashboard_window->Draw();
 #endif
 
     ImDrawData* draw_data = ImGui::GetDrawData();
@@ -352,14 +379,24 @@ bool main_loop()
 #endif
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
-    g_imGuiWindow->WindowData()->set_background_color(ImVec4(0.45f, 0.55f, 0.60f, 1.00f));
-    const bool is_minimized = g_imGuiWindow->Shown() && g_imGuiWindow->Minimized();
-    g_imGuiWindow->WindowData()->is_minimized = is_minimized;
+    g_window_window->WindowData()->set_background_color(ImVec4(0.45f, 0.55f, 0.60f, 1.00f));
+    const bool is_minimized = g_window_window->Shown() && g_window_window->Minimized();
+    g_window_window->WindowData()->is_minimized = is_minimized;
 
     if (!is_minimized)
     {
-        g_vulkanRenderer->RenderWindow(draw_data, g_imGuiWindow->WindowData());
-        g_vulkanRenderer->Present(g_imGuiWindow->WindowData());
+        g_vulkanRenderer->RenderWindow(draw_data, g_window_window->WindowData());
+        g_vulkanRenderer->Present(g_window_window->WindowData());
+    }
+
+    g_dashboard_window->WindowData()->set_background_color(ImVec4(0.45f, 0.55f, 0.60f, 1.00f));
+    const bool is_minimized2 = g_dashboard_window->Shown() && g_dashboard_window->Minimized();
+    g_dashboard_window->WindowData()->is_minimized = is_minimized;
+
+    if (!is_minimized2)
+    {
+        g_vulkanRenderer->RenderWindow(draw_data, g_dashboard_window->WindowData());
+        g_vulkanRenderer->Present(g_dashboard_window->WindowData());
     }
 
 #    ifndef NO_VR

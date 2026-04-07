@@ -68,6 +68,7 @@ auto ImGuiWindow::Initialize(VulkanRenderer*& renderer, const char* name, int wi
     IMGUI_CHECKVERSION();
 
     imgui_context_ = ImGui::CreateContext();
+    ImGui::SetCurrentContext(imgui_context_);
     ImGuiIO& io = ImGui::GetIO();
     ( void ) io;
 
@@ -188,6 +189,7 @@ auto ImGuiWindow::Draw() -> void
 
 auto ImGuiWindow::Destroy(VulkanRenderer*& renderer) -> void
 {
+    ImGui::SetCurrentContext(imgui_context_);
     ImGui_ImplSDL3_Shutdown();
     SDL_DestroyWindow(window_);
 }
