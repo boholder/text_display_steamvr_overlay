@@ -50,4 +50,5 @@ private:
     bool window_shown_;
     bool window_minimized_;
     bool keyboard_active_;
+    ImGuiContext* imgui_context_;
 };

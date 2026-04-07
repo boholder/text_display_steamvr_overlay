@@ -67,7 +67,7 @@ auto ImGuiWindow::Initialize(VulkanRenderer*& renderer, const char* name, int wi
 
     IMGUI_CHECKVERSION();
 
-    ImGui::CreateContext();
+    imgui_context_ = ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     ( void ) io;
 
@@ -157,6 +157,7 @@ auto ImGuiWindow::Hide() -> void
 
 auto ImGuiWindow::Draw() -> void
 {
+    ImGui::SetCurrentContext(imgui_context_);
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
