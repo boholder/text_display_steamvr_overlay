@@ -42,7 +42,7 @@ public:
     auto SetKeyboardActiveState(bool state) -> void;
     auto Draw() -> void;
 
-    auto Destroy(VulkanRenderer*& renderer) -> void;
+    auto Destroy() -> void;
 
     auto IsMyEvent(const SDL_Event* event) const -> bool;
 

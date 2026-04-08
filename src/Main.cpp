@@ -263,12 +263,12 @@ void clean_resources()
     if (g_window_window)
     {
         g_vulkanRenderer->DestroyWindow(g_window_window->WindowData());
-        g_window_window->Destroy(g_vulkanRenderer);
+        g_window_window->Destroy();
     }
     if (g_dashboard_window)
     {
         g_vulkanRenderer->DestroyWindow(g_dashboard_window->WindowData());
-        g_dashboard_window->Destroy(g_vulkanRenderer);
+        g_dashboard_window->Destroy();
     }
     g_vulkanRenderer->Destroy();
 

@@ -187,7 +187,7 @@ auto ImGuiWindow::Draw() -> void
     ImGui::Render();
 }
 
-auto ImGuiWindow::Destroy(VulkanRenderer*& renderer) -> void
+auto ImGuiWindow::Destroy() -> void
 {
     ImGui::SetCurrentContext(imgui_context_);
     ImGui_ImplSDL3_Shutdown();
