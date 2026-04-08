@@ -272,7 +272,8 @@ void clean_resources()
     }
     g_vulkanRenderer->Destroy();
 
-    ImGui::DestroyContext();
+    g_window_window->DestroyContext();
+    g_dashboard_window->DestroyContext();
 
     SDL_Quit();
 }

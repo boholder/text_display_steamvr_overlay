@@ -195,6 +195,10 @@ auto ImGuiWindow::Destroy() -> void
 }
 
 auto ImGuiWindow::IsMyEvent(const SDL_Event* event) const -> bool
+{ return event->window.windowID == SDL_GetWindowID(window_); }
+
+auto ImGuiWindow::DestroyContext() const -> void
 {
-    return event->window.windowID == SDL_GetWindowID(window_);
+    ImGui::SetCurrentContext(imgui_context_);
+    ImGui::DestroyContext(imgui_context_);
 }

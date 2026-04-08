@@ -45,6 +45,7 @@ public:
     auto Destroy() -> void;
 
     auto IsMyEvent(const SDL_Event* event) const -> bool;
+    auto DestroyContext() const -> void;
 
 private:
     SDL_Window* window_;
