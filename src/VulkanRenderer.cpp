@@ -1193,7 +1193,6 @@ auto VulkanRenderer::DestroyWindow(VulkanWindow* window) const -> void
     vkDestroyRenderPass(vulkan_device_, window->render_pass, vulkan_allocator_);
     vkDestroySwapchainKHR(vulkan_device_, window->swapchain, vulkan_allocator_);
     vkDestroySurfaceKHR(vulkan_instance_, window->surface, vulkan_allocator_);
-    vkDestroyDescriptorPool(vulkan_device_, vulkan_descriptor_pool_, vulkan_allocator_);
 }
 
 auto VulkanRenderer::DestroyFrames(VulkanWindow* window) const -> void
@@ -1267,6 +1266,7 @@ auto VulkanRenderer::Destroy() -> void
     f_vkDestroyDebugReportCallbackEXT(vulkan_instance_, nullptr, vulkan_allocator_);
 #endif
 
+    vkDestroyDescriptorPool(vulkan_device_, vulkan_descriptor_pool_, vulkan_allocator_);
     vkDestroyDevice(vulkan_device_, vulkan_allocator_);
     vkDestroyInstance(vulkan_instance_, vulkan_allocator_);
 }
