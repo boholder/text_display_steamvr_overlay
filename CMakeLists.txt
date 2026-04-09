@@ -14,7 +14,10 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(NOT DEFINED ENABLE_VULKAN_VALIDATION)
+# Vulkan validation layer adds extra reporting that may also catch validation layers orginating from external sources, ie. SteamVR
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(ENABLE_VULKAN_VALIDATION ON CACHE BOOL "Enable Vulkan validation layers" FORCE)
+else()
     set(ENABLE_VULKAN_VALIDATION OFF CACHE BOOL "Enable Vulkan validation layers" FORCE)
 endif()
 
@@ -43,9 +46,6 @@ if(NOT DEFINED NO_VR)
 endif()
 
 # Renderer configuration
-
-# Vulkan validation layer adds extra reporting that may also catch validation layers orginating from external sources, ie. SteamVR
-set(ENABLE_VULKAN_VALIDATION ON)
 
 # ImGui backend configuration
 
