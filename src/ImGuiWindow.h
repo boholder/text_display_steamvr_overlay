@@ -19,7 +19,8 @@ class ImGuiWindow
 {
 public:
     explicit ImGuiWindow();
-    auto Initialize(VulkanRenderer*& renderer, const char* name, int width, int height, float dpiScale, bool show = true) -> void;
+    auto Initialize(VulkanRenderer*& renderer, const char* name, int width, int height, float dpiScale,
+        void (*draw_callback)(), bool show = true) -> void;
 
     [[nodiscard]] auto Window() const -> SDL_Window*
     { return window_; };
@@ -54,4 +55,5 @@ private:
     bool window_minimized_;
     bool keyboard_active_;
     ImGuiContext* imgui_context_;
+    void (*draw_callback_)();
 };

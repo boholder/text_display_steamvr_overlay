@@ -20,6 +20,7 @@
 #include <SDL3/SDL_vulkan.h>
 
 #include <math.h>
+#include <functional>
 
 ImGuiWindow::ImGuiWindow()
 {
@@ -28,10 +29,13 @@ ImGuiWindow::ImGuiWindow()
     window_shown_ = false;
     window_minimized_ = false;
     keyboard_active_ = false;
+    draw_callback_ = nullptr;
 }
 
-auto ImGuiWindow::Initialize(VulkanRenderer*& renderer, const char* name, int width, int height, float dpiScale, bool show) -> void
+auto ImGuiWindow::Initialize(VulkanRenderer*& renderer, const char* name, int width, int height, float dpiScale, void (*draw_callback)(), bool show) -> void
 {
+    this->draw_callback_ = draw_callback;
+
     auto sdl_window_flags = SDL_WINDOW_VULKAN | SDL_WINDOW_HIDDEN | SDL_WINDOW_MOUSE_FOCUS | SDL_WINDOW_HIGH_PIXEL_DENSITY;
     window_ = SDL_CreateWindow(name, width * static_cast<int>(dpiScale), height * static_cast<int>(dpiScale), sdl_window_flags);
     if (window_ == nullptr)
@@ -163,26 +167,10 @@ auto ImGuiWindow::Draw() -> void
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    ImGuiIO& io = ImGui::GetIO();
-
-    // == Menu Render Begin
-
+    if (draw_callback_)
     {
-        static bool show_demo = true;
-        ImGui::ShowDemoWindow(&show_demo);
+        draw_callback_();
     }
-
-    {
-        static char buffer[128] = "Hello, world!";
-
-        ImGui::Begin("Hello, world!");
-        ImGui::Text("This is some useful text.");
-        ImGui::InputText("Your input", buffer, IM_ARRAYSIZE(buffer));
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-        ImGui::End();
-    }
-
-    // == Menu Render End
 
     ImGui::Render();
 }
