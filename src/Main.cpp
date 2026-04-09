@@ -421,6 +421,10 @@ bool main_loop()
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
+#ifdef ENABLE_DEBUG_LOG
+    spdlog::set_level(spdlog::level::debug);
+#endif
+
     if (!init_resources())
         return EXIT_FAILURE;
     spdlog::info("Successfully initialized");

@@ -17,6 +17,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Vulkan validation layer adds extra reporting that may also catch validation layers orginating from external sources, ie. SteamVR
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(ENABLE_VULKAN_VALIDATION ON CACHE BOOL "Enable Vulkan validation layers" FORCE)
+    set(ENABLE_DEBUG_LOG ON CACHE BOOL "Set Log Level To Debug" FORCE)
 else()
     set(ENABLE_VULKAN_VALIDATION OFF CACHE BOOL "Enable Vulkan validation layers" FORCE)
 endif()
@@ -122,6 +123,10 @@ endif()
 
 if (NO_VR)
     add_definitions(-DNO_VR)
+endif()
+
+if (ENABLE_DEBUG_LOG)
+    add_definitions(-DENABLE_DEBUG_LOG)
 endif()
 
 add_custom_target(${PNAME}_resources)
