@@ -354,6 +354,7 @@ bool main_loop()
 
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
     g_ImGuiOverlayWindow->Draw();
+    ImDrawData* draw_data = ImGui::GetDrawData();
 #endif
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
@@ -387,11 +388,13 @@ bool main_loop()
     g_overlay->SetMouseScale(width, height);
     g_overlay->SetMouseScale(width2, height2);
 #    endif
-    g_window_window->Draw();
-    g_dashboard_window->Draw();
-#endif
 
-    ImDrawData* draw_data = ImGui::GetDrawData();
+    g_window_window->Draw();
+    ImDrawData* window_draw_data = ImGui::GetDrawData();
+    g_dashboard_window->Draw();
+    ImDrawData* dashboard_draw_data = ImGui::GetDrawData();
+
+#endif
 
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
 #    ifndef NO_VR
@@ -406,7 +409,7 @@ bool main_loop()
 
     if (!is_minimized)
     {
-        g_vulkanRenderer->RenderWindow(draw_data, g_window_window->WindowData());
+        g_vulkanRenderer->RenderWindow(window_draw_data, g_window_window->WindowData());
         g_vulkanRenderer->Present(g_window_window->WindowData());
     }
 
@@ -416,7 +419,7 @@ bool main_loop()
 
     if (!is_minimized2)
     {
-        g_vulkanRenderer->RenderWindow(draw_data, g_dashboard_window->WindowData());
+        g_vulkanRenderer->RenderWindow(dashboard_draw_data, g_dashboard_window->WindowData());
         g_vulkanRenderer->Present(g_dashboard_window->WindowData());
     }
 
