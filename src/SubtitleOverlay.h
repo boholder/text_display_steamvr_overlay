@@ -11,8 +11,7 @@ namespace subtitle
 static void draw()
 {
     ImGuiWindowFlags window_flags = 0;
-    window_flags |= ImGuiWindowFlags_NoBackground;
-    window_flags |= ImGuiWindowFlags_NoTitleBar;
+    window_flags |= ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize;
     bool open_ptr = true;
 
     ImGuiIO const& io = ImGui::GetIO();
