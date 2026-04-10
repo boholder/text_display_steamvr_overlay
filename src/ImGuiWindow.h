@@ -51,7 +51,7 @@ public:
     auto SetKeyboardActiveState(bool state) -> void;
     auto Draw() -> void;
 
-    auto Destroy() -> void;
+    auto Destroy() const -> void;
 
     auto IsMyEvent(const SDL_Event* event) const -> bool;
     auto DestroyContext() const -> void;

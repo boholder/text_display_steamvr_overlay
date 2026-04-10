@@ -185,10 +185,15 @@ auto ImGuiWindow::Draw() -> void
     ImGui::Render();
 }
 
-auto ImGuiWindow::Destroy() -> void
+auto ImGuiWindow::Destroy() const -> void
 {
     ImGui::SetCurrentContext(imgui_context_);
-    ImGui_ImplSDL3_Shutdown();
+    static bool called = false;
+    if (!called)
+    {
+        ImGui_ImplSDL3_Shutdown();
+        called = true;
+    }
     SDL_DestroyWindow(window_);
 }
 
@@ -197,6 +202,12 @@ auto ImGuiWindow::IsMyEvent(const SDL_Event* event) const -> bool
 
 auto ImGuiWindow::DestroyContext() const -> void
 {
-    ImGui::SetCurrentContext(imgui_context_);
-    ImGui::DestroyContext(imgui_context_);
+    // If we call ImGui::DestroyContext(ImGuiContext* ctx),
+    // Assertion "Forgot to shutdown Renderer backend?" in
+    // ImGui::DestroyContext() -> ImGui::Shutdown() (imgui.cpp line 4432)
+    // will be triggered.
+    //
+    // So only run part of ImGui::DestroyContext(): free the context memory to avoid assertion failure.
+    // The program is already about to exit, doesn't matter.
+    ImGui::MemFree(imgui_context_);
 }
