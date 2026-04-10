@@ -50,7 +50,7 @@ extern "C" __declspec(dllexport) unsigned long AmdPowerXpressRequestHighPerforma
 #endif
 
 static VulkanRenderer* g_vulkanRenderer = new VulkanRenderer();
-static ImGuiWindow* g_window_window = new ImGuiWindow();
+static ImGuiWindow* g_subtitle_window = new ImGuiWindow();
 static ImGuiWindow* g_dashboard_window = new ImGuiWindow();
 static ImGuiOverlayWindow* g_ImGuiOverlayWindow = new ImGuiOverlayWindow();
 static VrOverlay* g_overlay = new VrOverlay();
@@ -99,7 +99,7 @@ static void create_dashboard_overlay()
 
 static void create_window_overlay()
 {
-    g_overlay->Create(vr::VROverlayType_World, WINDOW_KEY, WINDOW_NAME);
+    g_overlay->Create(vr::VROverlayType_World, SUBTITLE_KEY, SUBTITLE_NAME);
 
     g_overlay->SetInputMethod(vr::VROverlayInputMethod_Mouse);
 
@@ -188,7 +188,7 @@ static void draw_window()
     bool open_ptr = true;
 
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::Begin(WINDOW_NAME, &open_ptr, window_flags);
+    ImGui::Begin(SUBTITLE_NAME, &open_ptr, window_flags);
     ImGui::Text("W");
     ImGui::Text("Current context: %p", static_cast<void*>(ImGui::GetCurrentContext()));
     ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
@@ -277,10 +277,10 @@ bool init_resources()
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
     g_dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
-    g_window_window->Initialize(
-        g_vulkanRenderer, WINDOW_NAME, WIN_WIDTH, WIN_HEIGHT, g_dpiScale, draw_window, SDL_WINDOW_TRANSPARENT | SDL_WINDOW_BORDERLESS
+    g_subtitle_window->Initialize(
+        g_vulkanRenderer, SUBTITLE_NAME, WIN_WIDTH, WIN_HEIGHT, g_dpiScale, draw_window, SDL_WINDOW_TRANSPARENT | SDL_WINDOW_BORDERLESS
     );
-    g_vulkanRenderer->SetupOverlay(0, WIN_WIDTH, WIN_HEIGHT, g_window_window->WindowData()->surface_format);
+    g_vulkanRenderer->SetupOverlay(0, WIN_WIDTH, WIN_HEIGHT, g_subtitle_window->WindowData()->surface_format);
     g_dashboard_window->Initialize(g_vulkanRenderer, DASHBOARD_NAME, WIN_WIDTH, WIN_HEIGHT, g_dpiScale, draw_dashboard);
     g_vulkanRenderer->SetupOverlay(0, WIN_WIDTH, WIN_HEIGHT, g_dashboard_window->WindowData()->surface_format);
 #endif
@@ -297,10 +297,10 @@ void clean_resources()
     {
         g_ImGuiOverlayWindow->Destroy();
     }
-    if (g_window_window)
+    if (g_subtitle_window)
     {
-        g_vulkanRenderer->DestroyWindow(g_window_window->WindowData());
-        g_window_window->Destroy();
+        g_vulkanRenderer->DestroyWindow(g_subtitle_window->WindowData());
+        g_subtitle_window->Destroy();
     }
     if (g_dashboard_window)
     {
@@ -309,7 +309,7 @@ void clean_resources()
     }
     g_vulkanRenderer->Destroy();
 
-    g_window_window->DestroyContext();
+    g_subtitle_window->DestroyContext();
     g_dashboard_window->DestroyContext();
 
     SDL_Quit();
@@ -359,13 +359,13 @@ bool main_loop()
                 ticking = false;
         };
 
-        process_event(g_window_window);
+        process_event(g_subtitle_window);
         process_event(g_dashboard_window);
     }
 #endif
 
 #ifndef NO_VR
-    ticking = !handle_openvr_events(g_overlay, g_window_window);
+    ticking = !handle_openvr_events(g_overlay, g_subtitle_window);
     ticking = !handle_openvr_events(g_overlay, g_dashboard_window);
 #endif
 
@@ -380,15 +380,15 @@ bool main_loop()
 
         if (!io.WantTextInput)
         {
-            g_window_window->SetKeyboardActiveState(false);
+            g_subtitle_window->SetKeyboardActiveState(false);
             g_dashboard_window->SetKeyboardActiveState(false);
         }
 
 #    ifndef NO_VR
-        if (g_overlay && g_overlay->IsVisible() && !g_window_window->KeyboardActive() && io.WantTextInput)
+        if (g_overlay && g_overlay->IsVisible() && !g_subtitle_window->KeyboardActive() && io.WantTextInput)
         {
             g_overlay->ShowKeyboard(vr::k_EGamepadTextInputModeNormal);
-            g_window_window->SetKeyboardActiveState(true);
+            g_subtitle_window->SetKeyboardActiveState(true);
         }
         if (g_overlay && g_overlay->IsVisible() && !g_dashboard_window->KeyboardActive() && io.WantTextInput)
         {
@@ -398,7 +398,7 @@ bool main_loop()
 #    endif
     }
 
-    auto [width, height] = update_window_size_and_swapchain(g_window_window);
+    auto [width, height] = update_window_size_and_swapchain(g_subtitle_window);
     auto [width2, height2] = update_window_size_and_swapchain(g_dashboard_window);
 
 #    ifndef NO_VR
@@ -406,8 +406,8 @@ bool main_loop()
     g_overlay->SetMouseScale(width2, height2);
 #    endif
 
-    g_window_window->Draw();
-    ImDrawData* window_draw_data = ImGui::GetDrawData();
+    g_subtitle_window->Draw();
+    ImDrawData* subtitle_draw_data = ImGui::GetDrawData();
     g_dashboard_window->Draw();
     ImDrawData* dashboard_draw_data = ImGui::GetDrawData();
 
@@ -420,14 +420,14 @@ bool main_loop()
 #endif
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
-    g_window_window->WindowData()->set_background_color(ImVec4(0.45f, 0.55f, 0.60f, 1.00f));
-    const bool is_minimized = g_window_window->Shown() && g_window_window->Minimized();
-    g_window_window->WindowData()->is_minimized = is_minimized;
+    g_subtitle_window->WindowData()->set_background_color(ImVec4(0.45f, 0.55f, 0.60f, 1.00f));
+    const bool is_minimized = g_subtitle_window->Shown() && g_subtitle_window->Minimized();
+    g_subtitle_window->WindowData()->is_minimized = is_minimized;
 
     if (!is_minimized)
     {
-        g_vulkanRenderer->RenderWindow(window_draw_data, g_window_window->WindowData());
-        g_vulkanRenderer->Present(g_window_window->WindowData());
+        g_vulkanRenderer->RenderWindow(subtitle_draw_data, g_subtitle_window->WindowData());
+        g_vulkanRenderer->Present(g_subtitle_window->WindowData());
     }
 
     g_dashboard_window->WindowData()->set_background_color(ImVec4(0.45f, 0.55f, 0.60f, 1.00f));
