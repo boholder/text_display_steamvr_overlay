@@ -85,6 +85,7 @@ add_executable(${PNAME}
         "src/ImGuiOverlayWindow.cpp"
         "src/constants.h"
         "src/VulkanWindow.cpp"
+        "src/SubtitleOverlay.h"
 )
 
 target_compile_features(${PNAME} PUBLIC cxx_std_23)

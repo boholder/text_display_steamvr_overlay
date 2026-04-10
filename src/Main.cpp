@@ -36,6 +36,7 @@
 
 #include "ImGuiWindow.h"
 #include "ImGuiOverlayWindow.h"
+#include "SubtitleOverlay.h"
 
 #include "VrOverlay.h"
 #include "VrUtils.h"
@@ -50,7 +51,7 @@ extern "C" __declspec(dllexport) unsigned long AmdPowerXpressRequestHighPerforma
 #endif
 
 static VulkanRenderer* g_vulkanRenderer = new VulkanRenderer();
-static ImGuiWindow* g_subtitle_window = new ImGuiWindow();
+static ImGuiWindow* g_subtitle_window = nullptr;
 static ImGuiWindow* g_dashboard_window = new ImGuiWindow();
 static ImGuiOverlayWindow* g_ImGuiOverlayWindow = new ImGuiOverlayWindow();
 static VrOverlay* g_overlay = new VrOverlay();
@@ -180,26 +181,6 @@ static bool handle_openvr_events(const VrOverlay* overlay, ImGuiWindow* window)
     return false;
 }
 
-static void draw_window()
-{
-    ImGuiWindowFlags window_flags = 0;
-    window_flags |= ImGuiWindowFlags_NoBackground;
-    window_flags |= ImGuiWindowFlags_NoTitleBar;
-    bool open_ptr = true;
-
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::Begin(SUBTITLE_NAME, &open_ptr, window_flags);
-    ImGui::Text("W");
-    ImGui::Text("Current context: %p", static_cast<void*>(ImGui::GetCurrentContext()));
-    ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-    ImGui::End();
-
-    {
-        static bool show_demo = true;
-        ImGui::ShowDemoWindow(&show_demo);
-    }
-}
-
 static void draw_dashboard()
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -277,9 +258,7 @@ bool init_resources()
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
     g_dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
-    g_subtitle_window->Initialize(
-        g_vulkanRenderer, SUBTITLE_NAME, WIN_WIDTH, WIN_HEIGHT, g_dpiScale, draw_window, SDL_WINDOW_TRANSPARENT | SDL_WINDOW_BORDERLESS
-    );
+    g_subtitle_window = subtitle::init(g_vulkanRenderer, g_dpiScale);
     g_vulkanRenderer->SetupOverlay(0, WIN_WIDTH, WIN_HEIGHT, g_subtitle_window->WindowData()->surface_format);
     g_dashboard_window->Initialize(g_vulkanRenderer, DASHBOARD_NAME, WIN_WIDTH, WIN_HEIGHT, g_dpiScale, draw_dashboard);
     g_vulkanRenderer->SetupOverlay(0, WIN_WIDTH, WIN_HEIGHT, g_dashboard_window->WindowData()->surface_format);
