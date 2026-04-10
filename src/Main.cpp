@@ -37,6 +37,7 @@
 #include "ImGuiWindow.h"
 #include "ImGuiOverlayWindow.h"
 #include "SubtitleOverlay.h"
+#include "DashboardOverlay.h"
 
 #include "VrOverlay.h"
 #include "VrUtils.h"
@@ -52,7 +53,7 @@ extern "C" __declspec(dllexport) unsigned long AmdPowerXpressRequestHighPerforma
 
 static VulkanRenderer* g_vulkanRenderer = new VulkanRenderer();
 static ImGuiWindow* g_subtitle_window = nullptr;
-static ImGuiWindow* g_dashboard_window = new ImGuiWindow();
+static ImGuiWindow* g_dashboard_window = nullptr;
 static ImGuiOverlayWindow* g_ImGuiOverlayWindow = new ImGuiOverlayWindow();
 static VrOverlay* g_overlay = new VrOverlay();
 
@@ -181,20 +182,6 @@ static bool handle_openvr_events(const VrOverlay* overlay, ImGuiWindow* window)
     return false;
 }
 
-static void draw_dashboard()
-{
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::Begin(DASHBOARD_NAME);
-    ImGui::Text("D");
-    ImGui::Text("Current context: %p", static_cast<void*>(ImGui::GetCurrentContext()));
-    ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-    ImGui::End();
-
-    {
-        static bool show_demo = true;
-        ImGui::ShowDemoWindow(&show_demo);
-    }
-}
 
 /**
  * @return whether initialization was successful
@@ -260,7 +247,7 @@ bool init_resources()
     g_dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
     g_subtitle_window = subtitle::init(g_vulkanRenderer, g_dpiScale);
     g_vulkanRenderer->SetupOverlay(0, WIN_WIDTH, WIN_HEIGHT, g_subtitle_window->WindowData()->surface_format);
-    g_dashboard_window->Initialize(g_vulkanRenderer, DASHBOARD_NAME, WIN_WIDTH, WIN_HEIGHT, g_dpiScale, draw_dashboard);
+    g_dashboard_window = dashboard::init(g_vulkanRenderer, g_dpiScale);
     g_vulkanRenderer->SetupOverlay(0, WIN_WIDTH, WIN_HEIGHT, g_dashboard_window->WindowData()->surface_format);
 #endif
 
