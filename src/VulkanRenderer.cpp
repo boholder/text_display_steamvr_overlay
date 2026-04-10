@@ -569,13 +569,13 @@ auto VulkanRenderer::SetupSwapchain(VulkanWindow* window, uint32_t width, uint32
     if (window->pipeline)
         vkDestroyPipeline(vulkan_device_, window->pipeline, vulkan_allocator_);
 
-    VkSurfaceCapabilitiesKHR surface_capabilities = {};
-    vk_result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkan_physical_device_, window->surface, &surface_capabilities);
+    VkSurfaceCapabilitiesKHR cap = {};
+    vk_result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vulkan_physical_device_, window->surface, &cap);
     VK_VALIDATE_RESULT(vk_result);
 
     // currentExtent will be (0,0) if the surface is minimized,
     // cause error: vkCreateSwapchainKHR(): pCreateInfo->imageExtent (width = 0, height = 0) is invalid.
-    if (surface_capabilities.currentExtent.width == 0 || surface_capabilities.currentExtent.height == 0)
+    if (cap.currentExtent.width == 0 || cap.currentExtent.height == 0)
     {
         if (old_swapchain)
         {
@@ -610,25 +610,24 @@ auto VulkanRenderer::SetupSwapchain(VulkanWindow* window, uint32_t width, uint32
     uint32_t min_image_count = minimum_concurrent_image_count_;
 
     if (window->present_mode != VK_PRESENT_MODE_SHARED_DEMAND_REFRESH_KHR
-        && window->present_mode != VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR && surface_capabilities.minImageCount > min_image_count)
-        min_image_count = surface_capabilities.minImageCount;
+        && window->present_mode != VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR && cap.minImageCount > min_image_count)
+        min_image_count = cap.minImageCount;
 
-    if (min_image_count > surface_capabilities.maxImageCount)
-        min_image_count = surface_capabilities.maxImageCount;
+    if (min_image_count > cap.maxImageCount)
+        min_image_count = cap.maxImageCount;
 
     window->width = width;
     window->height = height;
 
     // (0xFFFFFFFF, 0xFFFFFFFF) indicating that the surface size will be determined by the extent of a swapchain targeting the surface.
-    if (surface_capabilities.currentExtent.width != 0xffffffff && surface_capabilities.currentExtent.height != 0xffffffff)
+    if (cap.currentExtent.width != 0xffffffff && cap.currentExtent.height != 0xffffffff)
     {
-        window->width = surface_capabilities.currentExtent.width;
-        window->height = surface_capabilities.currentExtent.height;
+        window->width = cap.currentExtent.width;
+        window->height = cap.currentExtent.height;
     }
 
-    VkSurfaceTransformFlagBitsKHR surface_transform_flags = surface_capabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
-                                                                ? VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
-                                                                : surface_capabilities.currentTransform;
+    VkSurfaceTransformFlagBitsKHR surface_transform_flags
+        = cap.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR ? VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR : cap.currentTransform;
 
     VkSwapchainCreateInfoKHR swapchain_create_info = {
         .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
