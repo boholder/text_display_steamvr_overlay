@@ -386,7 +386,7 @@ bool main_loop()
 #endif
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
-    g_subtitle_window->WindowData()->set_background_color(ImVec4(0.45f, 0.55f, 0.60f, 1.00f));
+    g_subtitle_window->WindowData()->set_background_color(ImVec4(0, 0, 0, 1.0f));
     const bool is_minimized = g_subtitle_window->Shown() && g_subtitle_window->Minimized();
     g_subtitle_window->WindowData()->is_minimized = is_minimized;
 
