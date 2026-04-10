@@ -8,6 +8,42 @@
 namespace subtitle
 {
 
+static VrOverlay* create_overlay()
+{
+    static auto *ovl = new VrOverlay();
+    ovl->Create(vr::VROverlayType_World, SUBTITLE_KEY, SUBTITLE_NAME);
+
+    ovl->SetInputMethod(vr::VROverlayInputMethod_Mouse);
+
+    ovl->EnableFlag(vr::VROverlayFlags_SendVRDiscreteScrollEvents);
+    ovl->EnableFlag(vr::VROverlayFlags_EnableClickStabilization);
+    ovl->EnableFlag(vr::VROverlayFlags_MakeOverlaysInteractiveIfVisible);
+
+#ifdef WINDOW_SET_DEVICE_RELATIVE
+    ovl->SetWidth(0.15f);
+
+    // Device relative offset
+    glm::vec3 position = {-0.10, 0, 0.10};
+    glm::quat rotation
+        = glm::angleAxis(glm::half_pi<float>(), glm::vec3(0, 1, 0)) * glm::angleAxis(-glm::half_pi<float>(), glm::vec3(1, 0, 0));
+    rotation *= glm::angleAxis(glm::radians(10.0f), glm::vec3(0, 1, 0));
+    rotation = glm::normalize(rotation);
+
+    ovl->SetTransformDeviceRelative(vr::TrackedControllerRole_LeftHand, position, rotation);
+#elif WINDOW_SET_WORLD_RELATIVE
+    ovl->SetWidth(1.0f);
+
+    // Origin relative offset
+    glm::vec3 position = {0.0f, 1.5f, -1.0f};
+    glm::quat rotation = glm::quat_identity<float, glm::defaultp>();
+
+    ovl->SetTransformWorldRelative(vr::TrackingUniverseStanding, position, rotation);
+#endif
+
+    ovl->Show();
+    return ovl;
+}
+
 static void draw()
 {
     ImGuiWindowFlags window_flags = 0;

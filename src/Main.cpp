@@ -82,57 +82,6 @@ static auto UpdateApplicationRefreshRate() -> void
     }
 }
 
-static void create_dashboard_overlay()
-{
-    g_overlay->Create(vr::VROverlayType_Dashboard, DASHBOARD_KEY, DASHBOARD_NAME);
-
-    // when overlay is VROverlayType_Dashboard we should set a thumbnail for the dashboard
-    std::string thumbnail_path = {};
-    thumbnail_path += SDL_GetCurrentDirectory();
-    thumbnail_path += "icon.png";
-    g_overlay->SetThumbnail(thumbnail_path);
-
-    g_overlay->SetInputMethod(vr::VROverlayInputMethod_Mouse);
-    g_overlay->SetWidth(2.5f);
-
-    g_overlay->EnableFlag(vr::VROverlayFlags_SendVRDiscreteScrollEvents);
-    g_overlay->EnableFlag(vr::VROverlayFlags_EnableClickStabilization);
-}
-
-static void create_window_overlay()
-{
-    g_overlay->Create(vr::VROverlayType_World, SUBTITLE_KEY, SUBTITLE_NAME);
-
-    g_overlay->SetInputMethod(vr::VROverlayInputMethod_Mouse);
-
-    g_overlay->EnableFlag(vr::VROverlayFlags_SendVRDiscreteScrollEvents);
-    g_overlay->EnableFlag(vr::VROverlayFlags_EnableClickStabilization);
-    g_overlay->EnableFlag(vr::VROverlayFlags_MakeOverlaysInteractiveIfVisible);
-
-#ifdef WINDOW_SET_DEVICE_RELATIVE
-    g_overlay->SetWidth(0.15f);
-
-    // Device relative offset
-    glm::vec3 position = {-0.10, 0, 0.10};
-    glm::quat rotation
-        = glm::angleAxis(glm::half_pi<float>(), glm::vec3(0, 1, 0)) * glm::angleAxis(-glm::half_pi<float>(), glm::vec3(1, 0, 0));
-    rotation *= glm::angleAxis(glm::radians(10.0f), glm::vec3(0, 1, 0));
-    rotation = glm::normalize(rotation);
-
-    g_overlay->SetTransformDeviceRelative(vr::TrackedControllerRole_LeftHand, position, rotation);
-#elif WINDOW_SET_WORLD_RELATIVE
-    g_overlay->SetWidth(1.0f);
-
-    // Origin relative offset
-    glm::vec3 position = {0.0f, 1.5f, -1.0f};
-    glm::quat rotation = glm::quat_identity<float, glm::defaultp>();
-
-    g_overlay->SetTransformWorldRelative(vr::TrackingUniverseStanding, position, rotation);
-#endif
-
-    g_overlay->Show();
-}
-
 /** @return whether the application should quit */
 static bool handle_openvr_events(const VrOverlay* overlay, ImGuiWindow* window)
 {
@@ -218,8 +167,8 @@ bool init_resources()
 
     try
     {
-        create_dashboard_overlay();
-        create_window_overlay();
+        dashboard::create_overlay();
+        subtitle::create_overlay();
     }
     catch (std::exception& ex)
     {

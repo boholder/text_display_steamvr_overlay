@@ -8,6 +8,25 @@
 namespace dashboard
 {
 
+static VrOverlay* create_overlay()
+{
+    static auto *ovl = new VrOverlay();
+    ovl->Create(vr::VROverlayType_Dashboard, DASHBOARD_KEY, DASHBOARD_NAME);
+
+    // when overlay is VROverlayType_Dashboard we should set a thumbnail for the dashboard
+    std::string thumbnail_path = {};
+    thumbnail_path += SDL_GetCurrentDirectory();
+    thumbnail_path += "icon.png";
+    ovl->SetThumbnail(thumbnail_path);
+
+    ovl->SetInputMethod(vr::VROverlayInputMethod_Mouse);
+    ovl->SetWidth(2.5F);
+
+    ovl->EnableFlag(vr::VROverlayFlags_SendVRDiscreteScrollEvents);
+    ovl->EnableFlag(vr::VROverlayFlags_EnableClickStabilization);
+    return ovl;
+}
+
 static void draw()
 {
     ImGuiIO const& io = ImGui::GetIO();
@@ -25,7 +44,7 @@ static void draw()
 
 static ImGuiWindow* init(VulkanRenderer*& g_vulkanRenderer, float g_dpiScale)
 {
-    const auto w = new ImGuiWindow();
+    auto *const w = new ImGuiWindow();
     w->Initialize(g_vulkanRenderer, DASHBOARD_NAME, DASHBOARD_WIDTH, DASHBOARD_HEIGHT, g_dpiScale, dashboard::draw);
     return w;
 }
