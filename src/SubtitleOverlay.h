@@ -3,6 +3,7 @@
 
 #include "constants.h"
 #include "imgui.h"
+#include "ImGuiWindow.h"
 
 #define WIN_WIDTH 500
 #define WIN_HEIGHT 200

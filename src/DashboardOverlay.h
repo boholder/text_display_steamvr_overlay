@@ -3,7 +3,7 @@
 
 #include "constants.h"
 #include "imgui.h"
-#include "VulkanRenderer.h"
+#include "ImGuiWindow.h"
 
 #define WIN_WIDTH 1280
 #define WIN_HEIGHT 720
@@ -13,11 +13,11 @@ namespace dashboard
 
 static void draw()
 {
-    ImGuiIO& io = ImGui::GetIO();
+    ImGuiIO const& io = ImGui::GetIO();
     ImGui::Begin(DASHBOARD_NAME);
     ImGui::Text("D");
     ImGui::Text("Current context: %p", static_cast<void*>(ImGui::GetCurrentContext()));
-    ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+    ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0F / io.Framerate, io.Framerate);
     ImGui::End();
 
     {
