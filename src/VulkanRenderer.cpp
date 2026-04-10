@@ -629,7 +629,15 @@ auto VulkanRenderer::SetupSwapchain(VulkanWindow* window, uint32_t width, uint32
     VkSurfaceTransformFlagBitsKHR surface_transform_flags
         = cap.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR ? VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR : cap.currentTransform;
 
-    VkSwapchainCreateInfoKHR swapchain_create_info = {
+    VkCompositeAlphaFlagBitsKHR composite_alpha;
+    if (cap.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR)
+        composite_alpha = VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR;
+    else if (cap.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR)
+        composite_alpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    else
+        IM_ASSERT(false && "No supported composite alpha mode found!");
+
+    VkSwapchainCreateInfoKHR const swapchain_create_info = {
         .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
         .surface = window->surface,
         .minImageCount = min_image_count,
@@ -640,7 +648,7 @@ auto VulkanRenderer::SetupSwapchain(VulkanWindow* window, uint32_t width, uint32
         .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
         .imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
         .preTransform = surface_transform_flags,
-        .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+        .compositeAlpha = composite_alpha,
         .presentMode = window->present_mode,
         .clipped = VK_TRUE,
         .oldSwapchain = old_swapchain,
