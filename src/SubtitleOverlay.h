@@ -5,9 +5,6 @@
 #include "imgui.h"
 #include "ImGuiWindow.h"
 
-#define WIN_WIDTH 500
-#define WIN_HEIGHT 200
-
 namespace subtitle
 {
 
@@ -30,7 +27,13 @@ static ImGuiWindow* init(VulkanRenderer*& g_vulkanRenderer, float g_dpiScale)
 {
     const auto w = new ImGuiWindow();
     w->Initialize(
-        g_vulkanRenderer, SUBTITLE_NAME, WIN_WIDTH, WIN_HEIGHT, g_dpiScale, subtitle::draw, SDL_WINDOW_TRANSPARENT | SDL_WINDOW_BORDERLESS
+        g_vulkanRenderer,
+        SUBTITLE_NAME,
+        SUBTITLE_WIDTH,
+        SUBTITLE_HEIGHT,
+        g_dpiScale,
+        subtitle::draw,
+        SDL_WINDOW_TRANSPARENT | SDL_WINDOW_BORDERLESS
     );
     return w;
 }

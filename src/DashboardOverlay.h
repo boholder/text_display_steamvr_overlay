@@ -5,9 +5,6 @@
 #include "imgui.h"
 #include "ImGuiWindow.h"
 
-#define WIN_WIDTH 1280
-#define WIN_HEIGHT 720
-
 namespace dashboard
 {
 
@@ -29,9 +26,7 @@ static void draw()
 static ImGuiWindow* init(VulkanRenderer*& g_vulkanRenderer, float g_dpiScale)
 {
     const auto w = new ImGuiWindow();
-    w->Initialize(
-        g_vulkanRenderer, DASHBOARD_NAME, WIN_WIDTH, WIN_HEIGHT, g_dpiScale, dashboard::draw
-    );
+    w->Initialize(g_vulkanRenderer, DASHBOARD_NAME, DASHBOARD_WIDTH, DASHBOARD_HEIGHT, g_dpiScale, dashboard::draw);
     return w;
 }
 
