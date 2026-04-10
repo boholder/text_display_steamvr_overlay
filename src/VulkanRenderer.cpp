@@ -125,7 +125,15 @@ auto VulkanRenderer::Initialize() -> void
         ( void ) pUserData;
         ( void ) pLayerPrefix;
 
-        spdlog::error("[Vulkan] Debug report from ObjectType: [{}], message: {}", ( int ) objectType, pMessage);
+        // FIXME: The clean_resources() in "Main.c" doesn't properly destroy all Vulkan resources
+        // when destroying g_subtitle_window and g_dashboard_window (due to using multiple ImGui contexts),
+        // result in debug reports when calling vkDestroyDevice() in VulkanRenderer::Destroy()
+        // temp suppress these reports
+        if (!std::string(pMessage).contains("has not been destroyed"))
+        {
+            spdlog::error("[Vulkan] Debug report from ObjectType: [{}], message: {}", static_cast<int>(objectType), pMessage);
+        }
+
         return VK_FALSE;
     };
 
