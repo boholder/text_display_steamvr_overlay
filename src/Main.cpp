@@ -356,7 +356,8 @@ bool main_loop()
     }
 
 #    ifndef NO_VR
-    g_vulkanRenderer->RenderOverlay(0, draw_data, g_overlay);
+    g_vulkanRenderer->RenderOverlay(0, subtitle_draw_data, g_overlay);
+    g_vulkanRenderer->RenderOverlay(1, dashboard_draw_data, g_overlay);
 #    endif
 #endif
 

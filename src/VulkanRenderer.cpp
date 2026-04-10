@@ -84,7 +84,7 @@ auto VulkanRenderer::Initialize() -> void
     std::vector instance_extensions = convert_str_to_char_arr(INSTANCE_EXTS_FOR_NO_VR);
 #else
     // prepare instance extensions
-    vulkan_instance_extensions_ = GetVulkanExtensionsRequiredByOpenVR(INSTANCE, nullptr);
+    vulkan_instance_extensions_ = vk_util::GetVulkanExtensionsRequiredByOpenVR(INSTANCE, nullptr);
     auto instance_extensions = convert_str_to_char_arr(vulkan_instance_extensions_);
 #endif
 
@@ -217,7 +217,7 @@ auto VulkanRenderer::Initialize() -> void
     vulkan_device_extensions_ = DEVICE_EXTS_FOR_NO_VR;
 #else
     // get device extensions
-    vulkan_device_extensions_ = GetVulkanExtensionsRequiredByOpenVR(DEVICE, vulkan_physical_device_);
+    vulkan_device_extensions_ = vk_util::GetVulkanExtensionsRequiredByOpenVR(DEVICE, vulkan_physical_device_);
 #endif
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
