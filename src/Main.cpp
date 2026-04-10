@@ -182,12 +182,22 @@ static bool handle_openvr_events(const VrOverlay* overlay, ImGuiWindow* window)
 
 static void draw_window()
 {
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoBackground;
+    window_flags |= ImGuiWindowFlags_NoTitleBar;
+    bool open_ptr = true;
+
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::Begin(WINDOW_NAME);
+    ImGui::Begin(WINDOW_NAME, &open_ptr, window_flags);
     ImGui::Text("W");
     ImGui::Text("Current context: %p", static_cast<void*>(ImGui::GetCurrentContext()));
     ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
     ImGui::End();
+
+    {
+        static bool show_demo = true;
+        ImGui::ShowDemoWindow(&show_demo);
+    }
 }
 
 static void draw_dashboard()
@@ -198,6 +208,11 @@ static void draw_dashboard()
     ImGui::Text("Current context: %p", static_cast<void*>(ImGui::GetCurrentContext()));
     ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
     ImGui::End();
+
+    {
+        static bool show_demo = true;
+        ImGui::ShowDemoWindow(&show_demo);
+    }
 }
 
 /**
@@ -262,7 +277,9 @@ bool init_resources()
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
     g_dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
-    g_window_window->Initialize(g_vulkanRenderer, WINDOW_NAME, WIN_WIDTH, WIN_HEIGHT, g_dpiScale, draw_window);
+    g_window_window->Initialize(
+        g_vulkanRenderer, WINDOW_NAME, WIN_WIDTH, WIN_HEIGHT, g_dpiScale, draw_window, SDL_WINDOW_TRANSPARENT | SDL_WINDOW_BORDERLESS
+    );
     g_vulkanRenderer->SetupOverlay(0, WIN_WIDTH, WIN_HEIGHT, g_window_window->WindowData()->surface_format);
     g_dashboard_window->Initialize(g_vulkanRenderer, DASHBOARD_NAME, WIN_WIDTH, WIN_HEIGHT, g_dpiScale, draw_dashboard);
     g_vulkanRenderer->SetupOverlay(0, WIN_WIDTH, WIN_HEIGHT, g_dashboard_window->WindowData()->surface_format);

@@ -32,11 +32,21 @@ ImGuiWindow::ImGuiWindow()
     draw_callback_ = nullptr;
 }
 
-auto ImGuiWindow::Initialize(VulkanRenderer*& renderer, const char* name, int width, int height, float dpiScale, void (*draw_callback)(), bool show) -> void
+auto ImGuiWindow::Initialize(
+    VulkanRenderer*& renderer,
+    const char* name,
+    const int width,
+    const int height,
+    const float dpiScale,
+    void (*draw_callback)(),
+    const unsigned long long more_sdl_window_flags,
+    const bool show
+) -> void
 {
     this->draw_callback_ = draw_callback;
 
-    auto sdl_window_flags = SDL_WINDOW_VULKAN | SDL_WINDOW_HIDDEN | SDL_WINDOW_MOUSE_FOCUS | SDL_WINDOW_HIGH_PIXEL_DENSITY;
+    auto sdl_window_flags
+        = SDL_WINDOW_VULKAN | SDL_WINDOW_HIDDEN | SDL_WINDOW_MOUSE_FOCUS | SDL_WINDOW_HIGH_PIXEL_DENSITY | more_sdl_window_flags;
     window_ = SDL_CreateWindow(name, width * static_cast<int>(dpiScale), height * static_cast<int>(dpiScale), sdl_window_flags);
     if (window_ == nullptr)
     {

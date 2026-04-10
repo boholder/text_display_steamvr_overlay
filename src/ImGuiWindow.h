@@ -19,8 +19,16 @@ class ImGuiWindow
 {
 public:
     explicit ImGuiWindow();
-    auto Initialize(VulkanRenderer*& renderer, const char* name, int width, int height, float dpiScale,
-        void (*draw_callback)(), bool show = true) -> void;
+    auto Initialize(
+        VulkanRenderer*& renderer,
+        const char* name,
+        int width,
+        int height,
+        float dpiScale,
+        void (*draw_callback)(),
+        unsigned long long more_sdl_window_flags = 0,
+        bool show = true
+    ) -> void;
 
     [[nodiscard]] auto Window() const -> SDL_Window*
     { return window_; };
