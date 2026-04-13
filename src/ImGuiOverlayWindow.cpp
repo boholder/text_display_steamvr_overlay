@@ -17,7 +17,7 @@
 
 ImGuiOverlayWindow::ImGuiOverlayWindow() {}
 
-auto ImGuiOverlayWindow::Initialize(VulkanRenderer*& renderer, VrOverlay*& overlay, int width, int height) -> void
+auto ImGuiOverlayWindow::Initialize(VulkanRenderer*& renderer, VrOverlay*& overlay, int width, int height, int overlayIndex) -> void
 {
     IMGUI_CHECKVERSION();
 
@@ -89,7 +89,7 @@ auto ImGuiOverlayWindow::Initialize(VulkanRenderer*& renderer, VrOverlay*& overl
     };
 
     ImGui_ImplVulkan_Init(&init_info);
-    renderer->SetupOverlay(0, width, height, surface_format);
+    renderer->SetupOverlay(overlayIndex, width, height, surface_format);
 }
 
 auto ImGuiOverlayWindow::Draw() -> void
