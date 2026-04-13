@@ -7,7 +7,7 @@ class Settings
 {
 public:
     Settings()
-    { t = "Hello"; }
+    { t = "foo"; }
 
     std::string t;
 };
