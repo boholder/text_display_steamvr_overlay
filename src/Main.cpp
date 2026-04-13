@@ -54,8 +54,8 @@ extern "C" __declspec(dllexport) unsigned long AmdPowerXpressRequestHighPerforma
 static VulkanRenderer* g_vulkanRenderer = new VulkanRenderer();
 static ImGuiWindow* g_subtitle_window = nullptr;
 static ImGuiWindow* g_dashboard_window = nullptr;
-static ImGuiOverlayWindow* g_subtitle_ovl_window = new ImGuiOverlayWindow();
-static ImGuiOverlayWindow* g_dashboard_ovl_window = new ImGuiOverlayWindow();
+static ImGuiOverlayWindow* g_subtitle_ovl_window = nullptr;
+static ImGuiOverlayWindow* g_dashboard_ovl_window = nullptr;
 static auto g_subtitle_overlay = new VrOverlay();
 static auto g_dashboard_overlay = new VrOverlay();
 
@@ -187,15 +187,15 @@ bool init_resources()
     g_vulkanRenderer->Initialize();
 
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
-    g_subtitle_ovl_window->Initialize(g_vulkanRenderer, g_subtitle_overlay, SUBTITLE_WIDTH, SUBTITLE_HEIGHT, 0, subtitle::draw);
-    g_dashboard_ovl_window->Initialize(g_vulkanRenderer, g_dashboard_overlay, DASHBOARD_WIDTH, DASHBOARD_HEIGHT, 1, dashboard::draw);
+    g_subtitle_ovl_window = subtitle::init_ovl_window(g_vulkanRenderer, g_subtitle_overlay);
+    g_dashboard_ovl_window = dashboard::init_ovl_window(g_vulkanRenderer, g_dashboard_overlay);
 #endif
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
     g_dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
-    g_subtitle_window = subtitle::init(g_vulkanRenderer, g_dpiScale);
+    g_subtitle_window = subtitle::init_window(g_vulkanRenderer, g_dpiScale);
     g_vulkanRenderer->SetupOverlay(0, SUBTITLE_WIDTH, SUBTITLE_HEIGHT, g_subtitle_window->WindowData()->surface_format);
-    g_dashboard_window = dashboard::init(g_vulkanRenderer, g_dpiScale);
+    g_dashboard_window = dashboard::init_window(g_vulkanRenderer, g_dpiScale);
     g_vulkanRenderer->SetupOverlay(1, DASHBOARD_WIDTH, DASHBOARD_HEIGHT, g_dashboard_window->WindowData()->surface_format);
 #endif
 

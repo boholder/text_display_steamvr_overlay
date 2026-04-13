@@ -42,10 +42,17 @@ static void draw()
     }
 }
 
-static ImGuiWindow* init(VulkanRenderer*& g_vulkanRenderer, float g_dpiScale)
+static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiScale)
 {
     auto *const w = new ImGuiWindow();
     w->Initialize(g_vulkanRenderer, DASHBOARD_NAME, DASHBOARD_WIDTH, DASHBOARD_HEIGHT, g_dpiScale, dashboard::draw);
+    return w;
+}
+
+static ImGuiOverlayWindow* init_ovl_window(VulkanRenderer*& g_vulkanRenderer, VrOverlay*& g_dashboard_overlay)
+{
+    const auto w = new ImGuiOverlayWindow();
+    w->Initialize(g_vulkanRenderer, g_dashboard_overlay, DASHBOARD_WIDTH, DASHBOARD_HEIGHT, 1, dashboard::draw);
     return w;
 }
 

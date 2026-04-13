@@ -58,7 +58,7 @@ static void draw()
     ImGui::End();
 }
 
-static ImGuiWindow* init(VulkanRenderer*& g_vulkanRenderer, float g_dpiScale)
+static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiScale)
 {
     const auto w = new ImGuiWindow();
     w->Initialize(
@@ -70,6 +70,13 @@ static ImGuiWindow* init(VulkanRenderer*& g_vulkanRenderer, float g_dpiScale)
         subtitle::draw,
         SDL_WINDOW_TRANSPARENT | SDL_WINDOW_BORDERLESS
     );
+    return w;
+}
+
+static ImGuiOverlayWindow* init_ovl_window(VulkanRenderer*& g_vulkanRenderer, VrOverlay*& g_subtitle_overlay)
+{
+    const auto w = new ImGuiOverlayWindow();
+    w->Initialize(g_vulkanRenderer, g_subtitle_overlay, SUBTITLE_WIDTH, SUBTITLE_HEIGHT, 0, subtitle::draw);
     return w;
 }
 
