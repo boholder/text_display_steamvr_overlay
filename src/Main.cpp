@@ -54,7 +54,8 @@ extern "C" __declspec(dllexport) unsigned long AmdPowerXpressRequestHighPerforma
 static VulkanRenderer* g_vulkanRenderer = new VulkanRenderer();
 static ImGuiWindow* g_subtitle_window = nullptr;
 static ImGuiWindow* g_dashboard_window = nullptr;
-static ImGuiOverlayWindow* g_ImGuiOverlayWindow = new ImGuiOverlayWindow();
+static ImGuiOverlayWindow* g_subtitle_ovl_window = new ImGuiOverlayWindow();
+static ImGuiOverlayWindow* g_dashboard_ovl_window = new ImGuiOverlayWindow();
 static auto g_subtitle_overlay = new VrOverlay();
 static auto g_dashboard_overlay = new VrOverlay();
 
@@ -63,9 +64,6 @@ static auto g_dashboard_overlay = new VrOverlay();
  */
 static float g_hmd_refresh_rate = 24.0f;
 static float g_dpiScale = 0.0f;
-
-#define WIN_WIDTH 1280
-#define WIN_HEIGHT 720
 
 static auto UpdateApplicationRefreshRate() -> void
 {
@@ -189,15 +187,16 @@ bool init_resources()
     g_vulkanRenderer->Initialize();
 
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
-    g_ImGuiOverlayWindow->Initialize(g_vulkanRenderer, g_overlay, WIN_WIDTH, WIN_HEIGHT);
+    g_subtitle_ovl_window->Initialize(g_vulkanRenderer, g_subtitle_overlay, SUBTITLE_WIDTH, SUBTITLE_HEIGHT);
+    g_dashboard_ovl_window->Initialize(g_vulkanRenderer, g_dashboard_overlay, DASHBOARD_WIDTH, DASHBOARD_HEIGHT);
 #endif
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
     g_dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
     g_subtitle_window = subtitle::init(g_vulkanRenderer, g_dpiScale);
-    g_vulkanRenderer->SetupOverlay(0, WIN_WIDTH, WIN_HEIGHT, g_subtitle_window->WindowData()->surface_format);
+    g_vulkanRenderer->SetupOverlay(0, SUBTITLE_WIDTH, SUBTITLE_HEIGHT, g_subtitle_window->WindowData()->surface_format);
     g_dashboard_window = dashboard::init(g_vulkanRenderer, g_dpiScale);
-    g_vulkanRenderer->SetupOverlay(0, WIN_WIDTH, WIN_HEIGHT, g_dashboard_window->WindowData()->surface_format);
+    g_vulkanRenderer->SetupOverlay(1, DASHBOARD_WIDTH, DASHBOARD_HEIGHT, g_dashboard_window->WindowData()->surface_format);
 #endif
 
     return true;
@@ -208,9 +207,13 @@ void clean_resources()
     VkResult vk_result = vkDeviceWaitIdle(g_vulkanRenderer->Device());
     VK_VALIDATE_RESULT(vk_result);
 
-    if (g_ImGuiOverlayWindow)
+    if (g_subtitle_ovl_window)
     {
-        g_ImGuiOverlayWindow->Destroy();
+        g_subtitle_ovl_window->Destroy();
+    }
+    if (g_dashboard_ovl_window)
+    {
+        g_dashboard_ovl_window->Destroy();
     }
     if (g_subtitle_window)
     {
@@ -285,8 +288,10 @@ bool main_loop()
 #endif
 
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
-    g_ImGuiOverlayWindow->Draw();
-    ImDrawData* draw_data = ImGui::GetDrawData();
+    g_subtitle_ovl_window->Draw();
+    ImDrawData* subtitle_draw_data = ImGui::GetDrawData();
+    g_dashboard_ovl_window->Draw();
+    ImDrawData* dashboard_draw_data = ImGui::GetDrawData();
 #endif
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
@@ -330,7 +335,8 @@ bool main_loop()
 
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
 #    ifndef NO_VR
-    g_vulkanRenderer->RenderOverlay(0, draw_data, g_overlay);
+    g_vulkanRenderer->RenderOverlay(0, subtitle_draw_data, g_subtitle_overlay);
+    g_vulkanRenderer->RenderOverlay(1, dashboard_draw_data, g_dashboard_overlay);
 #    endif
 #endif
 
