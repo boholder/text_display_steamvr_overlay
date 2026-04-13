@@ -227,8 +227,10 @@ void clean_resources()
     }
     g_vulkanRenderer->Destroy();
 
-    g_subtitle_window->DestroyContext();
-    g_dashboard_window->DestroyContext();
+    if (g_subtitle_window)
+        g_subtitle_window->DestroyContext();
+    if (g_dashboard_window)
+        g_dashboard_window->DestroyContext();
 
     SDL_Quit();
 }
