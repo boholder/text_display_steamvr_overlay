@@ -27,4 +27,5 @@ public:
 
 private:
     Vulkan_Overlay overlay_data_;
+    ImGuiContext* imgui_context_;
 };

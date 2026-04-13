@@ -21,7 +21,8 @@ auto ImGuiOverlayWindow::Initialize(VulkanRenderer*& renderer, VrOverlay*& overl
 {
     IMGUI_CHECKVERSION();
 
-    ImGui::CreateContext();
+    imgui_context_ = ImGui::CreateContext();
+    ImGui::SetCurrentContext(imgui_context_);
     ImGuiIO& io = ImGui::GetIO();
     ( void ) io;
 
@@ -94,6 +95,7 @@ auto ImGuiOverlayWindow::Initialize(VulkanRenderer*& renderer, VrOverlay*& overl
 
 auto ImGuiOverlayWindow::Draw() -> void
 {
+    ImGui::SetCurrentContext(imgui_context_);
     static char buffer[128] = "Hello, world!";
 
     ImGui_ImplVulkan_NewFrame();
@@ -123,4 +125,7 @@ auto ImGuiOverlayWindow::Draw() -> void
 }
 
 auto ImGuiOverlayWindow::Destroy() -> void
-{ ImGui_ImplOpenVR_Shutdown(); }
+{
+    ImGui::SetCurrentContext(imgui_context_);
+    ImGui_ImplOpenVR_Shutdown();
+}
