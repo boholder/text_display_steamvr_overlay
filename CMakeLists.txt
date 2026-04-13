@@ -80,11 +80,11 @@ message(STATUS "IMGUI_SDL_PLATFORM_BACKEND = ${IMGUI_SDL_PLATFORM_BACKEND}")
 
 add_executable(${PNAME}
         "src/Main.cpp"
-        "src/VulkanRenderer.cpp"
-        "src/ImGuiWindow.cpp"
-        "src/ImGuiOverlayWindow.cpp"
+        "src/base/VulkanRenderer.cpp"
+        "src/base/ImGuiWindow.cpp"
+        "src/base/ImGuiOverlayWindow.cpp"
         "src/constants.h"
-        "src/VulkanWindow.cpp"
+        "src/base/VulkanWindow.cpp"
         "src/SubtitleOverlay.h"
         "src/DashboardOverlay.h"
 )

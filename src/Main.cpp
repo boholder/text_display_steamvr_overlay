@@ -31,16 +31,16 @@
 
 #include <openvr.h>
 
-#include "VulkanRenderer.h"
-#include "VulkanUtils.h"
+#include "base/VulkanRenderer.h"
+#include "base/VulkanUtils.h"
 
-#include "ImGuiWindow.h"
-#include "ImGuiOverlayWindow.h"
+#include "base/ImGuiWindow.h"
+#include "base/ImGuiOverlayWindow.h"
 #include "SubtitleOverlay.h"
 #include "DashboardOverlay.h"
 
-#include "VrOverlay.h"
-#include "VrUtils.h"
+#include "base/VrOverlay.h"
+#include "base/VrUtils.h"
 
 #include "backends/imgui_impl_openvr.h"
 
