@@ -187,8 +187,8 @@ bool init_resources()
     g_vulkanRenderer->Initialize();
 
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
-    g_subtitle_ovl_window->Initialize(g_vulkanRenderer, g_subtitle_overlay, SUBTITLE_WIDTH, SUBTITLE_HEIGHT, 0);
-    g_dashboard_ovl_window->Initialize(g_vulkanRenderer, g_dashboard_overlay, DASHBOARD_WIDTH, DASHBOARD_HEIGHT, 1);
+    g_subtitle_ovl_window->Initialize(g_vulkanRenderer, g_subtitle_overlay, SUBTITLE_WIDTH, SUBTITLE_HEIGHT, 0, subtitle::draw);
+    g_dashboard_ovl_window->Initialize(g_vulkanRenderer, g_dashboard_overlay, DASHBOARD_WIDTH, DASHBOARD_HEIGHT, 1, dashboard::draw);
 #endif
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND

@@ -15,10 +15,16 @@
 
 #include <math.h>
 
-ImGuiOverlayWindow::ImGuiOverlayWindow() {}
-
-auto ImGuiOverlayWindow::Initialize(VulkanRenderer*& renderer, VrOverlay*& overlay, int width, int height, int overlayIndex) -> void
+ImGuiOverlayWindow::ImGuiOverlayWindow()
 {
+    imgui_context_ = nullptr;
+    draw_callback_ = nullptr;
+}
+
+auto ImGuiOverlayWindow::Initialize(VulkanRenderer*& renderer, VrOverlay*& overlay, int width, int height, int overlayIndex, void (*draw_callback)()) -> void
+{
+    this->draw_callback_ = draw_callback;
+
     IMGUI_CHECKVERSION();
 
     imgui_context_ = ImGui::CreateContext();
@@ -102,24 +108,10 @@ auto ImGuiOverlayWindow::Draw() -> void
     ImGui_ImplOpenVR_NewFrame();
     ImGui::NewFrame();
 
-    ImGuiIO& io = ImGui::GetIO();
-
-    // == Menu Render Begin
-
+    if (draw_callback_ != nullptr)
     {
-        static bool show_demo = true;
-        ImGui::ShowDemoWindow(&show_demo);
+        draw_callback_();
     }
-
-    {
-        ImGui::Begin("Hello, world!");
-        ImGui::Text("This is some useful text.");
-        ImGui::InputText("Your input", buffer, IM_ARRAYSIZE(buffer));
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-        ImGui::End();
-    }
-
-    // == Menu Render End
 
     ImGui::Render();
 }
