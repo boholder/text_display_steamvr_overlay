@@ -204,33 +204,28 @@ bool init_resources()
 
 void clean_resources()
 {
-    VkResult vk_result = vkDeviceWaitIdle(g_vulkanRenderer->Device());
+    const VkResult vk_result = vkDeviceWaitIdle(g_vulkanRenderer->Device());
     VK_VALIDATE_RESULT(vk_result);
 
-    if (g_subtitle_ovl_window)
-    {
-        g_subtitle_ovl_window->Destroy();
-    }
-    if (g_dashboard_ovl_window)
-    {
-        g_dashboard_ovl_window->Destroy();
-    }
-    if (g_subtitle_window)
-    {
-        g_vulkanRenderer->DestroyWindow(g_subtitle_window->WindowData());
-        g_subtitle_window->Destroy();
-    }
-    if (g_dashboard_window)
-    {
-        g_vulkanRenderer->DestroyWindow(g_dashboard_window->WindowData());
-        g_dashboard_window->Destroy();
-    }
+#ifdef IMGUI_OPENVR_PLATFORM_BACKEND
+    g_subtitle_ovl_window->Destroy();
+    g_dashboard_ovl_window->Destroy();
+#endif
+
+#ifdef IMGUI_SDL_PLATFORM_BACKEND
+    g_vulkanRenderer->DestroyWindow(g_subtitle_window->WindowData());
+    g_subtitle_window->Destroy();
+
+    g_vulkanRenderer->DestroyWindow(g_dashboard_window->WindowData());
+    g_dashboard_window->Destroy();
+#endif
+
     g_vulkanRenderer->Destroy();
 
-    if (g_subtitle_window)
-        g_subtitle_window->DestroyContext();
-    if (g_dashboard_window)
-        g_dashboard_window->DestroyContext();
+#ifdef IMGUI_SDL_PLATFORM_BACKEND
+    g_subtitle_window->DestroyContext();
+    g_dashboard_window->DestroyContext();
+#endif
 
     SDL_Quit();
 }
