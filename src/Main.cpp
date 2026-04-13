@@ -55,7 +55,8 @@ static VulkanRenderer* g_vulkanRenderer = new VulkanRenderer();
 static ImGuiWindow* g_subtitle_window = nullptr;
 static ImGuiWindow* g_dashboard_window = nullptr;
 static ImGuiOverlayWindow* g_ImGuiOverlayWindow = new ImGuiOverlayWindow();
-static VrOverlay* g_overlay = new VrOverlay();
+static auto g_subtitle_overlay = new VrOverlay();
+static auto g_dashboard_overlay = new VrOverlay();
 
 /**
  * current refresh rate of the headset. retrieved at every frame
@@ -131,7 +132,6 @@ static bool handle_openvr_events(const VrOverlay* overlay, ImGuiWindow* window)
     return false;
 }
 
-
 /**
  * @return whether initialization was successful
  */
@@ -167,8 +167,8 @@ bool init_resources()
 
     try
     {
-        dashboard::create_overlay();
-        subtitle::create_overlay();
+        g_subtitle_overlay = subtitle::create_overlay();
+        g_dashboard_overlay = dashboard::create_overlay();
     }
     catch (std::exception& ex)
     {
@@ -280,8 +280,8 @@ bool main_loop()
 #endif
 
 #ifndef NO_VR
-    ticking = !handle_openvr_events(g_overlay, g_subtitle_window);
-    ticking = !handle_openvr_events(g_overlay, g_dashboard_window);
+    ticking = !handle_openvr_events(g_subtitle_overlay, g_subtitle_window);
+    ticking = !handle_openvr_events(g_dashboard_overlay, g_dashboard_window);
 #endif
 
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
@@ -300,14 +300,14 @@ bool main_loop()
         }
 
 #    ifndef NO_VR
-        if (g_overlay && g_overlay->IsVisible() && !g_subtitle_window->KeyboardActive() && io.WantTextInput)
+        if (g_subtitle_overlay && g_subtitle_overlay->IsVisible() && !g_subtitle_window->KeyboardActive() && io.WantTextInput)
         {
-            g_overlay->ShowKeyboard(vr::k_EGamepadTextInputModeNormal);
+            g_subtitle_overlay->ShowKeyboard(vr::k_EGamepadTextInputModeNormal);
             g_subtitle_window->SetKeyboardActiveState(true);
         }
-        if (g_overlay && g_overlay->IsVisible() && !g_dashboard_window->KeyboardActive() && io.WantTextInput)
+        if (g_dashboard_overlay && g_dashboard_overlay->IsVisible() && !g_dashboard_window->KeyboardActive() && io.WantTextInput)
         {
-            g_overlay->ShowKeyboard(vr::k_EGamepadTextInputModeNormal);
+            g_dashboard_overlay->ShowKeyboard(vr::k_EGamepadTextInputModeNormal);
             g_dashboard_window->SetKeyboardActiveState(true);
         }
 #    endif
@@ -317,8 +317,8 @@ bool main_loop()
     auto [width2, height2] = update_window_size_and_swapchain(g_dashboard_window);
 
 #    ifndef NO_VR
-    g_overlay->SetMouseScale(width, height);
-    g_overlay->SetMouseScale(width2, height2);
+    g_subtitle_overlay->SetMouseScale(width, height);
+    g_dashboard_overlay->SetMouseScale(width2, height2);
 #    endif
 
     g_subtitle_window->Draw();
@@ -356,8 +356,8 @@ bool main_loop()
     }
 
 #    ifndef NO_VR
-    g_vulkanRenderer->RenderOverlay(0, subtitle_draw_data, g_overlay);
-    g_vulkanRenderer->RenderOverlay(1, dashboard_draw_data, g_overlay);
+    g_vulkanRenderer->RenderOverlay(0, subtitle_draw_data, g_subtitle_overlay);
+    g_vulkanRenderer->RenderOverlay(1, dashboard_draw_data, g_dashboard_overlay);
 #    endif
 #endif
 
