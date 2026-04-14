@@ -32,6 +32,7 @@ static VrOverlay* create_overlay()
 static void draw()
 {
     ImGuiIO const& io = ImGui::GetIO();
+    ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
     ImGui::Begin(DASHBOARD_NAME);
     ImGui::Text("D");
     ImGui::InputText("Your input", &settings.t);
@@ -39,10 +40,10 @@ static void draw()
     ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0F / io.Framerate, io.Framerate);
     ImGui::End();
 
-    {
-        static bool show_demo = true;
-        ImGui::ShowDemoWindow(&show_demo);
-    }
+    // {
+    //     static bool show_demo = true;
+    //     ImGui::ShowDemoWindow(&show_demo);
+    // }
 }
 
 static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiScale)
