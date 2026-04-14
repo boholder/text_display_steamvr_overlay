@@ -26,6 +26,8 @@ public:
         int height,
         float dpiScale,
         void (*draw_callback)(),
+        int pos_x = SDL_WINDOWPOS_CENTERED,
+        int pos_y = SDL_WINDOWPOS_CENTERED,
         unsigned long long more_sdl_window_flags = 0,
         bool show = true
     ) -> void;

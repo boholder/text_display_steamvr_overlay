@@ -39,6 +39,8 @@ auto ImGuiWindow::Initialize(
     const int height,
     const float dpiScale,
     void (*draw_callback)(),
+    const int pos_x,
+    const int pos_y,
     const unsigned long long more_sdl_window_flags,
     const bool show
 ) -> void
@@ -68,7 +70,7 @@ auto ImGuiWindow::Initialize(
     VulkanWindow* window = &window_data_;
     renderer->SetupWindow(window, surface, initial_width, initial_height);
 
-    SDL_SetWindowPosition(window_, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+    SDL_SetWindowPosition(window_, pos_x, pos_y);
     SDL_SetWindowFocusable(window_, show);
     SDL_CaptureMouse(false);
 

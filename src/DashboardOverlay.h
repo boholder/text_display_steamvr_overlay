@@ -48,7 +48,16 @@ static void draw()
 static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiScale)
 {
     auto* const w = new ImGuiWindow();
-    w->Initialize(g_vulkanRenderer, DASHBOARD_NAME, DASHBOARD_WIDTH, DASHBOARD_HEIGHT, g_dpiScale, dashboard::draw);
+    w->Initialize(
+        g_vulkanRenderer,
+        DASHBOARD_NAME,
+        DASHBOARD_WIDTH,
+        DASHBOARD_HEIGHT,
+        g_dpiScale,
+        dashboard::draw,
+        SDL_WINDOWPOS_CENTERED,
+        SUBTITLE_WIDTH
+    );
     return w;
 }
 

@@ -70,6 +70,8 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
         SUBTITLE_HEIGHT,
         g_dpiScale,
         subtitle::draw,
+        SDL_WINDOWPOS_CENTERED,
+        0,
         SDL_WINDOW_TRANSPARENT | SDL_WINDOW_BORDERLESS
     );
     return w;
