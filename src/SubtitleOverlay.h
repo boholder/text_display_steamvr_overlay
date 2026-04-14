@@ -47,6 +47,8 @@ static VrOverlay* create_overlay()
 
 static void draw()
 {
+    settings.apply_to_subtitle();
+
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize;
     bool open_ptr = true;
@@ -74,6 +76,7 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
         0,
         SDL_WINDOW_TRANSPARENT | SDL_WINDOW_BORDERLESS
     );
+    settings.apply_to_subtitle();
     return w;
 }
 

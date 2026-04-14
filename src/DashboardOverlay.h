@@ -30,6 +30,8 @@ static VrOverlay* create_overlay()
 
 static void draw()
 {
+    settings.apply_to_dashboard();
+
     ImGuiIO const& io = ImGui::GetIO();
     ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
     ImGui::Begin(DASHBOARD_NAME);
@@ -58,6 +60,7 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
         SDL_WINDOWPOS_CENTERED,
         SUBTITLE_WIDTH
     );
+    settings.apply_to_dashboard();
     return w;
 }
 

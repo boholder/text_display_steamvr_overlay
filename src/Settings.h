@@ -5,6 +5,13 @@ class Settings
 {
 public:
     Settings();
+    static void apply_to_subtitle();
+    static void apply_to_dashboard();
+
+private:
+    static bool dirty;
+    static bool dirty_to_subtitle;
+    static bool dirty_to_dashboard;
 };
 
 extern Settings settings;
