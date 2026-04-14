@@ -1,6 +1,7 @@
 #ifndef TEXT_DISPLAY_STEAMVR_OVERLAY_SUBTITLEOVERLAY_H
 #define TEXT_DISPLAY_STEAMVR_OVERLAY_SUBTITLEOVERLAY_H
 
+#include "Settings.h"
 #include "constants.h"
 #include "imgui.h"
 #include "base/ImGuiWindow.h"
@@ -10,7 +11,7 @@ namespace subtitle
 
 static VrOverlay* create_overlay()
 {
-    static auto *ovl = new VrOverlay();
+    static auto* ovl = new VrOverlay();
     ovl->Create(vr::VROverlayType_World, SUBTITLE_KEY, SUBTITLE_NAME);
 
     ovl->SetInputMethod(vr::VROverlayInputMethod_Mouse);
@@ -53,6 +54,7 @@ static void draw()
     ImGuiIO const& io = ImGui::GetIO();
     ImGui::Begin(SUBTITLE_NAME, &open_ptr, window_flags);
     ImGui::Text("W");
+    ImGui::Text("Input in dashboard: %s", settings.t.c_str());
     ImGui::Text("Current context: %p", static_cast<void*>(ImGui::GetCurrentContext()));
     ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0F / io.Framerate, io.Framerate);
     ImGui::End();
