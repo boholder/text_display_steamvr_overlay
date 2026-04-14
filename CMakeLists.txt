@@ -17,7 +17,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Vulkan validation layer adds extra reporting that may also catch validation layers orginating from external sources, ie. SteamVR
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(ENABLE_VULKAN_VALIDATION ON CACHE BOOL "Enable Vulkan validation layers" FORCE)
-    set(ENABLE_DEBUG_LOG ON CACHE BOOL "Set Log Level To Debug" FORCE)
+    set(ENABLE_DEBUG_LOG ON CACHE BOOL "Set Log Level to Debug" FORCE)
+    set(ENABLE_DEBUG_UI ON CACHE BOOL "Print Additional Debug Info in Overlays" FORCE)
 else()
     set(ENABLE_VULKAN_VALIDATION OFF CACHE BOOL "Enable Vulkan validation layers" FORCE)
 endif()
@@ -88,7 +89,6 @@ add_executable(${PNAME}
         "src/SubtitleOverlay.h"
         "src/DashboardOverlay.h"
         "src/Settings.cpp"
-        "src/base/imgui_stdlib.cpp"
 )
 
 target_compile_features(${PNAME} PUBLIC cxx_std_23)
@@ -131,6 +131,10 @@ endif()
 
 if (ENABLE_DEBUG_LOG)
     add_definitions(-DENABLE_DEBUG_LOG)
+endif()
+
+if (ENABLE_DEBUG_UI)
+    add_definitions(-DENABLE_DEBUG_UI)
 endif()
 
 add_custom_target(${PNAME}_resources)

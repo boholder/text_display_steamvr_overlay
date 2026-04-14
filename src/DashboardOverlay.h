@@ -5,7 +5,6 @@
 #include "constants.h"
 #include "imgui.h"
 #include "base/ImGuiWindow.h"
-#include "base/imgui_stdlib.h"
 
 namespace dashboard
 {
@@ -34,10 +33,10 @@ static void draw()
     ImGuiIO const& io = ImGui::GetIO();
     ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
     ImGui::Begin(DASHBOARD_NAME);
-    ImGui::Text("D");
-    ImGui::InputText("Your input", &settings.t);
+#ifdef ENABLE_DEBUG_UI
     ImGui::Text("Current context: %p", static_cast<void*>(ImGui::GetCurrentContext()));
     ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0F / io.Framerate, io.Framerate);
+#endif
     ImGui::End();
 
     // {

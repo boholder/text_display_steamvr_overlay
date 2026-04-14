@@ -53,10 +53,10 @@ static void draw()
 
     ImGuiIO const& io = ImGui::GetIO();
     ImGui::Begin(SUBTITLE_NAME, &open_ptr, window_flags);
-    ImGui::Text("W");
-    ImGui::Text("Input in dashboard: %s", settings.t.c_str());
+#ifdef ENABLE_DEBUG_UI
     ImGui::Text("Current context: %p", static_cast<void*>(ImGui::GetCurrentContext()));
     ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0F / io.Framerate, io.Framerate);
+#endif
     ImGui::End();
 }
 
