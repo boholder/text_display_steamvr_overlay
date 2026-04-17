@@ -32,19 +32,16 @@ static void draw()
 {
     settings.apply_to_dashboard();
 
-    ImGuiIO const& io = ImGui::GetIO();
-    ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
-    ImGui::Begin(DASHBOARD_NAME);
+    const int window_flags = im_util::set_next_window_fill_os_window();
+
+    ImGui::Begin(DASHBOARD_NAME, nullptr, window_flags);
 
     ImGui::SeparatorText("Subtitle Options");
     ImGui::SliderFloat("Subtitle Font Size", &settings.subtitle_font_size, SUBTITLE_FONT_SIZE_MIN, SUBTITLE_FONT_SIZE_MAX);
     ImGui::ColorEdit4("Subtitle Font Color", settings.subtitle_font_color, ImGuiColorEditFlags_AlphaBar);
 
-#ifdef ENABLE_DEBUG_UI
-    ImGui::SeparatorText("Debug Info");
-    ImGui::Text("Current context: %p", static_cast<void*>(ImGui::GetCurrentContext()));
-    ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0F / io.Framerate, io.Framerate);
-#endif
+    im_util::show_debug_info();
+
     ImGui::End();
 
     // {
@@ -64,7 +61,7 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
         g_dpiScale,
         dashboard::draw,
         SDL_WINDOWPOS_CENTERED,
-        SUBTITLE_WIDTH
+        SUBTITLE_HEIGHT * g_dpiScale
     );
     settings.apply_to_dashboard();
     return w;

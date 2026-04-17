@@ -3,6 +3,11 @@
 
 #include <imgui.h>
 
+#define SUBTITLE_FONT_SIZE_MIN 10.0F
+#define SUBTITLE_FONT_SIZE_DEFAULT 20.0F
+#define SUBTITLE_FONT_SIZE_MAX 50.0F
+#define SUBTITLE_FONT_COLOR_DEFAULT {1.0F, 1.0F, 1.0F, 1.0F}
+
 class Settings
 {
 public:
@@ -17,7 +22,7 @@ public:
     static void apply_to_dashboard();
 
     static float subtitle_font_color[4];
-    static ImVec4 get_subtitle_font_color();
+    static ImU32 get_subtitle_font_color();
 
     static float subtitle_font_size;
 

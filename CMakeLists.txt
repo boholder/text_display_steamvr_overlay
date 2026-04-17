@@ -89,6 +89,7 @@ add_executable(${PNAME}
         "src/SubtitleOverlay.h"
         "src/DashboardOverlay.h"
         "src/Settings.cpp"
+        "src/base/ImGuiUtils.h"
 )
 
 target_compile_features(${PNAME} PUBLIC cxx_std_23)

@@ -4,6 +4,7 @@
 #include "Settings.h"
 #include "constants.h"
 #include "imgui.h"
+#include "base/ImGuiUtils.h"
 #include "base/ImGuiWindow.h"
 
 namespace subtitle
@@ -49,22 +50,23 @@ static void draw()
 {
     settings.apply_to_subtitle();
 
-    ImGuiWindowFlags window_flags = 0;
-    window_flags |= ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize;
-    bool open_ptr = true;
+    const int window_flags = im_util::set_next_window_fill_os_window();
 
-    ImGuiIO const& io = ImGui::GetIO();
-    ImGui::Begin(SUBTITLE_NAME, &open_ptr, window_flags);
+    ImGui::Begin(SUBTITLE_NAME, nullptr, window_flags | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar);
 
     ImGui::PushFont(nullptr, settings.subtitle_font_size);
-    ImGui::TextColored(settings.get_subtitle_font_color(), "EXAMPLE SUBTITLE TEXT");
+    ImGui::PushStyleColor(ImGuiCol_Text, settings.get_subtitle_font_color()); // Red color
+    ImGui::TextWrapped(
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut "
+        "enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in "
+        "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, "
+        "sunt in culpa qui officia deserunt mollit anim id est laborum."
+    );
+    ImGui::PopStyleColor();
     ImGui::PopFont();
 
-#ifdef ENABLE_DEBUG_UI
-    ImGui::SeparatorText("Debug Info");
-    ImGui::Text("Current context: %p", static_cast<void*>(ImGui::GetCurrentContext()));
-    ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0F / io.Framerate, io.Framerate);
-#endif
+    im_util::show_debug_info();
+
     ImGui::End();
 }
 
@@ -79,8 +81,8 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
         g_dpiScale,
         subtitle::draw,
         SDL_WINDOWPOS_CENTERED,
-        0,
-        SDL_WINDOW_TRANSPARENT | SDL_WINDOW_BORDERLESS
+        20,
+        SDL_WINDOW_TRANSPARENT
     );
     settings.apply_to_subtitle();
     return w;
