@@ -35,7 +35,11 @@ static void draw()
     ImGuiIO const& io = ImGui::GetIO();
     ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
     ImGui::Begin(DASHBOARD_NAME);
+
+    ImGui::ColorEdit3("Subtitle Font Color", settings.subtitle_font_color);
+
 #ifdef ENABLE_DEBUG_UI
+    ImGui::SeparatorText("Debug Info");
     ImGui::Text("Current context: %p", static_cast<void*>(ImGui::GetCurrentContext()));
     ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0F / io.Framerate, io.Framerate);
 #endif

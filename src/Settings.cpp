@@ -5,6 +5,7 @@
 bool Settings::dirty = true;
 bool Settings::dirty_to_subtitle = true;
 bool Settings::dirty_to_dashboard = true;
+float Settings::subtitle_font_color[3] = {1.0F, 1.0F, 1.0F};
 
 Settings::Settings() {}
 
@@ -35,3 +36,6 @@ static void apply_to_imgui()
     const ImGuiIO& io = ImGui::GetIO();
     io.Fonts->AddFontFromFileTTF("NotoSans-Regular.ttf");
 }
+
+ImVec4 Settings::get_subtitle_font_color()
+{ return {subtitle_font_color[0], subtitle_font_color[1], subtitle_font_color[2], 1.0F}; }
