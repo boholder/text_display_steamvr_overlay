@@ -56,7 +56,9 @@ static void draw()
     ImGuiIO const& io = ImGui::GetIO();
     ImGui::Begin(SUBTITLE_NAME, &open_ptr, window_flags);
 
+    ImGui::PushFont(nullptr, settings.subtitle_font_size);
     ImGui::TextColored(settings.get_subtitle_font_color(), "EXAMPLE SUBTITLE TEXT");
+    ImGui::PopFont();
 
 #ifdef ENABLE_DEBUG_UI
     ImGui::SeparatorText("Debug Info");

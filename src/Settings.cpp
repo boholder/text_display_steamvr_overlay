@@ -1,11 +1,14 @@
 #include "Settings.h"
 
+#include "constants.h"
+
 #include <imgui.h>
 
 bool Settings::dirty = true;
 bool Settings::dirty_to_subtitle = true;
 bool Settings::dirty_to_dashboard = true;
 float Settings::subtitle_font_color[4] = {1.0F, 1.0F, 1.0F, 1.0F};
+float Settings::subtitle_font_size = SUBTITLE_FONT_SIZE_DEFAULT;
 
 Settings::Settings() {}
 

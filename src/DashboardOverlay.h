@@ -36,6 +36,8 @@ static void draw()
     ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
     ImGui::Begin(DASHBOARD_NAME);
 
+    ImGui::SeparatorText("Subtitle Options");
+    ImGui::SliderFloat("Subtitle Font Size", &settings.subtitle_font_size, SUBTITLE_FONT_SIZE_MIN, SUBTITLE_FONT_SIZE_MAX);
     ImGui::ColorEdit4("Subtitle Font Color", settings.subtitle_font_color, ImGuiColorEditFlags_AlphaBar);
 
 #ifdef ENABLE_DEBUG_UI

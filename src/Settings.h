@@ -19,6 +19,8 @@ public:
     static float subtitle_font_color[4];
     static ImVec4 get_subtitle_font_color();
 
+    static float subtitle_font_size;
+
 private:
     static bool dirty;
     static bool dirty_to_subtitle;
