@@ -7,7 +7,13 @@ class Settings
 {
 public:
     Settings();
+    /**
+     * Options that remain in effect after being set, only apply once per changed.
+     */
     static void apply_to_subtitle();
+    /**
+     * Similar to apply_to_subtitle
+     */
     static void apply_to_dashboard();
 
     static float subtitle_font_color[3];
