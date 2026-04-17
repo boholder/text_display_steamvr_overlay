@@ -36,7 +36,7 @@ static void draw()
     ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
     ImGui::Begin(DASHBOARD_NAME);
 
-    ImGui::ColorEdit3("Subtitle Font Color", settings.subtitle_font_color);
+    ImGui::ColorEdit4("Subtitle Font Color", settings.subtitle_font_color, ImGuiColorEditFlags_AlphaBar);
 
 #ifdef ENABLE_DEBUG_UI
     ImGui::SeparatorText("Debug Info");

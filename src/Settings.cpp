@@ -5,7 +5,7 @@
 bool Settings::dirty = true;
 bool Settings::dirty_to_subtitle = true;
 bool Settings::dirty_to_dashboard = true;
-float Settings::subtitle_font_color[3] = {1.0F, 1.0F, 1.0F};
+float Settings::subtitle_font_color[4] = {1.0F, 1.0F, 1.0F, 1.0F};
 
 Settings::Settings() {}
 
@@ -38,4 +38,4 @@ static void apply_to_imgui_window()
 }
 
 ImVec4 Settings::get_subtitle_font_color()
-{ return {subtitle_font_color[0], subtitle_font_color[1], subtitle_font_color[2], 1.0F}; }
+{ return {subtitle_font_color[0], subtitle_font_color[1], subtitle_font_color[2], subtitle_font_color[3]}; }

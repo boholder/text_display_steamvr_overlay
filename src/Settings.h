@@ -16,7 +16,7 @@ public:
      */
     static void apply_to_dashboard();
 
-    static float subtitle_font_color[3];
+    static float subtitle_font_color[4];
     static ImVec4 get_subtitle_font_color();
 
 private:
