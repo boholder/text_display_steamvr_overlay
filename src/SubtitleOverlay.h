@@ -54,8 +54,12 @@ static void draw()
 
     ImGui::Begin(SUBTITLE_NAME, nullptr, window_flags | ImGuiWindowFlags_NoBackground);
 
+    ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(255, 0, 0, 255));
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 5.0F);
+    ImGui::BeginChild("text_boarder", ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_AutoResizeY);
+
     ImGui::PushFont(nullptr, settings.subtitle_font_size);
-    ImGui::PushStyleColor(ImGuiCol_Text, settings.get_subtitle_font_color()); // Red color
+    ImGui::PushStyleColor(ImGuiCol_Text, settings.get_subtitle_font_color());
     ImGui::TextWrapped(
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut "
         "enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in "
@@ -64,6 +68,10 @@ static void draw()
     );
     ImGui::PopStyleColor();
     ImGui::PopFont();
+
+    ImGui::EndChild();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
 
     im_util::show_im_window_debug_info();
 
