@@ -40,7 +40,7 @@ static void draw()
     ImGui::SliderFloat("Subtitle Font Size", &settings.subtitle_font_size, SUBTITLE_FONT_SIZE_MIN, SUBTITLE_FONT_SIZE_MAX);
     ImGui::ColorEdit4("Subtitle Font Color", settings.subtitle_font_color, ImGuiColorEditFlags_AlphaBar);
 
-    im_util::show_debug_info();
+    im_util::show_im_window_debug_info();
 
     ImGui::End();
 

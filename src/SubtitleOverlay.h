@@ -52,7 +52,7 @@ static void draw()
 
     const int window_flags = im_util::set_next_window_fill_os_window();
 
-    ImGui::Begin(SUBTITLE_NAME, nullptr, window_flags | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar);
+    ImGui::Begin(SUBTITLE_NAME, nullptr, window_flags | ImGuiWindowFlags_NoBackground);
 
     ImGui::PushFont(nullptr, settings.subtitle_font_size);
     ImGui::PushStyleColor(ImGuiCol_Text, settings.get_subtitle_font_color()); // Red color
@@ -65,7 +65,7 @@ static void draw()
     ImGui::PopStyleColor();
     ImGui::PopFont();
 
-    im_util::show_debug_info();
+    im_util::show_im_window_debug_info();
 
     ImGui::End();
 }

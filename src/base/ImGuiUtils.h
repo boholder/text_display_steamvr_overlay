@@ -22,10 +22,10 @@ static int set_next_window_fill_os_window()
     ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
 #endif
 
-    return ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDecoration;
+    return ImGuiWindowFlags_NoDecoration;
 }
 
-static void show_debug_info()
+static void show_im_window_debug_info()
 {
 #ifdef ENABLE_DEBUG_UI
     ImGui::SeparatorText("Debug Info");
