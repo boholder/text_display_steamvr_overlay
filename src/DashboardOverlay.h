@@ -56,7 +56,7 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
     auto* const w = new ImGuiWindow();
     w->Initialize(
         g_vulkanRenderer,
-        1,
+        DASHBOARD_INDEX,
         DASHBOARD_NAME,
         DASHBOARD_WIDTH,
         DASHBOARD_HEIGHT,
@@ -65,14 +65,18 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
         SDL_WINDOWPOS_CENTERED,
         SUBTITLE_HEIGHT * g_dpiScale
     );
+
     settings.apply_to_dashboard();
+
+    g_vulkanRenderer->SetupOverlay(DASHBOARD_INDEX, DASHBOARD_WIDTH, DASHBOARD_HEIGHT, w->WindowData()->surface_format);
+
     return w;
 }
 
 static ImGuiOverlayWindow* init_ovl_window(VulkanRenderer*& g_vulkanRenderer, VrOverlay*& g_dashboard_overlay)
 {
     const auto w = new ImGuiOverlayWindow();
-    w->Initialize(g_vulkanRenderer, g_dashboard_overlay, DASHBOARD_WIDTH, DASHBOARD_HEIGHT, 1, dashboard::draw);
+    w->Initialize(g_vulkanRenderer, g_dashboard_overlay, DASHBOARD_WIDTH, DASHBOARD_HEIGHT, DASHBOARD_INDEX, dashboard::draw);
     return w;
 }
 

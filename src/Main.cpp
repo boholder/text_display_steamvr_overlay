@@ -194,9 +194,7 @@ bool init_resources()
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
     g_dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
     g_subtitle_window = subtitle::init_window(g_vulkanRenderer, g_dpiScale);
-    g_vulkanRenderer->SetupOverlay(0, SUBTITLE_WIDTH, SUBTITLE_HEIGHT, g_subtitle_window->WindowData()->surface_format);
     g_dashboard_window = dashboard::init_window(g_vulkanRenderer, g_dpiScale);
-    g_vulkanRenderer->SetupOverlay(1, DASHBOARD_WIDTH, DASHBOARD_HEIGHT, g_dashboard_window->WindowData()->surface_format);
 #endif
 
     return true;
@@ -332,8 +330,8 @@ bool main_loop()
 
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
 #    ifndef NO_VR
-    g_vulkanRenderer->RenderOverlay(0, subtitle_draw_data, g_subtitle_overlay);
-    g_vulkanRenderer->RenderOverlay(1, dashboard_draw_data, g_dashboard_overlay);
+    g_vulkanRenderer->RenderOverlay(SUBTITLE_INDEX, subtitle_draw_data, g_subtitle_overlay);
+    g_vulkanRenderer->RenderOverlay(DASHBOARD_INDEX, dashboard_draw_data, g_dashboard_overlay);
 #    endif
 #endif
 
@@ -359,8 +357,8 @@ bool main_loop()
     }
 
 #    ifndef NO_VR
-    g_vulkanRenderer->RenderOverlay(0, subtitle_draw_data, g_subtitle_overlay);
-    g_vulkanRenderer->RenderOverlay(1, dashboard_draw_data, g_dashboard_overlay);
+    g_vulkanRenderer->RenderOverlay(SUBTITLE_INDEX, subtitle_draw_data, g_subtitle_overlay);
+    g_vulkanRenderer->RenderOverlay(DASHBOARD_INDEX, dashboard_draw_data, g_dashboard_overlay);
 #    endif
 #endif
 

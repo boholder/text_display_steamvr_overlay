@@ -6,6 +6,7 @@
 #include "imgui.h"
 #include "base/ImGuiUtils.h"
 #include "base/ImGuiWindow.h"
+#include "backends/imgui_impl_openvr.h"
 
 namespace subtitle
 {
@@ -91,7 +92,7 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
     const auto w = new ImGuiWindow();
     w->Initialize(
         g_vulkanRenderer,
-        0,
+        SUBTITLE_INDEX,
         SUBTITLE_NAME,
         SUBTITLE_WIDTH,
         SUBTITLE_HEIGHT,
@@ -101,14 +102,18 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
         20,
         SDL_WINDOW_TRANSPARENT
     );
+
     settings.apply_to_subtitle();
+
+    g_vulkanRenderer->SetupOverlay(SUBTITLE_INDEX, SUBTITLE_WIDTH, SUBTITLE_HEIGHT, w->WindowData()->surface_format);
+
     return w;
 }
 
 static ImGuiOverlayWindow* init_ovl_window(VulkanRenderer*& g_vulkanRenderer, VrOverlay*& g_subtitle_overlay)
 {
     const auto w = new ImGuiOverlayWindow();
-    w->Initialize(g_vulkanRenderer, g_subtitle_overlay, SUBTITLE_WIDTH, SUBTITLE_HEIGHT, 0, subtitle::draw);
+    w->Initialize(g_vulkanRenderer, g_subtitle_overlay, SUBTITLE_WIDTH, SUBTITLE_HEIGHT, SUBTITLE_INDEX, subtitle::draw);
     return w;
 }
 
