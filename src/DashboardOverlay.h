@@ -39,6 +39,7 @@ static void draw()
     ImGui::SeparatorText("Subtitle Options");
     ImGui::SliderFloat("Subtitle Font Size", &settings.subtitle_font_size, SUBTITLE_FONT_SIZE_MIN, SUBTITLE_FONT_SIZE_MAX);
     ImGui::ColorEdit4("Subtitle Font Color", settings.subtitle_font_color, ImGuiColorEditFlags_AlphaBar);
+    ImGui::Checkbox("Subtitle Boarder", &settings.show_boarder);
 
     im_util::show_im_window_debug_info();
 

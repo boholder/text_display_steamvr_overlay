@@ -7,6 +7,7 @@ bool Settings::dirty_to_subtitle = true;
 bool Settings::dirty_to_dashboard = true;
 float Settings::subtitle_font_color[4] = SUBTITLE_FONT_COLOR_DEFAULT;
 float Settings::subtitle_font_size = SUBTITLE_FONT_SIZE_DEFAULT;
+bool Settings::show_boarder = false;
 
 Settings::Settings() {}
 

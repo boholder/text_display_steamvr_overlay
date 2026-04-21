@@ -54,9 +54,13 @@ static void draw()
 
     ImGui::Begin(SUBTITLE_NAME, nullptr, window_flags | ImGuiWindowFlags_NoBackground);
 
-    ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(255, 0, 0, 255));
-    ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 5.0F);
-    ImGui::BeginChild("text_boarder", ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_AutoResizeY);
+    if (settings.show_boarder)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(255, 0, 0, 255));
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 5.0F);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+        ImGui::BeginChild("text_boarder", ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_AutoResizeY);
+    }
 
     ImGui::PushFont(nullptr, settings.subtitle_font_size);
     ImGui::PushStyleColor(ImGuiCol_Text, settings.get_subtitle_font_color());
@@ -69,9 +73,13 @@ static void draw()
     ImGui::PopStyleColor();
     ImGui::PopFont();
 
-    ImGui::EndChild();
-    ImGui::PopStyleColor();
-    ImGui::PopStyleVar();
+    if (settings.show_boarder)
+    {
+        ImGui::EndChild();
+        ImGui::PopStyleColor();
+        ImGui::PopStyleVar();
+        ImGui::PopStyleVar();
+    }
 
     im_util::show_im_window_debug_info();
 

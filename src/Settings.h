@@ -23,8 +23,9 @@ public:
 
     static float subtitle_font_color[4];
     static ImU32 get_subtitle_font_color();
-
     static float subtitle_font_size;
+
+    static bool show_boarder;
 
 private:
     static bool dirty;
