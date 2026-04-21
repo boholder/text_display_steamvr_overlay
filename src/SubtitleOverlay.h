@@ -91,6 +91,7 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
     const auto w = new ImGuiWindow();
     w->Initialize(
         g_vulkanRenderer,
+        0,
         SUBTITLE_NAME,
         SUBTITLE_WIDTH,
         SUBTITLE_HEIGHT,

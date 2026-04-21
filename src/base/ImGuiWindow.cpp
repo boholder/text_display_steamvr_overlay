@@ -34,6 +34,7 @@ ImGuiWindow::ImGuiWindow()
 
 auto ImGuiWindow::Initialize(
     VulkanRenderer*& renderer,
+    const uint8_t index,
     const char* name,
     const int width,
     const int height,
@@ -45,6 +46,8 @@ auto ImGuiWindow::Initialize(
     const bool show
 ) -> void
 {
+    this->index_ = index;
+
     this->draw_callback_ = draw_callback;
 
     auto sdl_window_flags

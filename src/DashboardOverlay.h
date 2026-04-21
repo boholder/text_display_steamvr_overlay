@@ -56,6 +56,7 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
     auto* const w = new ImGuiWindow();
     w->Initialize(
         g_vulkanRenderer,
+        1,
         DASHBOARD_NAME,
         DASHBOARD_WIDTH,
         DASHBOARD_HEIGHT,
