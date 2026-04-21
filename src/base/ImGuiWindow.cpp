@@ -22,10 +22,9 @@
 #include <math.h>
 #include <functional>
 
-ImGuiWindow::ImGuiWindow()
+ImGuiWindow::ImGuiWindow(const uint8_t index) : window_data_(index)
 {
     window_ = nullptr;
-    window_data_ = {};
     window_shown_ = false;
     window_minimized_ = false;
     keyboard_active_ = false;
@@ -34,7 +33,6 @@ ImGuiWindow::ImGuiWindow()
 
 auto ImGuiWindow::Initialize(
     VulkanRenderer*& renderer,
-    const uint8_t index,
     const char* name,
     const int width,
     const int height,
@@ -46,8 +44,6 @@ auto ImGuiWindow::Initialize(
     const bool show
 ) -> void
 {
-    this->index_ = index;
-
     this->draw_callback_ = draw_callback;
 
     auto sdl_window_flags

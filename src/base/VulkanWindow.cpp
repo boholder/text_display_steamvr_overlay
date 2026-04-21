@@ -1,8 +1,9 @@
 #include "VulkanRenderer.h"
 #include "VulkanUtils.h"
 
-VulkanWindow::VulkanWindow()
+VulkanWindow::VulkanWindow(const uint8_t index)
 {
+    this->index=index;
     width=0;
     height=0;
     swapchain=VK_NULL_HANDLE;

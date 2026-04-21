@@ -89,10 +89,9 @@ static void draw()
 
 static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiScale)
 {
-    const auto w = new ImGuiWindow();
+    const auto w = new ImGuiWindow(SUBTITLE_INDEX);
     w->Initialize(
         g_vulkanRenderer,
-        SUBTITLE_INDEX,
         SUBTITLE_NAME,
         SUBTITLE_WIDTH,
         SUBTITLE_HEIGHT,

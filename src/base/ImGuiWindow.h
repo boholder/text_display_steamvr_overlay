@@ -18,12 +18,9 @@
 class ImGuiWindow
 {
 public:
-    uint8_t index_;
-
-    explicit ImGuiWindow();
+    explicit ImGuiWindow(uint8_t index);
     auto Initialize(
         VulkanRenderer*& renderer,
-        uint8_t index,
         const char* name,
         int width,
         int height,

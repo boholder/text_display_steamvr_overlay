@@ -44,6 +44,7 @@ struct Vulkan_FrameSemaphore
 class VulkanWindow
 {
 public:
+    uint8_t index;
     uint32_t width;
     uint32_t height;
     VkSwapchainKHR swapchain;
@@ -62,7 +63,7 @@ public:
     std::vector<Vulkan_FrameSemaphore> semaphores;
     bool is_minimized;
 
-    VulkanWindow();
+    VulkanWindow(uint8_t index);
     void set_background_color(const ImVec4& color);
 };
 
