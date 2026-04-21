@@ -119,8 +119,8 @@ public:
     [[nodiscard]] auto MinimumConcurrentImageCount() const -> uint32_t
     { return minimum_concurrent_image_count_; }
 
-    [[nodiscard]] auto ShouldRebuildSwapchain() const -> bool
-    { return should_rebuild_swapchain_; }
+    [[nodiscard]] auto ShouldRebuildSwapchain(uint32_t index) const -> bool
+    { return should_rebuild_swapchain_.at(index); }
 
     auto SetupWindow(VulkanWindow* window, VkSurfaceKHR surface, uint32_t width, uint32_t height) -> void;
     auto SetupOverlay(uint32_t index, uint32_t width, uint32_t height, VkSurfaceFormatKHR format) -> void;
@@ -157,12 +157,14 @@ private:
     VkDescriptorPool vulkan_descriptor_pool_;
     VkPipelineCache vulkan_pipeline_cache_;
     std::atomic<uint32_t> minimum_concurrent_image_count_;
-    std::atomic<bool> should_rebuild_swapchain_;
     std::vector<std::string> vulkan_instance_extensions_;
     std::vector<std::string> vulkan_device_extensions_;
     VkDebugReportCallbackEXT debug_report_;
     std::vector<VkPhysicalDevice> device_list_;
     std::atomic<bool> should_enable_dynamic_rendering_;
+
+    // these are per overlay variables
+    std::vector<std::atomic<bool>> should_rebuild_swapchain_;
     std::vector<std::unique_ptr<Vulkan_Overlay>> overlays_;
 
     // Vulkan function wrappers

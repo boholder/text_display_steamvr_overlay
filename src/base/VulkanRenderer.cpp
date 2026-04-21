@@ -45,7 +45,6 @@ VulkanRenderer::VulkanRenderer()
     vulkan_descriptor_pool_ = VK_NULL_HANDLE;
     vulkan_pipeline_cache_ = VK_NULL_HANDLE;
     minimum_concurrent_image_count_ = 0;
-    should_rebuild_swapchain_ = false;
     vulkan_instance_extensions_ = {};
     vulkan_instance_extensions_.clear();
     vulkan_device_extensions_ = {};
@@ -55,6 +54,11 @@ VulkanRenderer::VulkanRenderer()
     should_enable_dynamic_rendering_ = false;
     f_vkCmdBeginRenderingKHR = nullptr;
     f_vkCmdEndRenderingKHR = nullptr;
+
+    should_rebuild_swapchain_ = std::vector<std::atomic<bool>>(2);
+    should_rebuild_swapchain_.at(0) = false;
+    should_rebuild_swapchain_.at(1) = false;
+
     overlays_.resize(2);
     overlays_.clear();
     overlays_.push_back(std::make_unique<Vulkan_Overlay>());
@@ -581,7 +585,7 @@ auto VulkanRenderer::SetupSwapchain(VulkanWindow* window, uint32_t width, uint32
         {
             vkDestroySwapchainKHR(vulkan_device_, old_swapchain, vulkan_allocator_);
         }
-        should_rebuild_swapchain_ = true;
+        should_rebuild_swapchain_.at(window->index) = true;
         return;
     }
 
@@ -803,7 +807,7 @@ auto VulkanRenderer::SetupSwapchain(VulkanWindow* window, uint32_t width, uint32
         VK_VALIDATE_RESULT(vk_result);
     }
 
-    should_rebuild_swapchain_ = false;
+    should_rebuild_swapchain_.at(window->index) = false;
 }
 
 /**
@@ -835,7 +839,7 @@ auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, VulkanWindow* window) -
     );
     // ref: https://vulkan-tutorial.com/Drawing_a_triangle/Swap_chain_recreation#page_Suboptimal-or-out-of-date-swap-chain
     if (vk_result == VK_ERROR_OUT_OF_DATE_KHR || vk_result == VK_SUBOPTIMAL_KHR)
-        should_rebuild_swapchain_ = true;
+        should_rebuild_swapchain_.at(window->index) = true;
     if (vk_result == VK_ERROR_OUT_OF_DATE_KHR)
         return;
     if (vk_result != VK_SUBOPTIMAL_KHR)
@@ -1170,7 +1174,7 @@ auto VulkanRenderer::RenderOverlay(uint32_t index, ImDrawData* draw_data, VrOver
 
 auto VulkanRenderer::Present(VulkanWindow* window) -> void
 {
-    if (should_rebuild_swapchain_ || window->is_minimized)
+    if (should_rebuild_swapchain_.at(window->index) || window->is_minimized)
         return;
 
     VkResult vk_result = {};
@@ -1189,7 +1193,7 @@ auto VulkanRenderer::Present(VulkanWindow* window) -> void
     vk_result = vkQueuePresentKHR(vulkan_queue_, &info);
 
     if (vk_result == VK_ERROR_OUT_OF_DATE_KHR || vk_result == VK_SUBOPTIMAL_KHR)
-        should_rebuild_swapchain_ = true;
+        should_rebuild_swapchain_.at(window->index) = true;
 
     if (vk_result == VK_ERROR_OUT_OF_DATE_KHR)
         return;

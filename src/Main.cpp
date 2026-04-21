@@ -238,7 +238,7 @@ static std::pair<int, int> update_window_size_and_swapchain(ImGuiWindow* window)
     fb_height *= static_cast<int>(g_dpiScale);
 
     if ((fb_width != 0 && fb_height != 0)
-        && (g_vulkanRenderer->ShouldRebuildSwapchain() || window->WindowData()->width != fb_width
+        && (g_vulkanRenderer->ShouldRebuildSwapchain(window->WindowData()->index) || window->WindowData()->width != fb_width
             || window->WindowData()->height != fb_height))
     {
         ImGui_ImplVulkan_SetMinImageCount(g_vulkanRenderer->MinimumConcurrentImageCount());
