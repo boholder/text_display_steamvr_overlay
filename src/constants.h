@@ -7,7 +7,7 @@
 #define SUBTITLE_KEY (APP_KEY ".window")
 #define SUBTITLE_NAME (APP_NAME " Window")
 #define SUBTITLE_WIDTH 1280
-#define SUBTITLE_HEIGHT 250
+#define SUBTITLE_HEIGHT 960
 #define SUBTITLE_INDEX 0
 
 #define DASHBOARD_KEY (APP_KEY ".dashboard")

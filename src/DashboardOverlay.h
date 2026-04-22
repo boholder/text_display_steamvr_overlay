@@ -39,7 +39,9 @@ static void draw()
     ImGui::SeparatorText("Subtitle Options");
     ImGui::SliderFloat("Subtitle Font Size", &settings.subtitle_font_size, SUBTITLE_FONT_SIZE_MIN, SUBTITLE_FONT_SIZE_MAX);
     ImGui::ColorEdit4("Subtitle Font Color", settings.subtitle_font_color, ImGuiColorEditFlags_AlphaBar);
-    ImGui::Checkbox("Subtitle Boarder", &settings.show_boarder);
+    ImGui::Checkbox("Subtitle Boarder", &settings.show_boarder_around_subtitle);
+    ImGui::SliderFloat("Subtitle Frame Width", &settings.subtitle_frame_width, SUBTITLE_FRAME_WIDTH_MIN, settings.subtitle_window_width);
+    ImGui::SliderFloat("Subtitle Frame Height", &settings.subtitle_frame_height, SUBTITLE_FRAME_HEIGHT_MIN, settings.subtitle_window_height);
 
     im_util::show_im_window_debug_info();
 
@@ -62,7 +64,7 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
         g_dpiScale,
         dashboard::draw,
         SDL_WINDOWPOS_CENTERED,
-        SUBTITLE_HEIGHT * g_dpiScale
+        250 * g_dpiScale
     );
 
     settings.apply_to_dashboard();
