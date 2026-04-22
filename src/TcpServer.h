@@ -10,7 +10,7 @@ namespace tcp_server
 
 static int tcp_server_thread()
 {
-    spdlog::debug("TCP server thread id: {}", std::this_thread::get_id()._Get_underlying_id());
+    SPDLOG_DEBUG("TCP server thread id: {}", std::this_thread::get_id()._Get_underlying_id());
 
     sockpp::initialize();
 
@@ -19,10 +19,10 @@ static int tcp_server_thread()
     sockpp::tcp_acceptor acc{port, 4, sockpp::tcp_acceptor::REUSE, ec};
     if (ec)
     {
-        spdlog::error("Error creating the acceptor: {}", ec.message());
+        SPDLOG_ERROR("Error creating the acceptor: {}", ec.message());
         return 1;
     }
-    spdlog::info("TCP server started on port {}", port);
+    SPDLOG_INFO("TCP server started on port {}", port);
 
     auto timeout = TCP_SERVER_TIMEOUT;
     while (true)
@@ -38,13 +38,13 @@ static int tcp_server_thread()
             }
             else
             {
-                spdlog::error("Error accepting connection: {}", res.error_message());
+                SPDLOG_ERROR("Error accepting connection: {}", res.error_message());
             }
         }
         else
         {
             auto peer_addr = peer.to_string();
-            spdlog::info("Connection with [{}] accepted", peer_addr);
+            SPDLOG_INFO("Connection with [{}] accepted", peer_addr);
 
             sockpp::tcp_socket sock = res.release();
             sockpp::result<size_t> r;
@@ -60,13 +60,13 @@ static int tcp_server_thread()
 
                 if (r.value() > 0)
                 {
-                    spdlog::debug("[{}] sends: [{}]", peer_addr, buf);
+                    SPDLOG_DEBUG("[{}] sends: [{}]", peer_addr, buf);
                 }
                 else if (r.error().value() == 0 && r.value() == 0)
                 {
                     // a successful read that returns a value of zero indicates that the connection is closed
                     // ref: https://github.com/fpagliughi/sockpp/issues/99#issuecomment-4263496155
-                    spdlog::info("Connection with [{}] closed", peer_addr);
+                    SPDLOG_INFO("Connection with [{}] closed", peer_addr);
                     break;
                 }
             }

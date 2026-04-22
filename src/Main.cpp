@@ -77,7 +77,7 @@ static auto UpdateApplicationRefreshRate() -> void
     }
     catch (std::exception& ex)
     {
-        spdlog::error("Failed to update HMD refresh rate: {}", ex.what());
+        SPDLOG_ERROR("Failed to update HMD refresh rate: {}", ex.what());
         if (g_hmd_refresh_rate == 24.0f)
             std::exit(EXIT_FAILURE);
     }
@@ -138,7 +138,7 @@ static bool handle_openvr_events(const VrOverlay* overlay, ImGuiWindow* window)
 bool init_resources()
 {
 #ifdef NO_VR
-    spdlog::info("Skipping OpenVR initialization");
+    SPDLOG_INFO("Skipping OpenVR initialization");
 #else
     // Initialize the overlay as "VRApplication_Background" instead of "VRApplication_Overlay"
     // This makes sure that the overlay *cannot* run while SteamVR is not running.
@@ -148,7 +148,7 @@ bool init_resources()
     }
     catch (std::exception& ex)
     {
-        spdlog::error("Failed to initialize OpenVR: {}", ex.what());
+        SPDLOG_ERROR("Failed to initialize OpenVR: {}", ex.what());
         return false;
     }
 
@@ -161,7 +161,7 @@ bool init_resources()
     }
     catch (std::exception& ex)
     {
-        spdlog::error("Failed to install OpenVR manifest: {}", ex.what());
+        SPDLOG_ERROR("Failed to install OpenVR manifest: {}", ex.what());
         return false;
     }
 
@@ -172,7 +172,7 @@ bool init_resources()
     }
     catch (std::exception& ex)
     {
-        spdlog::error("Failed to create or setup overlay: {}", ex.what());
+        SPDLOG_ERROR("Failed to create or setup overlay: {}", ex.what());
         return false;
     }
 #endif
@@ -181,7 +181,7 @@ bool init_resources()
     auto sdl_init_flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO;
     if (!SDL_Init(sdl_init_flags))
     {
-        spdlog::error("Failed to initialize SDL: {}", SDL_GetError());
+        SPDLOG_ERROR("Failed to initialize SDL: {}", SDL_GetError());
         return false;
     }
 #endif
@@ -383,13 +383,16 @@ bool main_loop()
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
+    // [10-31 23:46:59.678] shorten-level thread-id source-file-and-line: message
+    spdlog::set_pattern("%^[%m-%d %T.%e] %L %-5t %-8!s:%-4#: %v%$");
+
 #ifdef ENABLE_DEBUG_LOG
     spdlog::set_level(spdlog::level::debug);
 #endif
 
     if (!init_resources())
         return EXIT_FAILURE;
-    spdlog::info("Successfully initialized");
+    SPDLOG_INFO("Successfully initialized");
 
     bool ticking = true;
     while (ticking)
@@ -397,7 +400,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
         ticking = main_loop();
     }
 
-    spdlog::info("Quit event received, shutting down...");
+    SPDLOG_INFO("Quit event received, shutting down...");
     clean_resources();
     return EXIT_SUCCESS;
 }

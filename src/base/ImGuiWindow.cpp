@@ -51,14 +51,14 @@ auto ImGuiWindow::Initialize(
     window_ = SDL_CreateWindow(name, width * static_cast<int>(dpiScale), height * static_cast<int>(dpiScale), sdl_window_flags);
     if (window_ == nullptr)
     {
-        spdlog::error("[SDL] Failed to create a window: {}", SDL_GetError());
+        SPDLOG_ERROR("[SDL] Failed to create a window: {}", SDL_GetError());
         return;
     }
 
     VkSurfaceKHR surface = {};
     if (SDL_Vulkan_CreateSurface(window_, renderer->Instance(), renderer->Allocator(), &surface) == 0)
     {
-        spdlog::error("[SDL] Failed to create a Vulkan rendering surface for window: {}", SDL_GetError());
+        SPDLOG_ERROR("[SDL] Failed to create a Vulkan rendering surface for window: {}", SDL_GetError());
         return;
     }
 

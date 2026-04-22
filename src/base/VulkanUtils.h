@@ -18,7 +18,7 @@
 
 #define VK_VALIDATE_RESULT(e)                                                                                                              \
     if ((e) != VK_SUCCESS)                                                                                                                 \
-        spdlog::error("[Vulkan] Vulkan operation result is not VK_SUCCESS: {}", ( int ) (e));                                              \
+        SPDLOG_ERROR("[Vulkan] Vulkan operation result is not VK_SUCCESS: {}", ( int ) (e));                                               \
     if ((e) > 0)                                                                                                                           \
         assert(e);
 
@@ -58,7 +58,7 @@ static bool
     }
     else
     {
-        spdlog::error("[Vulkan] No Vulkan {} extension properties found in local, exit", type == INSTANCE ? "instance" : "device");
+        SPDLOG_ERROR("[Vulkan] No Vulkan {} extension properties found in local, exit", type == INSTANCE ? "instance" : "device");
         std::exit(EXIT_FAILURE);
     }
 
@@ -110,7 +110,7 @@ static std::vector<std::string> GetVulkanExtensionsRequiredByOpenVR(const Vulkan
             }
             else
             {
-                spdlog::error(
+                SPDLOG_ERROR(
                     "[Vulkan] [{}] {} extension asked by OpenVR was NOT available, exit", type == INSTANCE ? "instance" : "device", token
                 );
                 std::exit(EXIT_FAILURE);
@@ -119,7 +119,7 @@ static std::vector<std::string> GetVulkanExtensionsRequiredByOpenVR(const Vulkan
     }
     else
     {
-        spdlog::error("[Vulkan] NO Vulkan {} extension asked by OpenVR, exit", type == INSTANCE ? "instance" : "device");
+        SPDLOG_ERROR("[Vulkan] NO Vulkan {} extension asked by OpenVR, exit", type == INSTANCE ? "instance" : "device");
         std::exit(EXIT_FAILURE);
     }
 

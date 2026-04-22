@@ -135,7 +135,7 @@ auto VulkanRenderer::Initialize() -> void
         // temp suppress these reports
         if (!std::string(pMessage).contains("has not been destroyed"))
         {
-            spdlog::error("[Vulkan] Debug report from ObjectType: [{}], message: {}", static_cast<int>(objectType), pMessage);
+            SPDLOG_ERROR("[Vulkan] Debug report from ObjectType: [{}], message: {}", static_cast<int>(objectType), pMessage);
         }
 
         return VK_FALSE;
@@ -188,7 +188,7 @@ auto VulkanRenderer::Initialize() -> void
     VkPhysicalDeviceProperties properties = {};
     vkGetPhysicalDeviceProperties(vulkan_physical_device_, &properties);
 
-    spdlog::info(
+    SPDLOG_INFO(
         "[Vulkan] Using device [{}], discrete: [{}]",
         properties.deviceName,
         properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ? "Yes" : "No"
@@ -311,7 +311,7 @@ auto VulkanRenderer::SetupWindow(VulkanWindow* window, VkSurfaceKHR surface, uin
 
     if (result != VK_TRUE)
     {
-        spdlog::error("No WSI support on physical device 0");
+        SPDLOG_ERROR("No WSI support on physical device 0");
         exit(-1);
     }
 
@@ -352,11 +352,11 @@ auto VulkanRenderer::SetupWindow(VulkanWindow* window, VkSurfaceKHR surface, uin
         }
     };
 
-    spdlog::debug("Available present modes:");
+    SPDLOG_DEBUG("Available present modes:");
 
     for (auto& mode : m_modes)
     {
-        spdlog::debug("\t- {}", present_mode_to_string(mode));
+        SPDLOG_DEBUG("\t- {}", present_mode_to_string(mode));
     }
 
     VkPresentModeKHR present_mode = VK_PRESENT_MODE_FIFO_KHR;
@@ -369,7 +369,7 @@ auto VulkanRenderer::SetupWindow(VulkanWindow* window, VkSurfaceKHR surface, uin
     if (relaxed != m_modes.end() && mailbox == m_modes.end())
         present_mode = VK_PRESENT_MODE_FIFO_RELAXED_KHR;
 
-    spdlog::debug("Selected present mode: [{}]", present_mode_to_string(present_mode));
+    SPDLOG_DEBUG("Selected present mode: [{}]", present_mode_to_string(present_mode));
 
     window->surface_format = surface_format;
     window->present_mode = present_mode;
@@ -1118,7 +1118,7 @@ auto VulkanRenderer::RenderOverlay(uint32_t index, ImDrawData* draw_data, VrOver
     }
     catch (std::exception& ex)
     {
-        spdlog::error("[OpenVR] Failed to set overlay texture: {}", ex.what());
+        SPDLOG_ERROR("[OpenVR] Failed to set overlay texture: {}", ex.what());
         return;
     }
 
