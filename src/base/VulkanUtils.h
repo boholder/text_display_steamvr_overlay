@@ -133,4 +133,4 @@ static void set_vk_clear_value_background_color(VkClearValue& clear_value, const
     clear_value.color.float32[2] = color.z * color.w;
     clear_value.color.float32[3] = color.w;
 }
-} // namespace vkutil
+} // namespace vk_util

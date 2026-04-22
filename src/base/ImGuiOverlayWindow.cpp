@@ -21,7 +21,14 @@ ImGuiOverlayWindow::ImGuiOverlayWindow()
     draw_callback_ = nullptr;
 }
 
-auto ImGuiOverlayWindow::Initialize(VulkanRenderer*& renderer, VrOverlay*& overlay, int width, int height, int overlayIndex, void (*draw_callback)()) -> void
+auto ImGuiOverlayWindow::Initialize(
+    VulkanRenderer*& renderer,
+    VrOverlay*& overlay,
+    int width,
+    int height,
+    int overlayIndex,
+    void (*draw_callback)()
+) -> void
 {
     this->draw_callback_ = draw_callback;
 
