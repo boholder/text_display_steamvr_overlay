@@ -90,6 +90,7 @@ add_executable(${PNAME}
         "src/DashboardOverlay.h"
         "src/Settings.cpp"
         "src/base/ImGuiUtils.h"
+        "src/TcpServer.h"
 )
 
 target_compile_features(${PNAME} PUBLIC cxx_std_23)

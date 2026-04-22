@@ -12,6 +12,7 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <thread>
 
 #include <imgui.h>
 #include <backends/imgui_impl_sdl3.h>
@@ -38,6 +39,7 @@
 #include "base/ImGuiOverlayWindow.h"
 #include "SubtitleOverlay.h"
 #include "DashboardOverlay.h"
+#include "TcpServer.h"
 
 #include "base/VrOverlay.h"
 #include "base/VrUtils.h"
@@ -196,6 +198,9 @@ bool init_resources()
     g_subtitle_window = subtitle::init_window(g_vulkanRenderer, g_dpiScale);
     g_dashboard_window = dashboard::init_window(g_vulkanRenderer, g_dpiScale);
 #endif
+
+    std::thread tcp_server_thread(tcp_server::tcp_server_thread, settings.tcp_server_port);
+    tcp_server_thread.detach();
 
     return true;
 }

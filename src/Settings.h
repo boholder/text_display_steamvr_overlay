@@ -38,6 +38,7 @@ public:
     static float subtitle_frame_height;
     static float subtitle_window_width;
     static float subtitle_window_height;
+    static int tcp_server_port;
 
 private:
     static bool dirty;

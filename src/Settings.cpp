@@ -12,6 +12,7 @@ float Settings::subtitle_frame_width = SUBTITLE_FRAME_WIDTH_DEFAULT;
 float Settings::subtitle_frame_height = SUBTITLE_FRAME_HEIGHT_DEFAULT;
 float Settings::subtitle_window_width = SUBTITLE_FRAME_WIDTH_MAX;
 float Settings::subtitle_window_height = SUBTITLE_FRAME_HEIGHT_MAX;
+int Settings::tcp_server_port = 18781;
 
 Settings::Settings() {}
 

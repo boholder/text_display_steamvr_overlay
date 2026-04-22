@@ -352,11 +352,11 @@ auto VulkanRenderer::SetupWindow(VulkanWindow* window, VkSurfaceKHR surface, uin
         }
     };
 
-    spdlog::info("Available present modes:");
+    spdlog::debug("Available present modes:");
 
     for (auto& mode : m_modes)
     {
-        spdlog::info("\t- {}", present_mode_to_string(mode));
+        spdlog::debug("\t- {}", present_mode_to_string(mode));
     }
 
     VkPresentModeKHR present_mode = VK_PRESENT_MODE_FIFO_KHR;
@@ -369,7 +369,7 @@ auto VulkanRenderer::SetupWindow(VulkanWindow* window, VkSurfaceKHR surface, uin
     if (relaxed != m_modes.end() && mailbox == m_modes.end())
         present_mode = VK_PRESENT_MODE_FIFO_RELAXED_KHR;
 
-    spdlog::info("Selected: [{}]", present_mode_to_string(present_mode));
+    spdlog::info("Selected present mode: [{}]", present_mode_to_string(present_mode));
 
     window->surface_format = surface_format;
     window->present_mode = present_mode;
