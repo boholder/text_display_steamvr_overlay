@@ -117,7 +117,7 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
         g_dpiScale,
         subtitle::draw,
         SDL_WINDOWPOS_CENTERED,
-        20,
+        20, // offset from top of monitor, enough to show a part of titlebar for cursor to drag
         SDL_WINDOW_TRANSPARENT
     );
 
