@@ -16,4 +16,6 @@
 #define DASHBOARD_HEIGHT 720
 #define DASHBOARD_INDEX 1
 
+#define TCP_SERVER_TIMEOUT std::chrono::seconds(1)
+
 #endif // TEXT_DISPLAY_STEAMVR_OVERLAY_CONSTANTS_H

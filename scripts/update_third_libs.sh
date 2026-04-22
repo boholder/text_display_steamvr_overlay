@@ -7,13 +7,15 @@ SPDLOG_VERSION_TAG="v1.17.0"
 IMGUI_VERSION_TAG="v1.92.0"
 SDL_VERSION_TAG="release-3.4.2"
 GLM_VERSION_TAG="1.0.3"
+SOCKPP_VERSION_TAG="master"
 
 OPENVR_DIR="OpenVR"
 SPDLOG_DIR="spdlog"
 IMGUI_DIR="ImGui"
 SDL_DIR="SDL"
 GLM_DIR="glm"
-DIRS=("$OPENVR_DIR" "$SPDLOG_DIR" "$IMGUI_DIR" "$SDL_DIR" "$GLM_DIR")
+SOCKPP_DIR="sockpp"
+DIRS=("$OPENVR_DIR" "$SPDLOG_DIR" "$IMGUI_DIR" "$SDL_DIR" "$GLM_DIR" "$SOCKPP_DIR")
 
 THIRD_LIB_DIR="3rdparty"
 
@@ -44,6 +46,12 @@ function update_sdl() {
 function update_glm() {
     git clone --depth=1 --branch "$GLM_VERSION_TAG" https://github.com/g-truc/glm.git "$GLM_DIR"
     cd "$GLM_DIR" || exit
+    rm -rf .git
+}
+
+function update_sockpp() {
+    git clone --depth=1 --branch "$SOCKPP_VERSION_TAG" https://github.com/fpagliughi/sockpp.git "$SOCKPP_DIR"
+    cd "$SOCKPP_DIR" || exit
     rm -rf .git
 }
 
@@ -80,3 +88,4 @@ clone_if_not_exist "$OPENVR_DIR" update_openvr
 clone_if_not_exist "$IMGUI_DIR" update_imgui
 clone_if_not_exist "$SDL_DIR" update_sdl
 clone_if_not_exist "$GLM_DIR" update_glm
+clone_if_not_exist "$SOCKPP_DIR" update_sockpp

@@ -101,6 +101,7 @@ target_link_libraries(${PNAME}
         ImGui
         glm::glm
         spdlog::spdlog
+        Sockpp::sockpp
 )
 
 if (ENABLE_VULKAN_VALIDATION)

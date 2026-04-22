@@ -199,7 +199,7 @@ bool init_resources()
     g_dashboard_window = dashboard::init_window(g_vulkanRenderer, g_dpiScale);
 #endif
 
-    std::thread tcp_server_thread(tcp_server::tcp_server_thread, settings.tcp_server_port);
+    std::thread tcp_server_thread(tcp_server::tcp_server_thread);
     tcp_server_thread.detach();
 
     return true;

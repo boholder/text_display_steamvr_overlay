@@ -5,6 +5,7 @@ include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 set(SDL_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/SDL)
 set(ImGui_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/ImGui)
 set(SPDLOG_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/spdlog)
+set(SOCKPP_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/sockpp)
 
 find_package(Vulkan REQUIRED)
 
@@ -34,3 +35,5 @@ target_include_directories(ImGui PUBLIC ${ImGui_ROOT})
 target_link_libraries(ImGui PUBLIC SDL3::SDL3 vulkan OpenVR::API)
 
 add_subdirectory(${SPDLOG_ROOT} EXCLUDE_FROM_ALL)
+
+add_subdirectory(${SOCKPP_ROOT} EXCLUDE_FROM_ALL)
