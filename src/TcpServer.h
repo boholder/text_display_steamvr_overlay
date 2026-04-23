@@ -48,19 +48,21 @@ static int tcp_server_thread()
 
             sockpp::tcp_socket sock = res.release();
             sockpp::result<size_t> r;
-            char buf[512];
+            char buf[TCP_SERVER_BUFFER_SIZE];
+            // only zeroing non-zero (used for storing last data) parts in every loop
+            unsigned long long last_end = TCP_SERVER_BUFFER_SIZE;
 
-            while (sock.is_open())
+            while (true)
             {
                 auto* const begin = reinterpret_cast<char*>(&buf);
-                char* end = begin + sizeof(buf);
-                std::fill(begin, end, 0);
+                std::fill_n(begin, last_end, 0);
 
                 r = sock.read(buf, sizeof(buf)); // blocking
 
                 if (r.value() > 0)
                 {
                     SPDLOG_DEBUG("[{}] sends: [{}]", peer_addr, buf);
+                    last_end = r.value();
                 }
                 else if (r.error().value() == 0 && r.value() == 0)
                 {

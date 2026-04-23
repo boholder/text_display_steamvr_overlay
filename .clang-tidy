@@ -1,5 +1,6 @@
 ---
 Checks:          '*,
+    -altera-unroll-loops,
     -cert-err58-cpp,
     -cppcoreguidelines-avoid-c-arrays,
     -hicpp-avoid-c-arrays,
