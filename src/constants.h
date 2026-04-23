@@ -1,7 +1,8 @@
 #ifndef TEXT_DISPLAY_STEAMVR_OVERLAY_CONSTANTS_H
 #define TEXT_DISPLAY_STEAMVR_OVERLAY_CONSTANTS_H
 
-#define LOG_PATTERN "%^[%m-%d %T.%e] %L %-5t %-8!s:%-4#: %v%$"
+// [26-10-31 23:46:59.678] shorten-level thread-id source-file-and-line: message
+#define LOG_PATTERN "%^[%C-%m-%d %T.%e] %L %-5t %-8!s:%-4#: %v%$"
 
 #define APP_KEY "com.github.boholder.text_display_steamvr_overlay"
 #define APP_NAME "Text Display Overlay"

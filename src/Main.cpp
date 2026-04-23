@@ -387,7 +387,6 @@ bool main_loop()
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
-    // [10-31 23:46:59.678] shorten-level thread-id source-file-and-line: message
     spdlog::set_pattern(LOG_PATTERN);
 
 #ifdef ENABLE_DEBUG_LOG
