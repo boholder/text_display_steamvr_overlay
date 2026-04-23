@@ -46,10 +46,13 @@ public:
 
     static int tcp_server_port;
     static std::optional<std::string> validate_tcp_server_port();
+    static bool is_tcp_server_port_changed();
+    static void apply_tcp_server_port();
 
 private:
     static bool dirty_to_subtitle;
     static bool dirty_to_dashboard;
+    static int tcp_server_port_bak;
 };
 
 extern Settings settings;

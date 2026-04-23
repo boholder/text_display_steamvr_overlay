@@ -14,6 +14,7 @@ float Settings::subtitle_frame_height = SUBTITLE_FRAME_HEIGHT_DEFAULT;
 float Settings::subtitle_window_width = SUBTITLE_FRAME_WIDTH_MAX;
 float Settings::subtitle_window_height = SUBTITLE_FRAME_HEIGHT_MAX;
 int Settings::tcp_server_port = TCP_SERVER_DEFAULT_PORT;
+int Settings::tcp_server_port_bak = TCP_SERVER_DEFAULT_PORT;
 
 Settings::Settings() {}
 
@@ -59,3 +60,9 @@ std::optional<std::string> Settings::validate_tcp_server_port()
     }
     return std::nullopt;
 }
+
+bool Settings::is_tcp_server_port_changed()
+{ return tcp_server_port != tcp_server_port_bak; }
+
+void Settings::apply_tcp_server_port()
+{ tcp_server_port_bak = tcp_server_port; }
