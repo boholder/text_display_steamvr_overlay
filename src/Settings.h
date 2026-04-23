@@ -43,7 +43,6 @@ public:
     static int tcp_server_port;
 
 private:
-    static bool dirty;
     static bool dirty_to_subtitle;
     static bool dirty_to_dashboard;
 };

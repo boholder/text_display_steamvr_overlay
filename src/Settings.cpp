@@ -2,7 +2,6 @@
 
 #include <imgui.h>
 
-bool Settings::dirty = true;
 bool Settings::dirty_to_subtitle = true;
 bool Settings::dirty_to_dashboard = true;
 float Settings::subtitle_font_color[4] = SUBTITLE_FONT_COLOR_DEFAULT;
