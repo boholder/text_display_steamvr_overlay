@@ -2,6 +2,8 @@
 #define TEXT_DISPLAY_STEAMVR_OVERLAY_SETTINGS_H
 
 #include <imgui.h>
+#include <optional>
+#include <string>
 
 #define SUBTITLE_FONT_SIZE_MIN 10.0F
 #define SUBTITLE_FONT_SIZE_DEFAULT 20.0F
@@ -34,13 +36,16 @@ public:
 
     static float subtitle_font_color[4];
     static ImU32 get_subtitle_font_color();
+
     static float subtitle_font_size;
     static bool show_boarder_around_subtitle;
     static float subtitle_frame_width;
     static float subtitle_frame_height;
     static float subtitle_window_width;
     static float subtitle_window_height;
+
     static int tcp_server_port;
+    static std::optional<std::string> validate_tcp_server_port();
 
 private:
     static bool dirty_to_subtitle;

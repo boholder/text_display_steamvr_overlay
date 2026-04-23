@@ -6,6 +6,27 @@
 #include "imgui.h"
 #include "base/ImGuiWindow.h"
 
+static void validate_with_red_border(std::optional<std::string> (*validator)(), void (*draw_widget)())
+{
+    const std::optional<std::string> v = validator();
+
+    if (v.has_value())
+    {
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0F);
+        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0F, 0.2F, 0.2F, 1.0F));
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.30F, 0.10F, 0.10F, 1.0F));
+    }
+
+    draw_widget();
+
+    if (v.has_value())
+    {
+        ImGui::PopStyleColor(2);
+        ImGui::PopStyleVar();
+        ImGui::TextColored(ImVec4(1.0F, 0.4F, 0.4F, 1.0F), "%s", v.value().c_str());
+    }
+}
+
 namespace dashboard
 {
 
@@ -43,6 +64,10 @@ static void draw()
     ImGui::SliderFloat("Subtitle Frame Width", &settings.subtitle_frame_width, SUBTITLE_FRAME_WIDTH_MIN, settings.subtitle_window_width);
     ImGui::SliderFloat(
         "Subtitle Frame Height", &settings.subtitle_frame_height, SUBTITLE_FRAME_HEIGHT_MIN, settings.subtitle_window_height);
+
+    ImGui::SeparatorText("TCP Server Options");
+
+    validate_with_red_border(settings.validate_tcp_server_port, [] { ImGui::InputInt("Port", &settings.tcp_server_port, 0, 0, 0); });
 
     im_util::show_im_window_debug_info();
 

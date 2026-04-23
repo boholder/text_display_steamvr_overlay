@@ -1,6 +1,8 @@
 #include "Settings.h"
 
 #include <imgui.h>
+#include <optional>
+#include <string>
 
 bool Settings::dirty_to_subtitle = true;
 bool Settings::dirty_to_dashboard = true;
@@ -47,4 +49,13 @@ ImU32 Settings::get_subtitle_font_color()
 {
     return ImGui::ColorConvertFloat4ToU32(
         ImVec4(subtitle_font_color[0], subtitle_font_color[1], subtitle_font_color[2], subtitle_font_color[3]));
+}
+
+std::optional<std::string> Settings::validate_tcp_server_port()
+{
+    if (tcp_server_port <= 1024 || tcp_server_port > 65535)
+    {
+        return std::make_optional<std::string>("must be within 1025~65535");
+    }
+    return std::nullopt;
 }
