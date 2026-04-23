@@ -585,7 +585,7 @@ auto VulkanRenderer::SetupSwapchain(VulkanWindow* window, uint32_t width, uint32
         {
             vkDestroySwapchainKHR(vulkan_device_, old_swapchain, vulkan_allocator_);
         }
-        should_rebuild_swapchain_.at(window->index) = true;
+        should_rebuild_swapchain_.at(window->render_index) = true;
         return;
     }
 
@@ -807,7 +807,7 @@ auto VulkanRenderer::SetupSwapchain(VulkanWindow* window, uint32_t width, uint32
         VK_VALIDATE_RESULT(vk_result);
     }
 
-    should_rebuild_swapchain_.at(window->index) = false;
+    should_rebuild_swapchain_.at(window->render_index) = false;
 }
 
 /**
@@ -839,7 +839,7 @@ auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, VulkanWindow* window) -
     );
     // ref: https://vulkan-tutorial.com/Drawing_a_triangle/Swap_chain_recreation#page_Suboptimal-or-out-of-date-swap-chain
     if (vk_result == VK_ERROR_OUT_OF_DATE_KHR || vk_result == VK_SUBOPTIMAL_KHR)
-        should_rebuild_swapchain_.at(window->index) = true;
+        should_rebuild_swapchain_.at(window->render_index) = true;
     if (vk_result == VK_ERROR_OUT_OF_DATE_KHR)
         return;
     if (vk_result != VK_SUBOPTIMAL_KHR)
@@ -1174,7 +1174,7 @@ auto VulkanRenderer::RenderOverlay(uint32_t index, ImDrawData* draw_data, VrOver
 
 auto VulkanRenderer::Present(VulkanWindow* window) -> void
 {
-    if (should_rebuild_swapchain_.at(window->index) || window->is_minimized)
+    if (should_rebuild_swapchain_.at(window->render_index) || window->is_minimized)
         return;
 
     VkResult vk_result = {};
@@ -1193,7 +1193,7 @@ auto VulkanRenderer::Present(VulkanWindow* window) -> void
     vk_result = vkQueuePresentKHR(vulkan_queue_, &info);
 
     if (vk_result == VK_ERROR_OUT_OF_DATE_KHR || vk_result == VK_SUBOPTIMAL_KHR)
-        should_rebuild_swapchain_.at(window->index) = true;
+        should_rebuild_swapchain_.at(window->render_index) = true;
 
     if (vk_result == VK_ERROR_OUT_OF_DATE_KHR)
         return;

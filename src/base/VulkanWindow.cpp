@@ -3,7 +3,7 @@
 
 VulkanWindow::VulkanWindow(const uint8_t index)
 {
-    this->index = index;
+    this->render_index = index;
     width = 0;
     height = 0;
     swapchain = VK_NULL_HANDLE;

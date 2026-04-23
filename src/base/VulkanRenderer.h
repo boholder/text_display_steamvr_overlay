@@ -44,7 +44,10 @@ struct Vulkan_FrameSemaphore
 class VulkanWindow
 {
 public:
-    uint8_t index;
+    /**
+     * For setting/getting VulkanWindow instance-specific data in VulkanRenderer
+     */
+    uint8_t render_index;
     uint32_t width;
     uint32_t height;
     VkSwapchainKHR swapchain;
