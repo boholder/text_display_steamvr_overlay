@@ -14,6 +14,12 @@
 #include <vector>
 #include <thread>
 
+// ref: https://github.com/gabime/spdlog/wiki/FAQ#how-to-remove-all-debug-statements-at-compile-time-
+#ifdef ENABLE_DEBUG_LOG
+#    define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
+#endif
+#include <spdlog/spdlog.h>
+
 #include <imgui.h>
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_vulkan.h>
@@ -21,8 +27,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_vulkan.h>
-
-#include <spdlog/spdlog.h>
 
 #define GLM_ENABLE_EXPERIMENTAL
 
@@ -384,10 +388,11 @@ bool main_loop()
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
     // [10-31 23:46:59.678] shorten-level thread-id source-file-and-line: message
-    spdlog::set_pattern("%^[%m-%d %T.%e] %L %-5t %-8!s:%-4#: %v%$");
+    spdlog::set_pattern(LOG_PATTERN);
 
 #ifdef ENABLE_DEBUG_LOG
     spdlog::set_level(spdlog::level::debug);
+    SPDLOG_DEBUG("Log level set to DEBUG");
 #endif
 
     if (!init_resources())
