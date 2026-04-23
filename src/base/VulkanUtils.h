@@ -16,10 +16,10 @@
 
 #include <spdlog/spdlog.h>
 
-#define VK_VALIDATE_RESULT(e)                                                                                                              \
-    if ((e) != VK_SUCCESS)                                                                                                                 \
-        SPDLOG_ERROR("[Vulkan] Vulkan operation result is not VK_SUCCESS: {}", ( int ) (e));                                               \
-    if ((e) > 0)                                                                                                                           \
+#define VK_VALIDATE_RESULT(e)                                                                \
+    if ((e) != VK_SUCCESS)                                                                   \
+        SPDLOG_ERROR("[Vulkan] Vulkan operation result is not VK_SUCCESS: {}", ( int ) (e)); \
+    if ((e) > 0)                                                                             \
         assert(e);
 
 enum VulkanExtensionType
@@ -111,8 +111,7 @@ static std::vector<std::string> GetVulkanExtensionsRequiredByOpenVR(const Vulkan
             else
             {
                 SPDLOG_ERROR(
-                    "[Vulkan] [{}] {} extension asked by OpenVR was NOT available, exit", type == INSTANCE ? "instance" : "device", token
-                );
+                    "[Vulkan] [{}] {} extension asked by OpenVR was NOT available, exit", type == INSTANCE ? "instance" : "device", token);
                 std::exit(EXIT_FAILURE);
             }
         }

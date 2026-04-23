@@ -67,14 +67,10 @@ public:
             = vr::VRSystem()->GetStringTrackedDeviceProperty(handle, property, buffer.data(), vr::k_unMaxPropertyStringSize, &result);
         if (result != vr::TrackedProp_Success || buffer_len == 0)
         {
-            throw std::runtime_error(
-                std::format(
-                    "Failed to get string prop \"{}\" for {} (err={})",
-                    static_cast<int>(property),
-                    static_cast<int>(handle),
-                    static_cast<int>(result)
-                )
-            );
+            throw std::runtime_error(std::format("Failed to get string prop \"{}\" for {} (err={})",
+                                                 static_cast<int>(property),
+                                                 static_cast<int>(handle),
+                                                 static_cast<int>(result)));
         }
 
         return buffer.data();
@@ -85,14 +81,10 @@ public:
         vr::ETrackedPropertyError result = {};
         auto value = vr::VRSystem()->GetBoolTrackedDeviceProperty(handle, property, &result);
         if (result > vr::TrackedProp_Success)
-            throw std::runtime_error(
-                std::format(
-                    "Failed to get bool prop \"{}\" for {} ({})",
-                    static_cast<int>(property),
-                    static_cast<int>(handle),
-                    static_cast<int>(result)
-                )
-            );
+            throw std::runtime_error(std::format("Failed to get bool prop \"{}\" for {} ({})",
+                                                 static_cast<int>(property),
+                                                 static_cast<int>(handle),
+                                                 static_cast<int>(result)));
         return value;
     }
 
@@ -101,14 +93,10 @@ public:
         vr::ETrackedPropertyError result = {};
         auto value = vr::VRSystem()->GetFloatTrackedDeviceProperty(handle, property, &result);
         if (result > vr::TrackedProp_Success)
-            throw std::runtime_error(
-                std::format(
-                    "Failed to get float prop \"{}\" for {} ({})",
-                    static_cast<int>(property),
-                    static_cast<int>(handle),
-                    static_cast<int>(result)
-                )
-            );
+            throw std::runtime_error(std::format("Failed to get float prop \"{}\" for {} ({})",
+                                                 static_cast<int>(property),
+                                                 static_cast<int>(handle),
+                                                 static_cast<int>(result)));
         return value;
     }
 
@@ -117,14 +105,10 @@ public:
         vr::ETrackedPropertyError result = {};
         auto value = vr::VRSystem()->GetInt32TrackedDeviceProperty(handle, property, &result);
         if (result > vr::TrackedProp_Success)
-            throw std::runtime_error(
-                std::format(
-                    "Failed to get int32 prop \"{}\" for {} ({})",
-                    static_cast<int>(property),
-                    static_cast<int>(handle),
-                    static_cast<int>(result)
-                )
-            );
+            throw std::runtime_error(std::format("Failed to get int32 prop \"{}\" for {} ({})",
+                                                 static_cast<int>(property),
+                                                 static_cast<int>(handle),
+                                                 static_cast<int>(result)));
         return value;
     }
 

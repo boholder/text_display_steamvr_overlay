@@ -46,6 +46,5 @@ static void apply_to_imgui_window()
 ImU32 Settings::get_subtitle_font_color()
 {
     return ImGui::ColorConvertFloat4ToU32(
-        ImVec4(subtitle_font_color[0], subtitle_font_color[1], subtitle_font_color[2], subtitle_font_color[3])
-    );
+        ImVec4(subtitle_font_color[0], subtitle_font_color[1], subtitle_font_color[2], subtitle_font_color[3]));
 }

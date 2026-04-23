@@ -19,12 +19,11 @@
 
 #include <openvr.h>
 
-static const std::vector<std::string> INSTANCE_EXTS_FOR_NO_VR
-    = {VK_KHR_SURFACE_EXTENSION_NAME,
+static const std::vector<std::string> INSTANCE_EXTS_FOR_NO_VR = {VK_KHR_SURFACE_EXTENSION_NAME,
 #ifdef WIN32
-       "VK_KHR_win32_surface",
+                                                                 "VK_KHR_win32_surface",
 #endif
-       VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME};
+                                                                 VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME};
 
 static const std::vector<std::string> DEVICE_EXTS_FOR_NO_VR = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME,
@@ -188,11 +187,9 @@ auto VulkanRenderer::Initialize() -> void
     VkPhysicalDeviceProperties properties = {};
     vkGetPhysicalDeviceProperties(vulkan_physical_device_, &properties);
 
-    SPDLOG_INFO(
-        "[Vulkan] Using device [{}], discrete: [{}]",
-        properties.deviceName,
-        properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ? "Yes" : "No"
-    );
+    SPDLOG_INFO("[Vulkan] Using device [{}], discrete: [{}]",
+                properties.deviceName,
+                properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ? "Yes" : "No");
     assert(vulkan_physical_device_ != VK_NULL_HANDLE);
 
     // find a graphics-capable queue family on the selected GPU
@@ -242,18 +239,16 @@ auto VulkanRenderer::Initialize() -> void
     should_enable_dynamic_rendering_ = has_dynamic_rendering_support;
     vulkan_device_extensions_.insert(
         vulkan_device_extensions_.end(),
-        {VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME}
-    );
+        {VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME, VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME, VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME});
 
     auto device_extensions = convert_str_to_char_arr(vulkan_device_extensions_);
 
     // create logical device
     constexpr float queue_priority = 1.0f;
-    VkDeviceQueueCreateInfo device_queue_info
-        = {.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-           .queueFamilyIndex = vulkan_queue_family_,
-           .queueCount = 1,
-           .pQueuePriorities = &queue_priority};
+    VkDeviceQueueCreateInfo device_queue_info = {.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+                                                 .queueFamilyIndex = vulkan_queue_family_,
+                                                 .queueCount = 1,
+                                                 .pQueuePriorities = &queue_priority};
 
     VkPhysicalDeviceDynamicRenderingFeaturesKHR dynamic_rendering_features = {
         .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR,
@@ -278,12 +273,11 @@ auto VulkanRenderer::Initialize() -> void
         {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, IMGUI_IMPL_VULKAN_MINIMUM_IMAGE_SAMPLER_POOL_SIZE},
     };
 
-    VkDescriptorPoolCreateInfo pool_info
-        = {.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-           .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
-           .maxSets = 0,
-           .poolSizeCount = static_cast<uint32_t>(IM_ARRAYSIZE(pool_sizes)),
-           .pPoolSizes = pool_sizes};
+    VkDescriptorPoolCreateInfo pool_info = {.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+                                            .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
+                                            .maxSets = 0,
+                                            .poolSizeCount = static_cast<uint32_t>(IM_ARRAYSIZE(pool_sizes)),
+                                            .pPoolSizes = pool_sizes};
 
     for (VkDescriptorPoolSize const& pool_size : pool_sizes)
         pool_info.maxSets += pool_size.descriptorCount;
@@ -305,8 +299,7 @@ auto VulkanRenderer::SetupWindow(VulkanWindow* window, VkSurfaceKHR surface, uin
 
     VkBool32 result = {};
     vk_result = vkGetPhysicalDeviceSurfaceSupportKHR(
-        vulkan_physical_device_, vulkan_queue_family_, window->surface, &result
-    ); // Check for WSI support
+        vulkan_physical_device_, vulkan_queue_family_, window->surface, &result); // Check for WSI support
     VK_VALIDATE_RESULT(vk_result);
 
     if (result != VK_TRUE)
@@ -526,18 +519,16 @@ auto VulkanRenderer::SetupOverlay(uint32_t index, uint32_t width, uint32_t heigh
         },
     };
 
-    vkCmdPipelineBarrier(
-        ovl->command_buffer,
-        VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-        0,
-        0,
-        nullptr,
-        0,
-        nullptr,
-        1,
-        &barrier
-    );
+    vkCmdPipelineBarrier(ovl->command_buffer,
+                         VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+                         VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                         0,
+                         0,
+                         nullptr,
+                         0,
+                         nullptr,
+                         1,
+                         &barrier);
 
     vk_result = vkEndCommandBuffer(ovl->command_buffer);
     VK_VALIDATE_RESULT(vk_result);
@@ -775,18 +766,16 @@ auto VulkanRenderer::SetupSwapchain(VulkanWindow* window, uint32_t width, uint32
             },
         };
 
-        vkCmdPipelineBarrier(
-            fd->command_buffer,
-            VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-            0,
-            0,
-            nullptr,
-            0,
-            nullptr,
-            1,
-            &barrier
-        );
+        vkCmdPipelineBarrier(fd->command_buffer,
+                             VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+                             VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                             0,
+                             0,
+                             nullptr,
+                             0,
+                             nullptr,
+                             1,
+                             &barrier);
 
         vk_result = vkEndCommandBuffer(fd->command_buffer);
         VK_VALIDATE_RESULT(vk_result);
@@ -835,8 +824,7 @@ auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, VulkanWindow* window) -
     // get the next image from swapchain
     // vulkan writes the image to window->frames
     vk_result = vkAcquireNextImageKHR(
-        vulkan_device_, window->swapchain, UINT64_MAX, image_acquired_semaphore, VK_NULL_HANDLE, &window->frame_index
-    );
+        vulkan_device_, window->swapchain, UINT64_MAX, image_acquired_semaphore, VK_NULL_HANDLE, &window->frame_index);
     // ref: https://vulkan-tutorial.com/Drawing_a_triangle/Swap_chain_recreation#page_Suboptimal-or-out-of-date-swap-chain
     if (vk_result == VK_ERROR_OUT_OF_DATE_KHR || vk_result == VK_SUBOPTIMAL_KHR)
         should_rebuild_swapchain_.at(window->render_index) = true;
@@ -915,18 +903,16 @@ auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, VulkanWindow* window) -
         },
     };
 
-    vkCmdPipelineBarrier(
-        fd->command_buffer,
-        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-        0,
-        0,
-        nullptr,
-        0,
-        nullptr,
-        1,
-        &render_barrier
-    );
+    vkCmdPipelineBarrier(fd->command_buffer,
+                         VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                         VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                         0,
+                         0,
+                         nullptr,
+                         0,
+                         nullptr,
+                         1,
+                         &render_barrier);
 
     f_vkCmdBeginRenderingKHR(fd->command_buffer, &rendering_info);
     // the ImGui backend translates GUI widgets into Vulkan draw commands
@@ -952,18 +938,16 @@ auto VulkanRenderer::RenderWindow(ImDrawData* draw_data, VulkanWindow* window) -
         },
     };
 
-    vkCmdPipelineBarrier(
-        fd->command_buffer,
-        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-        VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-        0,
-        0,
-        nullptr,
-        0,
-        nullptr,
-        1,
-        &present_barrier
-    );
+    vkCmdPipelineBarrier(fd->command_buffer,
+                         VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                         VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+                         0,
+                         0,
+                         nullptr,
+                         0,
+                         nullptr,
+                         1,
+                         &present_barrier);
 
     vk_result = vkEndCommandBuffer(fd->command_buffer);
     VK_VALIDATE_RESULT(vk_result);
@@ -1068,18 +1052,16 @@ auto VulkanRenderer::RenderOverlay(uint32_t index, ImDrawData* draw_data, VrOver
         },
     };
 
-    vkCmdPipelineBarrier(
-        ovl->command_buffer,
-        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-        VK_PIPELINE_STAGE_TRANSFER_BIT,
-        0,
-        0,
-        nullptr,
-        0,
-        nullptr,
-        1,
-        &barrier_optimal
-    );
+    vkCmdPipelineBarrier(ovl->command_buffer,
+                         VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                         VK_PIPELINE_STAGE_TRANSFER_BIT,
+                         0,
+                         0,
+                         nullptr,
+                         0,
+                         nullptr,
+                         1,
+                         &barrier_optimal);
 
     vk_result = vkEndCommandBuffer(ovl->command_buffer);
     VK_VALIDATE_RESULT(vk_result);
@@ -1152,18 +1134,16 @@ auto VulkanRenderer::RenderOverlay(uint32_t index, ImDrawData* draw_data, VrOver
         },
     };
 
-    vkCmdPipelineBarrier(
-        ovl->command_buffer,
-        VK_PIPELINE_STAGE_TRANSFER_BIT,
-        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-        0,
-        0,
-        nullptr,
-        0,
-        nullptr,
-        1,
-        &barrier_restore
-    );
+    vkCmdPipelineBarrier(ovl->command_buffer,
+                         VK_PIPELINE_STAGE_TRANSFER_BIT,
+                         VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                         0,
+                         0,
+                         nullptr,
+                         0,
+                         nullptr,
+                         1,
+                         &barrier_restore);
 
     vk_result = vkEndCommandBuffer(ovl->command_buffer);
     VK_VALIDATE_RESULT(vk_result);

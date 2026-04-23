@@ -31,18 +31,16 @@ ImGuiWindow::ImGuiWindow(const uint8_t index) : window_data_(index)
     draw_callback_ = nullptr;
 }
 
-auto ImGuiWindow::Initialize(
-    VulkanRenderer*& renderer,
-    const char* name,
-    const int width,
-    const int height,
-    const float dpiScale,
-    void (*draw_callback)(),
-    const int pos_x,
-    const int pos_y,
-    const unsigned long long more_sdl_window_flags,
-    const bool show
-) -> void
+auto ImGuiWindow::Initialize(VulkanRenderer*& renderer,
+                             const char* name,
+                             const int width,
+                             const int height,
+                             const float dpiScale,
+                             void (*draw_callback)(),
+                             const int pos_x,
+                             const int pos_y,
+                             const unsigned long long more_sdl_window_flags,
+                             const bool show) -> void
 {
     this->draw_callback_ = draw_callback;
 

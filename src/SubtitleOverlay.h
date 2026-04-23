@@ -86,8 +86,7 @@ static void draw()
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut "
         "enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in "
         "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, "
-        "sunt in culpa qui officia deserunt mollit anim id est laborum."
-    );
+        "sunt in culpa qui officia deserunt mollit anim id est laborum.");
     ImGui::PopStyleColor();
     ImGui::PopFont();
 
@@ -109,17 +108,15 @@ static void draw()
 static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiScale)
 {
     const auto w = new ImGuiWindow(SUBTITLE_INDEX);
-    w->Initialize(
-        g_vulkanRenderer,
-        SUBTITLE_NAME,
-        SUBTITLE_WIDTH,
-        SUBTITLE_HEIGHT,
-        g_dpiScale,
-        subtitle::draw,
-        SDL_WINDOWPOS_CENTERED,
-        20, // offset from top of monitor, enough to show a part of titlebar for cursor to drag
-        SDL_WINDOW_TRANSPARENT
-    );
+    w->Initialize(g_vulkanRenderer,
+                  SUBTITLE_NAME,
+                  SUBTITLE_WIDTH,
+                  SUBTITLE_HEIGHT,
+                  g_dpiScale,
+                  subtitle::draw,
+                  SDL_WINDOWPOS_CENTERED,
+                  20, // offset from top of monitor, enough to show a part of titlebar for cursor to drag
+                  SDL_WINDOW_TRANSPARENT);
 
     settings.apply_to_subtitle();
 

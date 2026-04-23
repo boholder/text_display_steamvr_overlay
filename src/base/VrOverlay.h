@@ -49,16 +49,14 @@ public:
             vr::EVROverlayError result = vr::VROverlay()->CreateOverlay(key, name, &handle);
             if (result > vr::VROverlayError_None)
                 throw std::runtime_error(
-                    std::format("Failed to create world overlay \"{}\" (\"{}\"): {}", name, key, static_cast<int>(result))
-                );
+                    std::format("Failed to create world overlay \"{}\" (\"{}\"): {}", name, key, static_cast<int>(result)));
         }
         if (type == vr::VROverlayType_Dashboard)
         {
             vr::EVROverlayError result = vr::VROverlay()->CreateDashboardOverlay(key, name, &handle, &thumbnail_handle);
             if (result > vr::VROverlayError_None)
                 throw std::runtime_error(
-                    std::format("Failed to create dashboard overlay \"{}\" (\"{}\"): {}", name, key, static_cast<int>(result))
-                );
+                    std::format("Failed to create dashboard overlay \"{}\" (\"{}\"): {}", name, key, static_cast<int>(result)));
         }
         if (type == vr::VROverlayType_Subview)
         {
@@ -83,8 +81,7 @@ public:
         vr::EVROverlayError result = vr::VROverlay()->SetOverlayInputMethod(handle, method);
         if (result > vr::VROverlayError_None)
             throw std::runtime_error(
-                std::format("Failed to set overlay input method \"{}\": {}", static_cast<int>(method), static_cast<int>(result))
-            );
+                std::format("Failed to set overlay input method \"{}\": {}", static_cast<int>(method), static_cast<int>(result)));
     }
 
     [[maybe_unused]] auto FlagEnabled(vr::VROverlayFlags flag) const -> bool
@@ -93,8 +90,7 @@ public:
         vr::EVROverlayError result = vr::VROverlay()->GetOverlayFlag(handle, flag, &enabled);
         if (result > vr::VROverlayError_None)
             throw std::runtime_error(
-                std::format("Failed to check if overlay flag is enabled \"{}\": {}", static_cast<int>(flag), static_cast<int>(result))
-            );
+                std::format("Failed to check if overlay flag is enabled \"{}\": {}", static_cast<int>(flag), static_cast<int>(result)));
         return enabled;
     }
 
@@ -103,8 +99,7 @@ public:
         vr::EVROverlayError result = vr::VROverlay()->SetOverlayFlag(handle, flag, true);
         if (result > vr::VROverlayError_None)
             throw std::runtime_error(
-                std::format("Failed to enable overlay flag \"{}\": {}", static_cast<int>(flag), static_cast<int>(result))
-            );
+                std::format("Failed to enable overlay flag \"{}\": {}", static_cast<int>(flag), static_cast<int>(result)));
     }
 
     [[maybe_unused]] auto DisableFlag(vr::VROverlayFlags flag) const -> void
@@ -112,8 +107,7 @@ public:
         vr::EVROverlayError result = vr::VROverlay()->SetOverlayFlag(handle, flag, false);
         if (result > vr::VROverlayError_None)
             throw std::runtime_error(
-                std::format("Failed to disable overlay flag \"{}\": {}", static_cast<int>(flag), static_cast<int>(result))
-            );
+                std::format("Failed to disable overlay flag \"{}\": {}", static_cast<int>(flag), static_cast<int>(result)));
     }
 
     [[maybe_unused]] auto SetWidth(float width) const -> void
@@ -140,16 +134,15 @@ public:
 
     [[maybe_unused]] auto ShowKeyboard(vr::EGamepadTextInputMode mode, bool multi_line = false) -> void
     {
-        vr::EVROverlayError result = vr::VROverlay()->ShowKeyboardForOverlay(
-            handle,
-            mode,
-            multi_line ? vr::k_EGamepadTextInputLineModeMultipleLines : vr::k_EGamepadTextInputLineModeSingleLine,
-            vr::KeyboardFlag_Minimal | vr::KeyboardFlag_HideDoneKey,
-            "OpenVR Overlay Provided Virtual Keyboard",
-            1,
-            "",
-            0
-        );
+        vr::EVROverlayError result = vr::VROverlay()->ShowKeyboardForOverlay(handle,
+                                                                             mode,
+                                                                             multi_line ? vr::k_EGamepadTextInputLineModeMultipleLines
+                                                                                        : vr::k_EGamepadTextInputLineModeSingleLine,
+                                                                             vr::KeyboardFlag_Minimal | vr::KeyboardFlag_HideDoneKey,
+                                                                             "OpenVR Overlay Provided Virtual Keyboard",
+                                                                             1,
+                                                                             "",
+                                                                             0);
         if (result > vr::VROverlayError_None)
             throw std::runtime_error(std::format("Failed to show keyboard {}", static_cast<int>(result)));
     }
