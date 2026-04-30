@@ -32,6 +32,7 @@ public:
      * Revert settings to last_applied
      */
     static void revert_to_last_applied();
+    static bool has_changed();
 
     /**
      * Options that remain in effect after being set, only apply once per changed.
@@ -49,8 +50,6 @@ public:
     static bool show_boarder_around_subtitle;
     static float subtitle_frame_width;
     static float subtitle_frame_height;
-    static float subtitle_window_width;
-    static float subtitle_window_height;
 
     static int tcp_server_port;
     static std::optional<std::string> validate_tcp_server_port();
@@ -68,8 +67,6 @@ private:
     bool _show_boarder_around_subtitle;
     float _subtitle_frame_width;
     float _subtitle_frame_height;
-    float _subtitle_window_width;
-    float _subtitle_window_height;
     int _tcp_server_port;
 };
 

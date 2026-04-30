@@ -1,9 +1,9 @@
 #ifndef TEXT_DISPLAY_STEAMVR_OVERLAY_DASHBOARDOVERLAY_H
 #define TEXT_DISPLAY_STEAMVR_OVERLAY_DASHBOARDOVERLAY_H
 
+#include <imgui.h>
 #include "Settings.h"
 #include "constants.h"
-#include "imgui.h"
 #include "base/ImGuiWindow.h"
 
 static void validate_with_red_border(std::optional<std::string> (*validator)(), void (*draw_widget)())
@@ -61,13 +61,29 @@ static void draw()
     ImGui::SliderFloat("Subtitle Font Size", &settings.subtitle_font_size, SUBTITLE_FONT_SIZE_MIN, SUBTITLE_FONT_SIZE_MAX);
     ImGui::ColorEdit4("Subtitle Font Color", settings.subtitle_font_color, ImGuiColorEditFlags_AlphaBar);
     ImGui::Checkbox("Subtitle Boarder", &settings.show_boarder_around_subtitle);
-    ImGui::SliderFloat("Subtitle Frame Width", &settings.subtitle_frame_width, SUBTITLE_FRAME_WIDTH_MIN, settings.subtitle_window_width);
-    ImGui::SliderFloat(
-        "Subtitle Frame Height", &settings.subtitle_frame_height, SUBTITLE_FRAME_HEIGHT_MIN, settings.subtitle_window_height);
+    ImGui::SliderFloat("Subtitle Frame Width", &settings.subtitle_frame_width, SUBTITLE_FRAME_WIDTH_MIN, SUBTITLE_FRAME_WIDTH_MAX);
+    ImGui::SliderFloat("Subtitle Frame Height", &settings.subtitle_frame_height, SUBTITLE_FRAME_HEIGHT_MIN, SUBTITLE_FRAME_HEIGHT_MAX);
 
     ImGui::SeparatorText("TCP Server Options");
 
     validate_with_red_border(settings.validate_tcp_server_port, [] { ImGui::InputInt("Port", &settings.tcp_server_port, 0, 0, 0); });
+
+    ImGui::Spacing();
+    ImGui::Separator();
+    ImGui::BeginDisabled();
+    ImGui::Button("OK");
+    ImGui::EndDisabled();
+    ImGui::SameLine();
+    const bool settings_not_changed = !Settings::has_changed();
+    if (settings_not_changed)
+        ImGui::BeginDisabled();
+    if (ImGui::Button("Cancel"))
+        Settings::revert_to_last_applied();
+    ImGui::SameLine();
+    if (ImGui::Button("Apply"))
+        Settings::apply_current();
+    if (settings_not_changed)
+        ImGui::EndDisabled();
 
     im_util::show_im_window_debug_info();
 

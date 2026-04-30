@@ -57,12 +57,11 @@ static void draw()
 
     ImGui::Begin(SUBTITLE_NAME, nullptr, window_flags | ImGuiWindowFlags_NoBackground);
 
-    settings.subtitle_window_width = ImGui::GetContentRegionAvail().x;
-    settings.subtitle_window_height = ImGui::GetContentRegionAvail().y;
+    static float window_width = ImGui::GetContentRegionAvail().x;
     const ImVec2 subtitle_frame_size(settings.subtitle_frame_width, settings.subtitle_frame_height);
 
     // make subtitle posited in center of window
-    float sub_frame_x_pos = (settings.subtitle_window_width - settings.subtitle_frame_width) * 0.5F;
+    float sub_frame_x_pos = (window_width - settings.subtitle_frame_width) * 0.5F;
     sub_frame_x_pos = std::max(sub_frame_x_pos, 0.0F);
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + sub_frame_x_pos);
 
