@@ -24,8 +24,14 @@
 class Settings
 {
 public:
-    static void backup_current();
-    static void apply_currently_changed();
+    /**
+     * Save current settings to last_applied
+     */
+    static void apply_current();
+    /**
+     * Revert settings to last_applied
+     */
+    static void revert_to_last_applied();
 
     /**
      * Options that remain in effect after being set, only apply once per changed.
@@ -57,8 +63,14 @@ private:
     static Settings clone();
     static Settings last_applied;
 
-    int _tcp_server_port;
     float _subtitle_font_color[4];
+    float _subtitle_font_size;
+    bool _show_boarder_around_subtitle;
+    float _subtitle_frame_width;
+    float _subtitle_frame_height;
+    float _subtitle_window_width;
+    float _subtitle_window_height;
+    int _tcp_server_port;
 };
 
 extern Settings settings;

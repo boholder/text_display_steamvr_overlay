@@ -3,6 +3,7 @@
 #include <imgui.h>
 #include <optional>
 #include <string>
+#include <spdlog/spdlog.h>
 
 bool Settings::dirty_to_subtitle = true;
 bool Settings::dirty_to_dashboard = true;
@@ -19,27 +20,43 @@ Settings Settings::last_applied = clone();
 
 auto settings = Settings();
 
-void Settings::backup_current()
-{ last_applied = clone(); }
+void Settings::apply_current()
+{
+    SPDLOG_INFO("Apply changed settings");
+    last_applied = clone();
+}
 
 Settings Settings::clone()
 {
     Settings b;
-    b._tcp_server_port = tcp_server_port;
     b._subtitle_font_color[0] = subtitle_font_color[0];
     b._subtitle_font_color[1] = subtitle_font_color[1];
     b._subtitle_font_color[2] = subtitle_font_color[2];
     b._subtitle_font_color[3] = subtitle_font_color[3];
+    b._subtitle_font_size = subtitle_font_size;
+    b._show_boarder_around_subtitle = show_boarder_around_subtitle;
+    b._subtitle_frame_width = subtitle_frame_width;
+    b._subtitle_frame_height = subtitle_frame_height;
+    b._subtitle_window_width = subtitle_window_width;
+    b._subtitle_window_height = subtitle_window_height;
+    b._tcp_server_port = tcp_server_port;
     return b;
 }
 
-void Settings::apply_currently_changed()
+void Settings::revert_to_last_applied()
 {
-    tcp_server_port = last_applied._tcp_server_port;
+    SPDLOG_INFO("Revert to last applied settings");
     subtitle_font_color[0] = last_applied._subtitle_font_color[0];
     subtitle_font_color[1] = last_applied._subtitle_font_color[1];
     subtitle_font_color[2] = last_applied._subtitle_font_color[2];
     subtitle_font_color[3] = last_applied._subtitle_font_color[3];
+    subtitle_font_size = last_applied._subtitle_font_size;
+    show_boarder_around_subtitle = last_applied._show_boarder_around_subtitle;
+    subtitle_frame_width = last_applied._subtitle_frame_width;
+    subtitle_frame_height = last_applied._subtitle_frame_height;
+    subtitle_window_width = last_applied._subtitle_window_width;
+    subtitle_window_height = last_applied._subtitle_window_height;
+    tcp_server_port = last_applied._tcp_server_port;
 }
 
 static void apply_to_imgui_window();
