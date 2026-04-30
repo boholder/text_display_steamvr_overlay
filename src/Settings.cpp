@@ -14,11 +14,33 @@ float Settings::subtitle_frame_height = SUBTITLE_FRAME_HEIGHT_DEFAULT;
 float Settings::subtitle_window_width = SUBTITLE_FRAME_WIDTH_MAX;
 float Settings::subtitle_window_height = SUBTITLE_FRAME_HEIGHT_MAX;
 int Settings::tcp_server_port = TCP_SERVER_DEFAULT_PORT;
-int Settings::tcp_server_port_bak = TCP_SERVER_DEFAULT_PORT;
 
-Settings::Settings() {}
+Settings Settings::last_applied = clone();
 
 auto settings = Settings();
+
+void Settings::backup_current()
+{ last_applied = clone(); }
+
+Settings Settings::clone()
+{
+    Settings b;
+    b._tcp_server_port = tcp_server_port;
+    b._subtitle_font_color[0] = subtitle_font_color[0];
+    b._subtitle_font_color[1] = subtitle_font_color[1];
+    b._subtitle_font_color[2] = subtitle_font_color[2];
+    b._subtitle_font_color[3] = subtitle_font_color[3];
+    return b;
+}
+
+void Settings::apply_currently_changed()
+{
+    tcp_server_port = last_applied._tcp_server_port;
+    subtitle_font_color[0] = last_applied._subtitle_font_color[0];
+    subtitle_font_color[1] = last_applied._subtitle_font_color[1];
+    subtitle_font_color[2] = last_applied._subtitle_font_color[2];
+    subtitle_font_color[3] = last_applied._subtitle_font_color[3];
+}
 
 static void apply_to_imgui_window();
 
@@ -62,7 +84,4 @@ std::optional<std::string> Settings::validate_tcp_server_port()
 }
 
 bool Settings::is_tcp_server_port_changed()
-{ return tcp_server_port != tcp_server_port_bak; }
-
-void Settings::apply_tcp_server_port()
-{ tcp_server_port_bak = tcp_server_port; }
+{ return tcp_server_port != last_applied._tcp_server_port; }

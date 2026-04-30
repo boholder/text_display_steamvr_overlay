@@ -7,11 +7,17 @@
 
 #include "Settings.h"
 
+/**
+ * For checking if the TCP server port setting option has changed
+ */
+static int current_port = 0;
+
 namespace tcp_server
 {
 
 static bool start_server(sockpp::tcp_acceptor& server)
 {
+    current_port = settings.tcp_server_port;
     in_port_t port = settings.tcp_server_port;
     std::error_code ec;
     server = {port, 4, sockpp::tcp_acceptor::REUSE, ec};
@@ -39,7 +45,7 @@ static void tcp_server_thread()
             server.shutdown();
             if (!start_server(server))
                 return;
-            settings.apply_tcp_server_port();
+            current_port = settings.tcp_server_port;
         }
 
         // accept a new client connection

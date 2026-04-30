@@ -24,7 +24,9 @@
 class Settings
 {
 public:
-    Settings();
+    static void backup_current();
+    static void apply_currently_changed();
+
     /**
      * Options that remain in effect after being set, only apply once per changed.
      */
@@ -47,12 +49,16 @@ public:
     static int tcp_server_port;
     static std::optional<std::string> validate_tcp_server_port();
     static bool is_tcp_server_port_changed();
-    static void apply_tcp_server_port();
 
 private:
     static bool dirty_to_subtitle;
     static bool dirty_to_dashboard;
-    static int tcp_server_port_bak;
+
+    static Settings clone();
+    static Settings last_applied;
+
+    int _tcp_server_port;
+    float _subtitle_font_color[4];
 };
 
 extern Settings settings;
