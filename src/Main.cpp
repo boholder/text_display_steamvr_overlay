@@ -14,12 +14,6 @@
 #include <vector>
 #include <thread>
 
-// ref: https://github.com/gabime/spdlog/wiki/FAQ#how-to-remove-all-debug-statements-at-compile-time-
-#ifdef ENABLE_DEBUG_LOG
-#    define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
-#endif
-#include <spdlog/spdlog.h>
-
 #include <imgui.h>
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_vulkan.h>
@@ -35,6 +29,8 @@
 #include <glm/gtx/euler_angles.hpp>
 
 #include <openvr.h>
+
+#include "log.h"
 
 #include "base/VulkanRenderer.h"
 #include "base/VulkanUtils.h"

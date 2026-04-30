@@ -3,7 +3,7 @@
 #include <imgui.h>
 #include <optional>
 #include <string>
-#include <spdlog/spdlog.h>
+#include "log.h"
 
 bool Settings::dirty_to_subtitle = true;
 bool Settings::dirty_to_dashboard = true;

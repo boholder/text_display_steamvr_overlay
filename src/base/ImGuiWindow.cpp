@@ -8,8 +8,6 @@
 
 #include "ImGuiWindow.h"
 
-#include <spdlog/spdlog.h>
-
 #include <imgui.h>
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_vulkan.h>
@@ -21,6 +19,8 @@
 
 #include <math.h>
 #include <functional>
+
+#include "../log.h"
 
 ImGuiWindow::ImGuiWindow(const uint8_t index) : window_data_(index)
 {

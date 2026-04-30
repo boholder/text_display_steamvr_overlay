@@ -2,9 +2,9 @@
 #define TEXT_DISPLAY_STEAMVR_OVERLAY_TCPSERVER_H
 
 #include "sockpp/tcp_acceptor.h"
-#include <spdlog/spdlog.h>
 #include <chrono>
 
+#include "log.h"
 #include "Settings.h"
 
 /**

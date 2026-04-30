@@ -14,7 +14,7 @@
 #include <vulkan/vulkan.h>
 #include <openvr.h>
 
-#include <spdlog/spdlog.h>
+#include "../log.h"
 
 #define VK_VALIDATE_RESULT(e)                                                                \
     if ((e) != VK_SUCCESS)                                                                   \

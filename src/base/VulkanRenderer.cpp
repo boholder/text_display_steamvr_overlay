@@ -8,8 +8,6 @@
 
 #include "VulkanRenderer.h"
 
-#include <spdlog/spdlog.h>
-
 #include "VulkanUtils.h"
 
 #include <ranges>
@@ -18,6 +16,8 @@
 #include <backends/imgui_impl_vulkan.h>
 
 #include <openvr.h>
+
+#include "../log.h"
 
 static const std::vector<std::string> INSTANCE_EXTS_FOR_NO_VR = {VK_KHR_SURFACE_EXTENSION_NAME,
 #ifdef WIN32

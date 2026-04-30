@@ -91,6 +91,7 @@ add_executable(${PNAME}
         "src/Settings.cpp"
         "src/base/ImGuiUtils.h"
         "src/TcpServer.h"
+        "src/log.h"
 )
 
 target_compile_features(${PNAME} PUBLIC cxx_std_23)
