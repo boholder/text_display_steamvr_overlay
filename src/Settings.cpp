@@ -5,6 +5,7 @@
 #include <string>
 #include "log.h"
 #include "utils.h"
+#include "constants.h"
 
 bool Settings::dirty_to_subtitle = true;
 bool Settings::dirty_to_dashboard = true;
@@ -33,8 +34,29 @@ void Settings::apply_current()
     ss2 << to_yaml(last_applied);
     const std::string current = ss2.str();
 
-    SPDLOG_DEBUG("{}", util::diff_lines(previous, current));
-    util::save_to_file("settings.yaml", current);
+    SPDLOG_DEBUG("Setting changing details:\n{}", util::diff_lines(previous, current));
+
+    util::save_to_file("settings.yaml", generate_config_comment() + current);
+}
+
+/**
+ * @return some words about the configuration file, for users who surprisingly find it on their disk and wondering what the file is.
+ */
+std::string Settings::generate_config_comment()
+{
+    std::stringstream time;
+    auto t = std::time(nullptr);
+    std::tm tm{};
+#ifdef _WIN32
+    localtime_s(&tm, &t);
+#else
+    localtime_r(&t, &tm);
+#endif
+    time << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
+
+    return std::format("# This is a configuration file generated and used by [{} v{}] at {}.\n", APP_NAME, APP_VERSION, time.str())
+           + "# You can manually change its content while the application is NOT running, or it might be overridden by the application.\n"
+           + std::format("# Check the link for more information: {}\n", APP_LINK);
 }
 
 Settings Settings::clone()

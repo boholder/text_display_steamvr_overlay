@@ -1,7 +1,11 @@
 #ifndef TEXT_DISPLAY_STEAMVR_OVERLAY_CONSTANTS_H
 #define TEXT_DISPLAY_STEAMVR_OVERLAY_CONSTANTS_H
 
+#define APP_VERSION "0.1.0"
+#define APP_LINK "https://github.com/boholder/text_display_steamvr_overlay"
+
 // [26-10-31 23:46:59.678] shorten-level thread-id source-file-and-line: message
+// ref: https://github.com/gabime/spdlog/wiki/Custom-formatting
 #define LOG_PATTERN "%^[%C-%m-%d %T.%e] %L %-5t %-8!s:%-4#: %v%$"
 
 #define APP_KEY "com.github.boholder.text_display_steamvr_overlay"

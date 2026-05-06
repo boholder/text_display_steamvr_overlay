@@ -61,6 +61,7 @@ private:
     static bool dirty_to_dashboard;
 
     static YAML::Node to_yaml(const Settings& s);
+    static std::string generate_config_comment();
 
     static Settings clone();
     static Settings last_applied;
