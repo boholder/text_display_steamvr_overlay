@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-``
-INIT=$1
+
+# Yes, I know CMake has https://cmake.org/cmake/help/latest/module/FetchContent.html
+# and I have no excuse for keep using this script to download dependencies.
+
+REMOVE_EXISTING=$1
 
 OPENVR_VERSION_TAG="v2.12.14"
 SPDLOG_VERSION_TAG="v1.17.0"
@@ -77,7 +80,7 @@ clone_if_not_exist() {
 cd "$THIRD_LIB_DIR" || exit
 WD=$(pwd)
 
-if [ -n "$INIT" ]; then
+if [ -n "$REMOVE_EXISTING" ]; then
     for dir in "${DIRS[@]}"; do
         rm_rf_dir "$dir"
     done
