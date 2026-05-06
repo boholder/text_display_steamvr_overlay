@@ -4,6 +4,7 @@
 #include <imgui.h>
 #include <optional>
 #include <string>
+#include <yaml-cpp/yaml.h>
 
 #define SUBTITLE_FONT_SIZE_MIN 10.0F
 #define SUBTITLE_FONT_SIZE_DEFAULT 20.0F
@@ -58,6 +59,8 @@ public:
 private:
     static bool dirty_to_subtitle;
     static bool dirty_to_dashboard;
+
+    static YAML::Node to_yaml(const Settings& s);
 
     static Settings clone();
     static Settings last_applied;

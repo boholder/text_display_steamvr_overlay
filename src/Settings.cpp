@@ -4,6 +4,7 @@
 #include <optional>
 #include <string>
 #include "log.h"
+#include "utils.h"
 
 bool Settings::dirty_to_subtitle = true;
 bool Settings::dirty_to_dashboard = true;
@@ -21,9 +22,19 @@ auto settings = Settings();
 void Settings::apply_current()
 {
     SPDLOG_INFO("Apply changed settings");
-    // SPDLOG_DEBUG("Previous settings: [{}]", last_applied);
+
+    std::stringstream ss;
+    ss << to_yaml(last_applied);
+    const std::string previous = ss.str();
+
     last_applied = clone();
-    // SPDLOG_DEBUG("Current settings: [{}]", last_applied);
+
+    std::stringstream ss2;
+    ss2 << to_yaml(last_applied);
+    const std::string current = ss2.str();
+
+    SPDLOG_DEBUG("{}", util::diff_lines(previous, current));
+    util::save_to_file("settings.yaml", current);
 }
 
 Settings Settings::clone()
@@ -67,6 +78,20 @@ bool Settings::has_changed()
                            || subtitle_frame_height != last_applied._subtitle_frame_height;
     const bool tcp_port = tcp_server_port != last_applied._tcp_server_port;
     return text_color || text_size || tcp_port;
+}
+
+YAML::Node Settings::to_yaml(const Settings& s)
+{
+    YAML::Node node;
+    const ImU32 c = ImGui::ColorConvertFloat4ToU32(
+        ImVec4(s._subtitle_font_color[0], s._subtitle_font_color[1], s._subtitle_font_color[2], s._subtitle_font_color[3]));
+    node["subtitle_font_color"] = std::format("#{:08X}", c);
+    node["subtitle_font_size"] = s._subtitle_font_size;
+    node["show_boarder_around_subtitle"] = s._show_boarder_around_subtitle;
+    node["subtitle_frame_width"] = s._subtitle_frame_width;
+    node["subtitle_frame_height"] = s._subtitle_frame_height;
+    node["tcp_server_port"] = s._tcp_server_port;
+    return node;
 }
 
 static void apply_to_imgui_window();
