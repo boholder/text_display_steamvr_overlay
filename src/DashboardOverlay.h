@@ -58,11 +58,11 @@ static void draw()
     ImGui::Begin(DASHBOARD_NAME, nullptr, window_flags);
 
     ImGui::SeparatorText("Subtitle Options");
-    ImGui::SliderFloat("Subtitle Font Size", &settings.subtitle_font_size, SUBTITLE_FONT_SIZE_MIN, SUBTITLE_FONT_SIZE_MAX);
+    ImGui::SliderInt("Subtitle Font Size", &settings.subtitle_font_size, SUBTITLE_FONT_SIZE_MIN, SUBTITLE_FONT_SIZE_MAX);
     ImGui::ColorEdit4("Subtitle Font Color", settings.subtitle_font_color, ImGuiColorEditFlags_AlphaBar);
     ImGui::Checkbox("Subtitle Boarder", &settings.show_boarder_around_subtitle);
-    ImGui::SliderFloat("Subtitle Frame Width", &settings.subtitle_frame_width, SUBTITLE_FRAME_WIDTH_MIN, SUBTITLE_FRAME_WIDTH_MAX);
-    ImGui::SliderFloat("Subtitle Frame Height", &settings.subtitle_frame_height, SUBTITLE_FRAME_HEIGHT_MIN, SUBTITLE_FRAME_HEIGHT_MAX);
+    ImGui::SliderInt("Subtitle Frame Width", &settings.subtitle_frame_width, SUBTITLE_FRAME_WIDTH_MIN, SUBTITLE_FRAME_WIDTH_MAX);
+    ImGui::SliderInt("Subtitle Frame Height", &settings.subtitle_frame_height, SUBTITLE_FRAME_HEIGHT_MIN, SUBTITLE_FRAME_HEIGHT_MAX);
 
     ImGui::SeparatorText("TCP Server Options");
 

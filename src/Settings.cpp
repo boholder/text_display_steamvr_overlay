@@ -10,10 +10,10 @@
 bool Settings::dirty_to_subtitle = true;
 bool Settings::dirty_to_dashboard = true;
 float Settings::subtitle_font_color[4] = SUBTITLE_FONT_COLOR_DEFAULT;
-float Settings::subtitle_font_size = SUBTITLE_FONT_SIZE_DEFAULT;
+int Settings::subtitle_font_size = SUBTITLE_FONT_SIZE_DEFAULT;
 bool Settings::show_boarder_around_subtitle = false;
-float Settings::subtitle_frame_width = SUBTITLE_FRAME_WIDTH_DEFAULT;
-float Settings::subtitle_frame_height = SUBTITLE_FRAME_HEIGHT_DEFAULT;
+int Settings::subtitle_frame_width = SUBTITLE_FRAME_WIDTH_DEFAULT;
+int Settings::subtitle_frame_height = SUBTITLE_FRAME_HEIGHT_DEFAULT;
 int Settings::tcp_server_port = TCP_SERVER_DEFAULT_PORT;
 
 Settings Settings::last_applied = clone();

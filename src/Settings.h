@@ -6,9 +6,9 @@
 #include <string>
 #include <yaml-cpp/yaml.h>
 
-#define SUBTITLE_FONT_SIZE_MIN 10.0F
-#define SUBTITLE_FONT_SIZE_DEFAULT 20.0F
-#define SUBTITLE_FONT_SIZE_MAX 50.0F
+#define SUBTITLE_FONT_SIZE_MIN 10
+#define SUBTITLE_FONT_SIZE_DEFAULT 20
+#define SUBTITLE_FONT_SIZE_MAX 50
 
 #define SUBTITLE_FONT_COLOR_DEFAULT {1.0F, 1.0F, 1.0F, 1.0F}
 
@@ -47,10 +47,10 @@ public:
     static float subtitle_font_color[4];
     static ImU32 get_subtitle_font_color();
 
-    static float subtitle_font_size;
+    static int subtitle_font_size;
     static bool show_boarder_around_subtitle;
-    static float subtitle_frame_width;
-    static float subtitle_frame_height;
+    static int subtitle_frame_width;
+    static int subtitle_frame_height;
 
     static int tcp_server_port;
     static std::optional<std::string> validate_tcp_server_port();
@@ -67,10 +67,10 @@ private:
     static Settings last_applied;
 
     float _subtitle_font_color[4];
-    float _subtitle_font_size;
+    int _subtitle_font_size;
     bool _show_boarder_around_subtitle;
-    float _subtitle_frame_width;
-    float _subtitle_frame_height;
+    int _subtitle_frame_width;
+    int _subtitle_frame_height;
     int _tcp_server_port;
 };
 
