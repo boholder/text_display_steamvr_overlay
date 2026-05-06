@@ -103,6 +103,7 @@ target_link_libraries(${PNAME}
         glm::glm
         spdlog::spdlog
         Sockpp::sockpp
+        yaml-cpp::yaml-cpp
 )
 
 if (ENABLE_VULKAN_VALIDATION)

@@ -6,6 +6,8 @@ set(SDL_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/SDL)
 set(ImGui_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/ImGui)
 set(SPDLOG_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/spdlog)
 set(SOCKPP_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/sockpp)
+set(YAMLCPP_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/yaml-cpp)
+set(GTEST_ROOT ${CMAKE_SOURCE_DIR}/3rdparty/googletest)
 
 find_package(Vulkan REQUIRED)
 
@@ -37,3 +39,7 @@ target_link_libraries(ImGui PUBLIC SDL3::SDL3 vulkan OpenVR::API)
 add_subdirectory(${SPDLOG_ROOT} EXCLUDE_FROM_ALL)
 
 add_subdirectory(${SOCKPP_ROOT} EXCLUDE_FROM_ALL)
+
+add_subdirectory(${YAMLCPP_ROOT} EXCLUDE_FROM_ALL)
+
+add_subdirectory(${GTEST_ROOT} EXCLUDE_FROM_ALL)

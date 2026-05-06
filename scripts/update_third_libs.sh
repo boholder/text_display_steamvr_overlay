@@ -11,6 +11,8 @@ IMGUI_VERSION_TAG="v1.92.0"
 SDL_VERSION_TAG="release-3.4.2"
 GLM_VERSION_TAG="1.0.3"
 SOCKPP_VERSION_TAG="master"
+YAMLCPP_VERSION_TAG="yaml-cpp-0.9.0"
+GTEST_VERSION_TAG="v1.17.0"
 
 OPENVR_DIR="OpenVR"
 SPDLOG_DIR="spdlog"
@@ -18,7 +20,9 @@ IMGUI_DIR="ImGui"
 SDL_DIR="SDL"
 GLM_DIR="glm"
 SOCKPP_DIR="sockpp"
-DIRS=("$OPENVR_DIR" "$SPDLOG_DIR" "$IMGUI_DIR" "$SDL_DIR" "$GLM_DIR" "$SOCKPP_DIR")
+YAMLCPP_DIR="yaml-cpp"
+GTEST_DIR="googletest"
+DIRS=("$OPENVR_DIR" "$SPDLOG_DIR" "$IMGUI_DIR" "$SDL_DIR" "$GLM_DIR" "$SOCKPP_DIR" "$YAMLCPP_DIR" "$GTEST_DIR")
 
 THIRD_LIB_DIR="3rdparty"
 
@@ -58,6 +62,18 @@ function update_sockpp() {
     rm -rf .git
 }
 
+function update_yamlcpp() {
+    git clone --depth=1 --branch "$YAMLCPP_VERSION_TAG" https://github.com/jbeder/yaml-cpp.git "$YAMLCPP_DIR"
+    cd "$YAMLCPP_DIR" || exit
+    rm -rf .git
+}
+
+function update_gtest() {
+    git clone --depth=1 --branch "$GTEST_VERSION_TAG" https://github.com/google/googletest.git "$GTEST_DIR"
+    cd "$GTEST_DIR" || exit
+    rm -rf .git
+}
+
 function rm_rf_dir() {
     if [ -e "$1" ];then
       rm -rf "$1"
@@ -92,3 +108,5 @@ clone_if_not_exist "$IMGUI_DIR" update_imgui
 clone_if_not_exist "$SDL_DIR" update_sdl
 clone_if_not_exist "$GLM_DIR" update_glm
 clone_if_not_exist "$SOCKPP_DIR" update_sockpp
+clone_if_not_exist "$YAMLCPP_DIR" update_yamlcpp
+clone_if_not_exist "$GTEST_DIR" update_gtest
