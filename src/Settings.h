@@ -26,16 +26,6 @@ class Settings
 {
 public:
     /**
-     * Save current settings to last_applied
-     */
-    static void apply_current();
-    /**
-     * Revert settings to last_applied
-     */
-    static void revert_to_last_applied();
-    static bool has_changed();
-
-    /**
      * Options that remain in effect after being set, only apply once per changed.
      */
     static void apply_to_subtitle();
@@ -44,36 +34,49 @@ public:
      */
     static void apply_to_dashboard();
 
-    static float subtitle_font_color[4];
-    static ImU32 get_subtitle_font_color();
+    /**
+     * Save current settings to last_applied
+     */
+    static void apply_current();
+    /**
+     * Revert settings to last_applied
+     */
+    static void revert_to_last_applied();
+    static bool has_changed_after_last_applied();
 
-    static int subtitle_font_size;
-    static bool show_boarder_around_subtitle;
-    static int subtitle_frame_width;
-    static int subtitle_frame_height;
+    float subtitle_font_color[4] = SUBTITLE_FONT_COLOR_DEFAULT;
+    [[nodiscard]] ImU32 get_subtitle_font_color() const;
 
-    static int tcp_server_port;
-    static std::optional<std::string> validate_tcp_server_port();
+    int subtitle_font_size = SUBTITLE_FONT_SIZE_DEFAULT;
+    bool show_boarder_around_subtitle = false;
+    int subtitle_frame_width = SUBTITLE_FRAME_WIDTH_DEFAULT;
+    int subtitle_frame_height = SUBTITLE_FRAME_HEIGHT_DEFAULT;
+
+    int tcp_server_port = TCP_SERVER_DEFAULT_PORT;
+    [[nodiscard]] std::optional<std::string> validate_tcp_server_port() const;
     static bool is_tcp_server_port_changed();
 
 private:
     static bool dirty_to_subtitle;
     static bool dirty_to_dashboard;
 
-    static YAML::Node to_yaml(const Settings& s);
-    static std::string generate_config_comment();
-
-    static Settings clone();
+    /**
+     * A backup that saves settings that
+     * the last time the user presses the "Apply" button
+     */
     static Settings last_applied;
 
-    float _subtitle_font_color[4];
-    int _subtitle_font_size;
-    bool _show_boarder_around_subtitle;
-    int _subtitle_frame_width;
-    int _subtitle_frame_height;
-    int _tcp_server_port;
+    bool operator==(const Settings& other) const;
+
+    static YAML::Node to_yaml(const Settings& s);
+    static std::string generate_config_comment();
 };
 
+/**
+ * Currently working settings,
+ * other logic will retrieve option values from it,
+ * dynamically changed by the user via Dashboard.
+ */
 extern Settings settings;
 
 #endif // TEXT_DISPLAY_STEAMVR_OVERLAY_SETTINGS_H

@@ -6,27 +6,6 @@
 #include "constants.h"
 #include "base/ImGuiWindow.h"
 
-static void validate_with_red_border(std::optional<std::string> (*validator)(), void (*draw_widget)())
-{
-    const std::optional<std::string> v = validator();
-
-    if (v.has_value())
-    {
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0F);
-        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0F, 0.2F, 0.2F, 1.0F));
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.30F, 0.10F, 0.10F, 1.0F));
-    }
-
-    draw_widget();
-
-    if (v.has_value())
-    {
-        ImGui::PopStyleColor(2);
-        ImGui::PopStyleVar();
-        ImGui::TextColored(ImVec4(1.0F, 0.4F, 0.4F, 1.0F), "%s", v.value().c_str());
-    }
-}
-
 namespace dashboard
 {
 
@@ -51,6 +30,27 @@ static VrOverlay* create_overlay()
 
 static void draw()
 {
+    auto validate_with_hint = [](std::optional<std::string> (Settings::*validator)() const, void (*draw_widget)())
+    {
+        const std::optional<std::string> v = std::invoke(validator, settings);
+
+        if (v.has_value())
+        {
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0F);
+            ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0F, 0.2F, 0.2F, 1.0F));
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.30F, 0.10F, 0.10F, 1.0F));
+        }
+
+        draw_widget();
+
+        if (v.has_value())
+        {
+            ImGui::PopStyleColor(2);
+            ImGui::PopStyleVar();
+            ImGui::TextColored(ImVec4(1.0F, 0.4F, 0.4F, 1.0F), "%s", v.value().c_str());
+        }
+    };
+
     settings.apply_to_dashboard();
 
     const int window_flags = im_util::set_next_window_fill_os_window();
@@ -66,7 +66,7 @@ static void draw()
 
     ImGui::SeparatorText("TCP Server Options");
 
-    validate_with_red_border(settings.validate_tcp_server_port, [] { ImGui::InputInt("Port", &settings.tcp_server_port, 0, 0, 0); });
+    validate_with_hint(&Settings::validate_tcp_server_port, [] { ImGui::InputInt("Port", &settings.tcp_server_port, 0, 0, 0); });
 
     ImGui::Spacing();
     ImGui::Separator();
@@ -74,7 +74,7 @@ static void draw()
     ImGui::Button("OK");
     ImGui::EndDisabled();
     ImGui::SameLine();
-    const bool settings_not_changed = !Settings::has_changed();
+    const bool settings_not_changed = !Settings::has_changed_after_last_applied();
     if (settings_not_changed)
         ImGui::BeginDisabled();
     if (ImGui::Button("Cancel"))
@@ -105,7 +105,7 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
                   g_dpiScale,
                   dashboard::draw,
                   SDL_WINDOWPOS_CENTERED,
-                  250 * g_dpiScale);
+                  250.0F * g_dpiScale);
 
     settings.apply_to_dashboard();
 

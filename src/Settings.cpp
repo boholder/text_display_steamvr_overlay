@@ -9,14 +9,7 @@
 
 bool Settings::dirty_to_subtitle = true;
 bool Settings::dirty_to_dashboard = true;
-float Settings::subtitle_font_color[4] = SUBTITLE_FONT_COLOR_DEFAULT;
-int Settings::subtitle_font_size = SUBTITLE_FONT_SIZE_DEFAULT;
-bool Settings::show_boarder_around_subtitle = false;
-int Settings::subtitle_frame_width = SUBTITLE_FRAME_WIDTH_DEFAULT;
-int Settings::subtitle_frame_height = SUBTITLE_FRAME_HEIGHT_DEFAULT;
-int Settings::tcp_server_port = TCP_SERVER_DEFAULT_PORT;
-
-Settings Settings::last_applied = clone();
+Settings Settings::last_applied = Settings();
 
 auto settings = Settings();
 
@@ -27,14 +20,12 @@ void Settings::apply_current()
     std::stringstream ss;
     ss << to_yaml(last_applied);
     const std::string previous = ss.str();
-
-    last_applied = clone();
-
     std::stringstream ss2;
-    ss2 << to_yaml(last_applied);
+    ss2 << to_yaml(settings);
     const std::string current = ss2.str();
-
     SPDLOG_DEBUG("Setting changing details:\n{}", util::diff_lines(previous, current));
+
+    last_applied = settings;
 
     util::save_to_file("settings.yaml", generate_config_comment() + current);
 }
@@ -59,60 +50,33 @@ std::string Settings::generate_config_comment()
            + std::format("# Check the link for more information: {}\n", APP_LINK);
 }
 
-Settings Settings::clone()
-{
-    Settings b;
-    b._subtitle_font_color[0] = subtitle_font_color[0];
-    b._subtitle_font_color[1] = subtitle_font_color[1];
-    b._subtitle_font_color[2] = subtitle_font_color[2];
-    b._subtitle_font_color[3] = subtitle_font_color[3];
-    b._subtitle_font_size = subtitle_font_size;
-    b._show_boarder_around_subtitle = show_boarder_around_subtitle;
-    b._subtitle_frame_width = subtitle_frame_width;
-    b._subtitle_frame_height = subtitle_frame_height;
-    b._tcp_server_port = tcp_server_port;
-    return b;
-}
-
 void Settings::revert_to_last_applied()
 {
     SPDLOG_INFO("Revert to last applied settings");
-    subtitle_font_color[0] = last_applied._subtitle_font_color[0];
-    subtitle_font_color[1] = last_applied._subtitle_font_color[1];
-    subtitle_font_color[2] = last_applied._subtitle_font_color[2];
-    subtitle_font_color[3] = last_applied._subtitle_font_color[3];
-    subtitle_font_size = last_applied._subtitle_font_size;
-    show_boarder_around_subtitle = last_applied._show_boarder_around_subtitle;
-    subtitle_frame_width = last_applied._subtitle_frame_width;
-    subtitle_frame_height = last_applied._subtitle_frame_height;
-    tcp_server_port = last_applied._tcp_server_port;
+    settings = last_applied;
 }
 
-bool Settings::has_changed()
+bool Settings::has_changed_after_last_applied()
+{ return settings != last_applied; }
+
+bool Settings::operator==(const Settings& other) const // NOLINT(*-overloaded-operator)
 {
-    const bool text_color = subtitle_font_color[0] != last_applied._subtitle_font_color[0]
-                            || subtitle_font_color[1] != last_applied._subtitle_font_color[1]
-                            || subtitle_font_color[2] != last_applied._subtitle_font_color[2]
-                            || subtitle_font_color[3] != last_applied._subtitle_font_color[3];
-    const bool text_size = subtitle_font_size != last_applied._subtitle_font_size
-                           || show_boarder_around_subtitle != last_applied._show_boarder_around_subtitle
-                           || subtitle_frame_width != last_applied._subtitle_frame_width
-                           || subtitle_frame_height != last_applied._subtitle_frame_height;
-    const bool tcp_port = tcp_server_port != last_applied._tcp_server_port;
-    return text_color || text_size || tcp_port;
+    return subtitle_font_color[0] == other.subtitle_font_color[0] && subtitle_font_color[1] == other.subtitle_font_color[1]
+           && subtitle_font_color[2] == other.subtitle_font_color[2] && subtitle_font_color[3] == other.subtitle_font_color[3]
+           && subtitle_font_size == other.subtitle_font_size && show_boarder_around_subtitle == other.show_boarder_around_subtitle
+           && subtitle_frame_width == other.subtitle_frame_width && subtitle_frame_height == other.subtitle_frame_height
+           && tcp_server_port == other.tcp_server_port;
 }
 
 YAML::Node Settings::to_yaml(const Settings& s)
 {
     YAML::Node node;
-    const ImU32 c = ImGui::ColorConvertFloat4ToU32(
-        ImVec4(s._subtitle_font_color[0], s._subtitle_font_color[1], s._subtitle_font_color[2], s._subtitle_font_color[3]));
-    node["subtitle_font_color"] = std::format("#{:08X}", c);
-    node["subtitle_font_size"] = s._subtitle_font_size;
-    node["show_boarder_around_subtitle"] = s._show_boarder_around_subtitle;
-    node["subtitle_frame_width"] = s._subtitle_frame_width;
-    node["subtitle_frame_height"] = s._subtitle_frame_height;
-    node["tcp_server_port"] = s._tcp_server_port;
+    node["subtitle_font_color"] = std::format("#{:08X}", s.get_subtitle_font_color());
+    node["subtitle_font_size"] = s.subtitle_font_size;
+    node["show_boarder_around_subtitle"] = s.show_boarder_around_subtitle;
+    node["subtitle_frame_width"] = s.subtitle_frame_width;
+    node["subtitle_frame_height"] = s.subtitle_frame_height;
+    node["tcp_server_port"] = s.tcp_server_port;
     return node;
 }
 
@@ -142,13 +106,13 @@ static void apply_to_imgui_window()
     io.Fonts->AddFontFromFileTTF("NotoSans-Regular.ttf");
 }
 
-ImU32 Settings::get_subtitle_font_color()
+ImU32 Settings::get_subtitle_font_color() const
 {
     return ImGui::ColorConvertFloat4ToU32(
         ImVec4(subtitle_font_color[0], subtitle_font_color[1], subtitle_font_color[2], subtitle_font_color[3]));
 }
 
-std::optional<std::string> Settings::validate_tcp_server_port()
+std::optional<std::string> Settings::validate_tcp_server_port() const
 {
     if (tcp_server_port <= 1024 || tcp_server_port > 65535)
     {
@@ -158,4 +122,4 @@ std::optional<std::string> Settings::validate_tcp_server_port()
 }
 
 bool Settings::is_tcp_server_port_changed()
-{ return tcp_server_port != last_applied._tcp_server_port; }
+{ return settings.tcp_server_port != last_applied.tcp_server_port; }
