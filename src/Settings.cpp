@@ -17,24 +17,16 @@ void Settings::apply_current()
 {
     SPDLOG_INFO("Apply changed settings");
 
-    std::stringstream ss;
-    ss << to_yaml(last_applied);
-    const std::string previous = ss.str();
-    std::stringstream ss2;
-    ss2 << to_yaml(settings);
-    const std::string current = ss2.str();
+    YAML::Emitter ss;
+    last_applied.write_yaml_to(ss);
+    const std::string previous = ss.c_str();
+    YAML::Emitter ss2;
+    settings.write_yaml_to(ss2);
+    const std::string current = ss2.c_str();
     SPDLOG_DEBUG("Setting changing details:\n{}", util::diff_lines(previous, current));
 
     last_applied = settings;
 
-    util::save_to_file("settings.yaml", generate_config_comment() + current);
-}
-
-/**
- * @return some words about the configuration file, for users who surprisingly find it on their disk and wondering what the file is.
- */
-std::string Settings::generate_config_comment()
-{
     std::stringstream time;
     auto t = std::time(nullptr);
     std::tm tm{};
@@ -45,9 +37,13 @@ std::string Settings::generate_config_comment()
 #endif
     time << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
 
-    return std::format("# This is a configuration file generated and used by [{} v{}] at {}.\n", APP_NAME, APP_VERSION, time.str())
-           + "# You can manually change its content while the application is NOT running, or it might be overridden by the application.\n"
-           + std::format("# Check the link for more information: {}\n", APP_LINK);
+    // some words about the configuration file, for users who surprisingly find it on their disk and wondering what the file it is.
+    auto header
+        = std::format("# This is a configuration file generated and used by [{} v{}] at {}.\n", APP_NAME, APP_VERSION, time.str())
+          + "# You can manually change its content while the application is NOT running, or it might be overridden by the application.\n"
+          + std::format("# Check the link for more information: {}\n\n", APP_LINK);
+
+    util::save_to_file("settings.yaml", header + current);
 }
 
 void Settings::revert_to_last_applied()
@@ -68,16 +64,20 @@ bool Settings::operator==(const Settings& other) const // NOLINT(*-overloaded-op
            && tcp_server_port == other.tcp_server_port;
 }
 
-YAML::Node Settings::to_yaml(const Settings& s)
+void Settings::write_yaml_to(YAML::Emitter& o) const
 {
-    YAML::Node node;
-    node["subtitle_font_color"] = std::format("#{:08X}", s.get_subtitle_font_color());
-    node["subtitle_font_size"] = s.subtitle_font_size;
-    node["show_boarder_around_subtitle"] = s.show_boarder_around_subtitle;
-    node["subtitle_frame_width"] = s.subtitle_frame_width;
-    node["subtitle_frame_height"] = s.subtitle_frame_height;
-    node["tcp_server_port"] = s.tcp_server_port;
-    return node;
+#define K YAML::Key <<
+#define V << YAML::Value <<
+
+    o << YAML::BeginMap;
+    o << YAML::Comment("AARRGGBB: eight hex bits corresponding to Alpha, Red, Green, Blue channel");
+    o << K "subtitle_font_color" V std::format("#{:08X}", get_subtitle_font_color());
+    o << K "subtitle_font_size" V subtitle_font_size;
+    o << K "show_boarder_around_subtitle" V show_boarder_around_subtitle;
+    o << K "subtitle_frame_width" V subtitle_frame_width;
+    o << K "subtitle_frame_height" V subtitle_frame_height;
+    o << K "tcp_server_port" V tcp_server_port;
+    o << YAML::EndMap;
 }
 
 static void apply_to_imgui_window();

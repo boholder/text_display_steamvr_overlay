@@ -68,8 +68,7 @@ private:
 
     bool operator==(const Settings& other) const;
 
-    static YAML::Node to_yaml(const Settings& s);
-    static std::string generate_config_comment();
+    void write_yaml_to(YAML::Emitter& o) const;
 };
 
 /**
