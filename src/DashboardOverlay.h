@@ -30,7 +30,12 @@ static VrOverlay* create_overlay()
 
 static void draw()
 {
-    auto validate_with_hint = [](std::optional<std::string> (Settings::*validator)() const, void (*draw_widget)())
+    // 1. function of Settings class
+    // 2. returns std::optional<std::string> as a validation result,
+    //    if it has value, then the value is a validation failure message
+    typedef std::optional<std::string> (Settings::*Validator)() const;
+
+    auto validate_with_hint = [](Validator validator, void (*draw_widget)())
     {
         const std::optional<std::string> v = std::invoke(validator, settings);
 
