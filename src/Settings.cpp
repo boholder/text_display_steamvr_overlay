@@ -13,6 +13,10 @@ Settings Settings::last_applied = Settings();
 
 auto settings = Settings();
 
+/**
+ * Accept current settings as last applied
+ * and save current settings to the config file.
+ */
 void Settings::apply_current()
 {
     SPDLOG_INFO("Apply changed settings");
@@ -70,7 +74,7 @@ void Settings::write_yaml_to(YAML::Emitter& o) const
 #define V << YAML::Value <<
 
     o << YAML::BeginMap;
-    o << YAML::Comment("AARRGGBB: eight hex bits corresponding to Alpha, Red, Green, Blue channel");
+    o << YAML::Comment("AARRGGBB: eight hex bits corresponding to the Alpha, Red, Green, Blue channel");
     o << K "subtitle_font_color" V std::format("#{:08X}", get_subtitle_font_color());
     o << K "subtitle_font_size" V subtitle_font_size;
     o << K "show_boarder_around_subtitle" V show_boarder_around_subtitle;
@@ -80,7 +84,11 @@ void Settings::write_yaml_to(YAML::Emitter& o) const
     o << YAML::EndMap;
 }
 
-static void apply_to_imgui_window();
+static void apply_to_imgui_window()
+{
+    const ImGuiIO& io = ImGui::GetIO();
+    io.Fonts->AddFontFromFileTTF("NotoSans-Regular.ttf");
+}
 
 void Settings::apply_to_subtitle()
 {
@@ -98,12 +106,6 @@ void Settings::apply_to_dashboard()
         dirty_to_dashboard = false;
         apply_to_imgui_window();
     }
-}
-
-static void apply_to_imgui_window()
-{
-    const ImGuiIO& io = ImGui::GetIO();
-    io.Fonts->AddFontFromFileTTF("NotoSans-Regular.ttf");
 }
 
 ImU32 Settings::get_subtitle_font_color() const

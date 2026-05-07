@@ -66,7 +66,7 @@ private:
      */
     static Settings last_applied;
 
-    bool operator==(const Settings& other) const;
+    bool operator==(const Settings& other) const; // NOLINT(*-overloaded-operator)
 
     void write_yaml_to(YAML::Emitter& o) const;
 };
