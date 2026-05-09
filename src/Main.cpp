@@ -381,7 +381,64 @@ bool main_loop()
     return ticking;
 }
 
-int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
+/**
+ * ref: https://stackoverflow.com/a/868894/23093084
+ *
+ * @author iain
+ */
+class InputParser
+{
+public:
+    InputParser(const int& argc, char** argv)
+    {
+        for (int i = 1; i < argc; ++i)
+            this->tokens.emplace_back(argv[i]);
+    }
+
+    [[nodiscard]] const std::string& getCmdOption(const std::string& option) const
+    {
+        auto itr = std::ranges::find(this->tokens, option);
+        if (itr != this->tokens.end() && ++itr != this->tokens.end())
+        {
+            return *itr;
+        }
+        static const std::string empty_string("");
+        return empty_string;
+    }
+
+    bool cmdOptionExists(const std::string& option) const
+    { return std::ranges::find(this->tokens, option) != this->tokens.end(); }
+
+private:
+    std::vector<std::string> tokens;
+};
+
+static void parse_cmd_args(const int argc, char** argv)
+{
+    const InputParser input(argc, argv);
+    std::string option;
+
+#define USE_ARG(SHORT, LONG, HANDLER)                                                          \
+    if (input.cmdOptionExists(SHORT) || input.cmdOptionExists(LONG))                           \
+    {                                                                                          \
+        option = input.getCmdOption(SHORT);                                                    \
+        if (option.empty())                                                                    \
+            option = input.getCmdOption(LONG);                                                 \
+        if (option.empty())                                                                    \
+        {                                                                                      \
+            SPDLOG_ERROR("option [{}] requires a value but not provided, exit", SHORT);        \
+            std::cerr << "option [" << (SHORT) << "] requires a value but not provided, exit"; \
+            exit(1);                                                                           \
+        }                                                                                      \
+        HANDLER(option);                                                                       \
+    }
+
+    // USE_ARG("-h", "--help", []([[maybe_unused]] const std::string& o) { std::cout << HELP_TEXT; exit(0); })
+
+    USE_ARG("-c", "--config", settings.load_from_yaml_file)
+}
+
+int main([[maybe_unused]] const int argc, [[maybe_unused]] char** argv)
 {
     spdlog::set_pattern(LOG_PATTERN);
 
@@ -389,6 +446,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
     spdlog::set_level(spdlog::level::debug);
     SPDLOG_DEBUG("Log level set to DEBUG");
 #endif
+
+    parse_cmd_args(argc, argv);
 
     if (!init_resources())
         return EXIT_FAILURE;

@@ -7,16 +7,14 @@
 #include "utils.h"
 #include "constants.h"
 
+#include <filesystem>
+
 bool Settings::dirty_to_subtitle = true;
 bool Settings::dirty_to_dashboard = true;
 Settings Settings::last_applied = Settings();
 
 auto settings = Settings();
 
-/**
- * Accept current settings as last applied
- * and save current settings to the config file.
- */
 void Settings::apply_current()
 {
     SPDLOG_INFO("Apply changed settings");
@@ -45,9 +43,10 @@ void Settings::apply_current()
     auto header
         = std::format("# This is a configuration file generated and used by [{} v{}] at {}.\n", APP_NAME, APP_VERSION, time.str())
           + "# You can manually change its content while the application is NOT running, or it might be overridden by the application.\n"
-          + std::format("# Check the link for more information: {}\n\n", APP_LINK);
+          + std::format("# Check the link for more information: {}\n", APP_LINK)
+          + "# For yaml file formatting, see: https://yaml.org/spec/1.2/spec.html\n\n";
 
-    util::save_to_file("settings.yaml", header + current);
+    util::save_to_file(settings.config_file_path, header + current);
 }
 
 void Settings::revert_to_last_applied()
@@ -82,6 +81,47 @@ void Settings::write_yaml_to(YAML::Emitter& o) const
     o << K "subtitle_frame_height" V subtitle_frame_height;
     o << K "tcp_server_port" V tcp_server_port;
     o << YAML::EndMap;
+}
+
+void Settings::load_from_yaml_file(const std::string& config_file_path)
+{
+    settings.config_file_path = config_file_path;
+    YAML::Node f = YAML::Load("");
+    const bool config_file_exists = std::filesystem::exists(config_file_path);
+    if (config_file_exists)
+    {
+        SPDLOG_INFO("Load settings from file [{}]", config_file_path);
+        f = YAML::LoadFile(config_file_path);
+    }
+
+#define APPLY(K)                                  \
+    if (f[#K])                                    \
+    settings.K = f[#K].as<decltype(settings.K)>()
+    // else 'settings' instance would use hardcoded default option values, as assigned when being inited.
+
+    if (f["subtitle_font_color"])
+    {
+        const auto str = f["subtitle_font_color"].as<std::string>();
+        const ImU32 u32 = strtoul(str.substr(1).c_str(), nullptr, 16);
+        const auto v4 = ImGui::ColorConvertU32ToFloat4(u32);
+        settings.subtitle_font_color[0] = v4.x;
+        settings.subtitle_font_color[1] = v4.y;
+        settings.subtitle_font_color[2] = v4.z;
+        settings.subtitle_font_color[3] = v4.w;
+    }
+
+    APPLY(subtitle_font_size);
+    APPLY(show_boarder_around_subtitle);
+    APPLY(subtitle_frame_width);
+    APPLY(subtitle_frame_height);
+    APPLY(tcp_server_port);
+    APPLY(config_file_path);
+
+    if (!config_file_exists)
+    {
+        SPDLOG_INFO("Dump default settings to file [{}]", config_file_path);
+    }
+    apply_current();
 }
 
 static void apply_to_imgui_window()

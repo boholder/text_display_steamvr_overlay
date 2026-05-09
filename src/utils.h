@@ -13,6 +13,7 @@ static void save_to_file(const std::string& filename, const std::string& content
     if (std::ofstream outFile(filename); outFile.is_open())
     {
         outFile << content;
+        outFile.flush();
         outFile.close();
     }
     else

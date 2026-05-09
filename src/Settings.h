@@ -22,6 +22,8 @@
 
 #define TCP_SERVER_DEFAULT_PORT 18781
 
+#define CONFIG_FILE_PATH "settings.yaml"
+
 class Settings
 {
 public:
@@ -34,8 +36,10 @@ public:
      */
     static void apply_to_dashboard();
 
+    static void save_to_file(const std::string& yaml_content);
     /**
-     * Save current settings to last_applied
+     * Save 'settings' to 'last_applied'
+     * and update the content of the config file.
      */
     static void apply_current();
     /**
@@ -55,6 +59,12 @@ public:
     int tcp_server_port = TCP_SERVER_DEFAULT_PORT;
     [[nodiscard]] std::optional<std::string> validate_tcp_server_port() const;
     static bool is_tcp_server_port_changed();
+
+    std::string config_file_path = CONFIG_FILE_PATH;
+    /**
+     * Load options to the 'settings' instance
+     */
+    static void load_from_yaml_file(const std::string& config_file_path);
 
 private:
     static bool dirty_to_subtitle;
