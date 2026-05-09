@@ -418,7 +418,11 @@ static void parse_cmd_args(const int argc, char** argv)
     const InputParser input(argc, argv);
     std::string option;
 
-#define USE_ARG(SHORT, LONG, HANDLER)                                                          \
+#define HANDLE(SHORT, LONG, HANDLER)                                 \
+    if (input.cmdOptionExists(SHORT) || input.cmdOptionExists(LONG)) \
+        HANDLER();
+
+#define HANDLE_WITH_VALUE(SHORT, LONG, HANDLER)                                                \
     if (input.cmdOptionExists(SHORT) || input.cmdOptionExists(LONG))                           \
     {                                                                                          \
         option = input.getCmdOption(SHORT);                                                    \
@@ -433,21 +437,26 @@ static void parse_cmd_args(const int argc, char** argv)
         HANDLER(option);                                                                       \
     }
 
-    // USE_ARG("-h", "--help", []([[maybe_unused]] const std::string& o) { std::cout << HELP_TEXT; exit(0); })
+    auto print_help_msg = []
+    {
+        std::cout << HELP_TEXT;
+        exit(0);
+    };
+    HANDLE("-h", "--help", print_help_msg);
 
-    USE_ARG("-c", "--config", settings.load_from_yaml_file)
+    HANDLE_WITH_VALUE("-c", "--config", settings.load_from_yaml_file);
 }
 
 int main([[maybe_unused]] const int argc, [[maybe_unused]] char** argv)
 {
+    parse_cmd_args(argc, argv);
+
     spdlog::set_pattern(LOG_PATTERN);
 
 #ifdef ENABLE_DEBUG_LOG
     spdlog::set_level(spdlog::level::debug);
     SPDLOG_DEBUG("Log level set to DEBUG");
 #endif
-
-    parse_cmd_args(argc, argv);
 
     if (!init_resources())
         return EXIT_FAILURE;

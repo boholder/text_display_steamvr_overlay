@@ -27,4 +27,10 @@
 #define TCP_SOCKET_TIMEOUT std::chrono::seconds(3)
 #define TCP_SERVER_BUFFER_SIZE 10240
 
+#define HELP_TEXT                                                                             \
+    "Usage: text_display_steamvr_overlay [OPTIONS]\n\n"                                       \
+    "OPTIONS:\n"                                                                              \
+    "  -h, --help      Show this help message and exit\n"                                     \
+    "  -c, --config    Load configuration from YAML file, or dump default options to there\n"
+
 #endif // TEXT_DISPLAY_STEAMVR_OVERLAY_CONSTANTS_H
