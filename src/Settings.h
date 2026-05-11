@@ -6,6 +6,8 @@
 #include <string>
 #include <yaml-cpp/yaml.h>
 
+#include "macro.h"
+
 #define SUBTITLE_FONT_SIZE_MIN 10
 #define SUBTITLE_FONT_SIZE_DEFAULT 20
 #define SUBTITLE_FONT_SIZE_MAX 50
@@ -24,6 +26,7 @@
 #define TCP_SERVER_DEFAULT_PORT 18781
 
 #define CONFIG_FILE_PATH "settings.yaml"
+#define CONFIG_FILE_PATH_NO_VR "settings_debug.yaml"
 
 class Settings
 {
@@ -49,9 +52,7 @@ public:
     static void revert_to_last_applied();
     static bool has_changed_after_last_applied();
 
-    // uint32_t subtitle_font_color = DIFF_VALUES_ON_VR(SUBTITLE_FONT_COLOR_DEFAULT);
-    uint32_t subtitle_font_color = SUBTITLE_FONT_COLOR_DEFAULT_NO_VR;
-
+    uint32_t subtitle_font_color = DIFF_VALUES_ON_VR(SUBTITLE_FONT_COLOR_DEFAULT);
     int subtitle_font_size = SUBTITLE_FONT_SIZE_DEFAULT;
     bool show_boarder_around_subtitle = false;
     int subtitle_frame_width = SUBTITLE_FRAME_WIDTH_DEFAULT;
@@ -61,7 +62,7 @@ public:
     [[nodiscard]] std::optional<std::string> validate_tcp_server_port() const;
     static bool is_tcp_server_port_changed();
 
-    std::string config_file_path = CONFIG_FILE_PATH;
+    std::string config_file_path = DIFF_VALUES_ON_VR(CONFIG_FILE_PATH);
     /**
      * Load options to the 'settings' instance
      */

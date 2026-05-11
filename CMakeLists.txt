@@ -93,6 +93,7 @@ add_executable(${PNAME}
         "src/TcpServer.h"
         "src/log.h"
         "src/utils.h"
+        "src/macro.h"
 )
 
 target_compile_features(${PNAME} PUBLIC cxx_std_23)
@@ -132,7 +133,7 @@ if (WINDOW_SET_WORLD_RELATIVE)
 endif()
 
 if (NO_VR)
-    add_definitions(-DNO_VR)
+    add_definitions(-DNO_VR=1)
 endif()
 
 if (ENABLE_DEBUG_LOG)
