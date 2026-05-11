@@ -76,7 +76,7 @@ void Settings::write_yaml_to(YAML::Emitter& o) const
 #define KV_COLOR(key) K #key V std::format("#{:08X}", util::revert_color_channel_order(key))
 
     o << YAML::BeginMap;
-    o << YAML::Comment("RRGGBBAA: eight hex bits corresponding to the Red, Green, Blue, Alpha channel");
+    o << YAML::Comment("color channel sequence: RRGGBBAA, eight hex bits corresponding to the Red, Green, Blue, Alpha channel");
     o << KV_COLOR(subtitle_font_color);
     o << KV(subtitle_font_size);
     o << KV(show_boarder_around_subtitle);
