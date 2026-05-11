@@ -71,7 +71,10 @@ static void draw()
     color[1] = v4.y;
     color[2] = v4.z;
     color[3] = v4.w;
-    if (ImGui::ColorEdit4("Subtitle Font Color", color, ImGuiColorEditFlags_AlphaBar)) {}
+    if (ImGui::ColorEdit4("Subtitle Font Color", color, ImGuiColorEditFlags_AlphaBar))
+    {
+        settings.subtitle_font_color = ImGui::ColorConvertFloat4ToU32({color[0], color[1], color[2], color[3]});
+    }
     ImGui::Checkbox("Subtitle Boarder", &settings.show_boarder_around_subtitle);
     ImGui::SliderInt("Subtitle Frame Width", &settings.subtitle_frame_width, SUBTITLE_FRAME_WIDTH_MIN, SUBTITLE_FRAME_WIDTH_MAX);
     ImGui::SliderInt("Subtitle Frame Height", &settings.subtitle_frame_height, SUBTITLE_FRAME_HEIGHT_MIN, SUBTITLE_FRAME_HEIGHT_MAX);
