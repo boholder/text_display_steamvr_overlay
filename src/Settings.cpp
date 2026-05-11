@@ -3,6 +3,8 @@
 #include <imgui.h>
 #include <optional>
 #include <string>
+#include <numeric>
+
 #include "log.h"
 #include "utils.h"
 #include "constants.h"
@@ -62,22 +64,26 @@ bool Settings::operator==(const Settings& other) const // NOLINT(*-overloaded-op
 {
     return subtitle_font_color == other.subtitle_font_color && subtitle_font_size == other.subtitle_font_size
            && show_boarder_around_subtitle == other.show_boarder_around_subtitle && subtitle_frame_width == other.subtitle_frame_width
-           && subtitle_frame_height == other.subtitle_frame_height && tcp_server_port == other.tcp_server_port;
+           && subtitle_frame_height == other.subtitle_frame_height && subtitle_background_color == other.subtitle_background_color
+           && tcp_server_port == other.tcp_server_port;
 }
 
 void Settings::write_yaml_to(YAML::Emitter& o) const
 {
 #define K YAML::Key <<
 #define V << YAML::Value <<
+#define KV(key) K #key V key
+#define KV_COLOR(key) K #key V std::format("#{:08X}", util::revert_color_channel_order(key))
 
     o << YAML::BeginMap;
-    o << YAML::Comment("AARRGGBB: eight hex bits corresponding to the Alpha, Red, Green, Blue channel");
-    o << K "subtitle_font_color" V std::format("#{:08X}", settings.subtitle_font_color);
-    o << K "subtitle_font_size" V subtitle_font_size;
-    o << K "show_boarder_around_subtitle" V show_boarder_around_subtitle;
-    o << K "subtitle_frame_width" V subtitle_frame_width;
-    o << K "subtitle_frame_height" V subtitle_frame_height;
-    o << K "tcp_server_port" V tcp_server_port;
+    o << YAML::Comment("RRGGBBAA: eight hex bits corresponding to the Red, Green, Blue, Alpha channel");
+    o << KV_COLOR(subtitle_font_color);
+    o << KV(subtitle_font_size);
+    o << KV(show_boarder_around_subtitle);
+    o << KV(subtitle_frame_width);
+    o << KV(subtitle_frame_height);
+    o << KV_COLOR(subtitle_background_color);
+    o << KV(tcp_server_port);
     o << YAML::EndMap;
 }
 
@@ -97,16 +103,20 @@ void Settings::load_from_yaml_file(const std::string& config_file_path)
     settings.K = f[#K].as<decltype(settings.K)>()
     // else 'settings' instance would use hardcoded default option values, as assigned when being inited.
 
-    if (f["subtitle_font_color"])
-    {
-        const auto str = f["subtitle_font_color"].as<std::string>();
-        settings.subtitle_font_color = strtoul(str.substr(1).c_str(), nullptr, 16);
+#define APPLY_COLOR(K)                                                     \
+    if (f[#K])                                                             \
+    {                                                                      \
+        const auto str = f[#K].as<std::string>();                          \
+        const uint32_t rgba = strtoul(str.substr(1).c_str(), nullptr, 16); \
+        settings.K = util::revert_color_channel_order(rgba);               \
     }
 
+    APPLY_COLOR(subtitle_font_color);
     APPLY(subtitle_font_size);
     APPLY(show_boarder_around_subtitle);
     APPLY(subtitle_frame_width);
     APPLY(subtitle_frame_height);
+    APPLY_COLOR(subtitle_background_color);
     APPLY(tcp_server_port);
     APPLY(config_file_path);
 

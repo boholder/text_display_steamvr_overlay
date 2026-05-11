@@ -2,7 +2,6 @@
 #define TEXT_DISPLAY_STEAMVR_OVERLAY_UTILS_H
 
 #include <fstream>
-#include <numeric>
 #include <imgui.h>
 #include <spdlog/spdlog.h>
 
@@ -60,20 +59,26 @@ static std::string diff_lines(const std::string& a, const std::string& b)
     return r.str();
 }
 
-static void convert_color(const uint32_t color, float (&out)[4])
+static void color_u32_to_f4(const uint32_t color, float (&out)[4])
 {
     // ColorConvertU32ToFloat4 returns ABGR
     // ref: https://github.com/ocornut/imgui/issues/761
     const ImVec4 v = ImGui::ColorConvertU32ToFloat4(color);
-    // we need RGBA
     out[0] = v.x;
     out[1] = v.y;
     out[2] = v.z;
     out[3] = v.w;
 };
 
-static uint32_t reverse_convert_color(const float (&color)[4])
+static uint32_t color_f4_to_u32(const float (&color)[4])
 { return ImGui::ColorConvertFloat4ToU32({color[0], color[1], color[2], color[3]}); };
+
+static uint32_t revert_color_channel_order(const uint32_t color)
+{
+    const ImVec4 v = ImGui::ColorConvertU32ToFloat4(color);
+    // revert the order
+    return ImGui::ColorConvertFloat4ToU32({v.w, v.z, v.y, v.x});
+}
 
 } // namespace util
 

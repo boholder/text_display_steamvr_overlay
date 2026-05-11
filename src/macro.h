@@ -2,9 +2,9 @@
 #define TEXT_DISPLAY_STEAMVR_OVERLAY_MACRO_H
 
 #if NO_VR
-#    define DIFF_VALUES_ON_VR(name) name##_NO_VR
+#    define DIFF_ON_VR(name) name##_NO_VR
 #else
-#    define DIFF_VALUES_ON_VR(name) name
+#    define DIFF_ON_VR(name) name
 #endif
 
 #endif // TEXT_DISPLAY_STEAMVR_OVERLAY_MACRO_H

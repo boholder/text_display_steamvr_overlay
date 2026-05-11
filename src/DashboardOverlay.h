@@ -5,6 +5,7 @@
 #include "Settings.h"
 #include "constants.h"
 #include "base/ImGuiWindow.h"
+#include "utils.h"
 
 namespace dashboard
 {
@@ -65,19 +66,19 @@ static void draw()
     ImGui::SeparatorText("Subtitle Options");
     ImGui::SliderInt("Subtitle Font Size", &settings.subtitle_font_size, SUBTITLE_FONT_SIZE_MIN, SUBTITLE_FONT_SIZE_MAX);
 
-    float color[4];
-    const auto v4 = ImGui::ColorConvertU32ToFloat4(settings.subtitle_font_color);
-    color[0] = v4.x;
-    color[1] = v4.y;
-    color[2] = v4.z;
-    color[3] = v4.w;
-    if (ImGui::ColorEdit4("Subtitle Font Color", color, ImGuiColorEditFlags_AlphaBar))
-    {
-        settings.subtitle_font_color = ImGui::ColorConvertFloat4ToU32({color[0], color[1], color[2], color[3]});
-    }
+    float font_color[4];
+    util::color_u32_to_f4(settings.subtitle_font_color, font_color);
+    if (ImGui::ColorEdit4("Subtitle Font Color", font_color, ImGuiColorEditFlags_AlphaBar))
+        settings.subtitle_font_color = util::color_f4_to_u32(font_color);
+
     ImGui::Checkbox("Subtitle Boarder", &settings.show_boarder_around_subtitle);
     ImGui::SliderInt("Subtitle Frame Width", &settings.subtitle_frame_width, SUBTITLE_FRAME_WIDTH_MIN, SUBTITLE_FRAME_WIDTH_MAX);
     ImGui::SliderInt("Subtitle Frame Height", &settings.subtitle_frame_height, SUBTITLE_FRAME_HEIGHT_MIN, SUBTITLE_FRAME_HEIGHT_MAX);
+
+    float bg_color[4];
+    util::color_u32_to_f4(settings.subtitle_background_color, bg_color);
+    if (ImGui::ColorEdit4("Subtitle Background Color", bg_color, ImGuiColorEditFlags_AlphaBar))
+        settings.subtitle_background_color = util::color_f4_to_u32(bg_color);
 
     ImGui::SeparatorText("TCP Server Options");
 

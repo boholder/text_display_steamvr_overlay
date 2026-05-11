@@ -75,6 +75,14 @@ static void draw()
         child_window_flags = child_window_flags & ~ImGuiWindowFlags_NoBackground;
     }
 
+    // visible = the alpha channel is not 00
+    const bool bg_color_visible = (settings.subtitle_background_color & 0xFF000000) != 0;
+    if (bg_color_visible)
+    {
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, settings.subtitle_background_color);
+        child_window_flags = child_window_flags & ~ImGuiWindowFlags_NoBackground;
+    }
+
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
     ImGui::BeginChild("text_boarder", subtitle_frame_size, ImGuiChildFlags_Borders, child_window_flags);
 
@@ -91,13 +99,15 @@ static void draw()
 
     ImGui::EndChild();
 
+    if (bg_color_visible)
+        ImGui::PopStyleColor(); // ImGuiCol_ChildBg
     if (settings.show_boarder_around_subtitle)
     {
-        ImGui::PopStyleColor();
-        ImGui::PopStyleVar();
+        ImGui::PopStyleColor(); // ImGuiCol_Border
+        ImGui::PopStyleVar(); // ImGuiStyleVar_ChildBorderSize
     }
 
-    ImGui::PopStyleVar();
+    ImGui::PopStyleVar(); // ImGuiStyleVar_WindowPadding
 
     im_util::show_im_window_debug_info();
 
