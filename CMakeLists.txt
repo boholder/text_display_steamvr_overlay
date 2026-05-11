@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.26)
 
 if (POLICY CMP0141)
-  cmake_policy(SET CMP0141 NEW)
-  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
-endif()
+    cmake_policy(SET CMP0141 NEW)
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
+endif ()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
@@ -15,37 +15,37 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Vulkan validation layer adds extra reporting that may also catch validation layers orginating from external sources, ie. SteamVR
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(ENABLE_VULKAN_VALIDATION ON CACHE BOOL "Enable Vulkan validation layers" FORCE)
     set(ENABLE_DEBUG_LOG ON CACHE BOOL "Set Log Level to Debug" FORCE)
     set(ENABLE_DEBUG_UI ON CACHE BOOL "Print Additional Debug Info in Overlays" FORCE)
-else()
+else ()
     set(ENABLE_VULKAN_VALIDATION OFF CACHE BOOL "Enable Vulkan validation layers" FORCE)
-endif()
+endif ()
 
-if(NOT DEFINED ENABLE_VULKAN_DYNAMIC_RENDERING)
+if (NOT DEFINED ENABLE_VULKAN_DYNAMIC_RENDERING)
     set(ENABLE_VULKAN_DYNAMIC_RENDERING OFF CACHE BOOL "Enable Vulkan dynamic rendering" FORCE)
-endif()
+endif ()
 
-if(NOT DEFINED IMGUI_OPENVR_PLATFORM_BACKEND)
+if (NOT DEFINED IMGUI_OPENVR_PLATFORM_BACKEND)
     set(IMGUI_OPENVR_PLATFORM_BACKEND OFF CACHE BOOL "Headless OpenVR backend for ImGui" FORCE)
-endif()
+endif ()
 
-if(NOT DEFINED IMGUI_SDL_PLATFORM_BACKEND)
+if (NOT DEFINED IMGUI_SDL_PLATFORM_BACKEND)
     set(IMGUI_SDL_PLATFORM_BACKEND OFF CACHE BOOL "SDL3 Window backend for ImGui" FORCE)
-endif()
+endif ()
 
-if(NOT DEFINED WINDOW_SET_DEVICE_RELATIVE)
+if (NOT DEFINED WINDOW_SET_DEVICE_RELATIVE)
     set(WINDOW_SET_DEVICE_RELATIVE OFF CACHE BOOL "Example Device Relative World Overlay" FORCE)
-endif()
+endif ()
 
-if(NOT DEFINED WINDOW_SET_WORLD_RELATIVE)
+if (NOT DEFINED WINDOW_SET_WORLD_RELATIVE)
     set(IMGUI_SDL_PLATFORM_BACKEND OFF CACHE BOOL "Example Origin Relative World Overlay" FORCE)
-endif()
+endif ()
 
-if(NOT DEFINED NO_VR)
+if (NOT DEFINED NO_VR)
     set(NO_VR OFF CACHE BOOL "Disable VR for easier debugging" FORCE)
-endif()
+endif ()
 
 # Renderer configuration
 
@@ -96,6 +96,16 @@ add_executable(${PNAME}
         "src/macro.h"
 )
 
+add_executable(tests
+        "test/test_util.cpp"
+)
+target_link_libraries(tests
+        gtest
+        gtest_main
+        ImGui
+        spdlog::spdlog
+)
+
 target_compile_features(${PNAME} PUBLIC cxx_std_23)
 
 target_link_libraries(${PNAME}
@@ -110,52 +120,52 @@ target_link_libraries(${PNAME}
 
 if (ENABLE_VULKAN_VALIDATION)
     add_definitions(-DENABLE_VULKAN_VALIDATION)
-endif()
+endif ()
 
 if (ENABLE_VULKAN_DYNAMIC_RENDERING)
     add_definitions(-DENABLE_VULKAN_DYNAMIC_RENDERING)
-endif()
+endif ()
 
 if (IMGUI_OPENVR_PLATFORM_BACKEND)
     add_definitions(-DIMGUI_OPENVR_PLATFORM_BACKEND)
-endif()
+endif ()
 
 if (IMGUI_SDL_PLATFORM_BACKEND)
     add_definitions(-DIMGUI_SDL_PLATFORM_BACKEND)
-endif()
+endif ()
 
 if (WINDOW_SET_DEVICE_RELATIVE)
     add_definitions(-DWINDOW_SET_DEVICE_RELATIVE)
-endif()
+endif ()
 
 if (WINDOW_SET_WORLD_RELATIVE)
     add_definitions(-DWINDOW_SET_WORLD_RELATIVE)
-endif()
+endif ()
 
 if (NO_VR)
     add_definitions(-DNO_VR=1)
-endif()
+endif ()
 
 if (ENABLE_DEBUG_LOG)
     add_definitions(-DENABLE_DEBUG_LOG)
-endif()
+endif ()
 
 if (ENABLE_DEBUG_UI)
     add_definitions(-DENABLE_DEBUG_UI)
-endif()
+endif ()
 
 add_custom_target(${PNAME}_resources)
 
 add_custom_command(
-    TARGET ${PNAME}_resources POST_BUILD
-    COMMENT "Copying Resources & Manifest"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CMAKE_SOURCE_DIR}/resources ${CMAKE_BINARY_DIR}
+        TARGET ${PNAME}_resources POST_BUILD
+        COMMENT "Copying Resources & Manifest"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CMAKE_SOURCE_DIR}/resources ${CMAKE_BINARY_DIR}
 )
 add_dependencies(${PNAME} ${PNAME}_resources)
 
 add_custom_command(
-    TARGET ${PNAME} POST_BUILD
-    COMMENT "Copying DLLs"
-    COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${PNAME}> $<TARGET_RUNTIME_DLLS:${PNAME}>
-    COMMAND_EXPAND_LISTS
+        TARGET ${PNAME} POST_BUILD
+        COMMENT "Copying DLLs"
+        COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${PNAME}> $<TARGET_RUNTIME_DLLS:${PNAME}>
+        COMMAND_EXPAND_LISTS
 )
