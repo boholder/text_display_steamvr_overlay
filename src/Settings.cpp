@@ -60,11 +60,9 @@ bool Settings::has_changed_after_last_applied()
 
 bool Settings::operator==(const Settings& other) const // NOLINT(*-overloaded-operator)
 {
-    return subtitle_font_color[0] == other.subtitle_font_color[0] && subtitle_font_color[1] == other.subtitle_font_color[1]
-           && subtitle_font_color[2] == other.subtitle_font_color[2] && subtitle_font_color[3] == other.subtitle_font_color[3]
-           && subtitle_font_size == other.subtitle_font_size && show_boarder_around_subtitle == other.show_boarder_around_subtitle
-           && subtitle_frame_width == other.subtitle_frame_width && subtitle_frame_height == other.subtitle_frame_height
-           && tcp_server_port == other.tcp_server_port;
+    return subtitle_font_color == other.subtitle_font_color && subtitle_font_size == other.subtitle_font_size
+           && show_boarder_around_subtitle == other.show_boarder_around_subtitle && subtitle_frame_width == other.subtitle_frame_width
+           && subtitle_frame_height == other.subtitle_frame_height && tcp_server_port == other.tcp_server_port;
 }
 
 void Settings::write_yaml_to(YAML::Emitter& o) const
@@ -74,7 +72,7 @@ void Settings::write_yaml_to(YAML::Emitter& o) const
 
     o << YAML::BeginMap;
     o << YAML::Comment("AARRGGBB: eight hex bits corresponding to the Alpha, Red, Green, Blue channel");
-    o << K "subtitle_font_color" V std::format("#{:08X}", get_subtitle_font_color());
+    o << K "subtitle_font_color" V std::format("#{:08X}", settings.subtitle_font_color);
     o << K "subtitle_font_size" V subtitle_font_size;
     o << K "show_boarder_around_subtitle" V show_boarder_around_subtitle;
     o << K "subtitle_frame_width" V subtitle_frame_width;
@@ -102,12 +100,7 @@ void Settings::load_from_yaml_file(const std::string& config_file_path)
     if (f["subtitle_font_color"])
     {
         const auto str = f["subtitle_font_color"].as<std::string>();
-        const ImU32 u32 = strtoul(str.substr(1).c_str(), nullptr, 16);
-        const auto v4 = ImGui::ColorConvertU32ToFloat4(u32);
-        settings.subtitle_font_color[0] = v4.x;
-        settings.subtitle_font_color[1] = v4.y;
-        settings.subtitle_font_color[2] = v4.z;
-        settings.subtitle_font_color[3] = v4.w;
+        settings.subtitle_font_color = strtoul(str.substr(1).c_str(), nullptr, 16);
     }
 
     APPLY(subtitle_font_size);
@@ -146,12 +139,6 @@ void Settings::apply_to_dashboard()
         dirty_to_dashboard = false;
         apply_to_imgui_window();
     }
-}
-
-ImU32 Settings::get_subtitle_font_color() const
-{
-    return ImGui::ColorConvertFloat4ToU32(
-        ImVec4(subtitle_font_color[0], subtitle_font_color[1], subtitle_font_color[2], subtitle_font_color[3]));
 }
 
 std::optional<std::string> Settings::validate_tcp_server_port() const

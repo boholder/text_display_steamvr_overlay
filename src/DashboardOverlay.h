@@ -64,7 +64,14 @@ static void draw()
 
     ImGui::SeparatorText("Subtitle Options");
     ImGui::SliderInt("Subtitle Font Size", &settings.subtitle_font_size, SUBTITLE_FONT_SIZE_MIN, SUBTITLE_FONT_SIZE_MAX);
-    ImGui::ColorEdit4("Subtitle Font Color", settings.subtitle_font_color, ImGuiColorEditFlags_AlphaBar);
+
+    float color[4];
+    const auto v4 = ImGui::ColorConvertU32ToFloat4(settings.subtitle_font_color);
+    color[0] = v4.x;
+    color[1] = v4.y;
+    color[2] = v4.z;
+    color[3] = v4.w;
+    if (ImGui::ColorEdit4("Subtitle Font Color", color, ImGuiColorEditFlags_AlphaBar)) {}
     ImGui::Checkbox("Subtitle Boarder", &settings.show_boarder_around_subtitle);
     ImGui::SliderInt("Subtitle Frame Width", &settings.subtitle_frame_width, SUBTITLE_FRAME_WIDTH_MIN, SUBTITLE_FRAME_WIDTH_MAX);
     ImGui::SliderInt("Subtitle Frame Height", &settings.subtitle_frame_height, SUBTITLE_FRAME_HEIGHT_MIN, SUBTITLE_FRAME_HEIGHT_MAX);

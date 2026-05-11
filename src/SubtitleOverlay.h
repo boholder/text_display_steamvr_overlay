@@ -80,7 +80,7 @@ static void draw()
 
     // subtitle text uses its own specific font size and color
     ImGui::PushFont(nullptr, settings.subtitle_font_size);
-    ImGui::PushStyleColor(ImGuiCol_Text, settings.get_subtitle_font_color());
+    ImGui::PushStyleColor(ImGuiCol_Text, settings.subtitle_font_color);
     ImGui::TextWrapped(
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut "
         "enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in "

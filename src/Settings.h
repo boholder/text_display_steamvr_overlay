@@ -10,7 +10,8 @@
 #define SUBTITLE_FONT_SIZE_DEFAULT 20
 #define SUBTITLE_FONT_SIZE_MAX 50
 
-#define SUBTITLE_FONT_COLOR_DEFAULT {1.0F, 1.0F, 1.0F, 1.0F}
+#define SUBTITLE_FONT_COLOR_DEFAULT 0x00FFFFFF
+#define SUBTITLE_FONT_COLOR_DEFAULT_NO_VR 0xFFFFFFFF
 
 #define SUBTITLE_FRAME_WIDTH_MIN 500
 #define SUBTITLE_FRAME_WIDTH_DEFAULT 1280
@@ -48,8 +49,8 @@ public:
     static void revert_to_last_applied();
     static bool has_changed_after_last_applied();
 
-    float subtitle_font_color[4] = SUBTITLE_FONT_COLOR_DEFAULT;
-    [[nodiscard]] ImU32 get_subtitle_font_color() const;
+    // uint32_t subtitle_font_color = DIFF_VALUES_ON_VR(SUBTITLE_FONT_COLOR_DEFAULT);
+    uint32_t subtitle_font_color = SUBTITLE_FONT_COLOR_DEFAULT_NO_VR;
 
     int subtitle_font_size = SUBTITLE_FONT_SIZE_DEFAULT;
     bool show_boarder_around_subtitle = false;
