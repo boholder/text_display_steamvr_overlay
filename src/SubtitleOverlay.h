@@ -58,10 +58,8 @@ static void draw()
 
     ImGui::Begin(SUBTITLE_NAME, nullptr, window_flags | ImGuiWindowFlags_NoBackground);
 
-    static float window_width = ImGui::GetContentRegionAvail().x;
-    const ImVec2 subtitle_frame_size(settings.subtitle_frame_width, settings.subtitle_frame_height);
-
     // make subtitle posited in center of window
+    static float window_width = ImGui::GetContentRegionAvail().x;
     float sub_frame_x_pos = (window_width - settings.subtitle_frame_width) * 0.5F;
     sub_frame_x_pos = std::max(sub_frame_x_pos, 0.0F);
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + sub_frame_x_pos);
@@ -71,9 +69,13 @@ static void draw()
     if (settings.show_boarder_around_subtitle)
     {
         ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(255, 0, 0, 255));
-        ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 5.0F);
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 5);
         // NoBackground flag will prevent boarder being shown, unset it
         child_window_flags = child_window_flags & ~ImGuiWindowFlags_NoBackground;
+    }
+    else
+    {
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 0);
     }
 
     // visible = the alpha channel is not 00
@@ -84,14 +86,17 @@ static void draw()
         child_window_flags = child_window_flags & ~ImGuiWindowFlags_NoBackground;
     }
 
+    // no padding between child window and parent frame
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+
+    const ImVec2 subtitle_frame_size(settings.subtitle_frame_width, settings.subtitle_frame_height);
     ImGui::BeginChild("text_boarder", subtitle_frame_size, ImGuiChildFlags_Borders, child_window_flags);
 
     // subtitle text uses its own specific font size and color
     ImGui::PushFont(nullptr, settings.subtitle_font_size);
     ImGui::PushStyleColor(ImGuiCol_Text, settings.subtitle_font_color);
     ImGui::TextWrapped(Subtitle::getShown().c_str());
-    ImGui::PopStyleColor();
+    ImGui::PopStyleColor(); // ImGuiCol_Text
     ImGui::PopFont();
 
     ImGui::EndChild();
@@ -99,10 +104,8 @@ static void draw()
     if (bg_color_visible)
         ImGui::PopStyleColor(); // ImGuiCol_ChildBg
     if (settings.show_boarder_around_subtitle)
-    {
         ImGui::PopStyleColor(); // ImGuiCol_Border
-        ImGui::PopStyleVar(); // ImGuiStyleVar_ChildBorderSize
-    }
+    ImGui::PopStyleVar(); // ImGuiStyleVar_ChildBorderSize
 
     ImGui::PopStyleVar(); // ImGuiStyleVar_WindowPadding
 
