@@ -167,8 +167,8 @@ bool init_resources()
 
     try
     {
-        g_subtitle_overlay = subtitle::create_overlay();
-        g_dashboard_overlay = dashboard::create_overlay();
+        g_subtitle_overlay = subtitle_ovl::create_overlay();
+        g_dashboard_overlay = dashboard_ovl::create_overlay();
     }
     catch (std::exception& ex)
     {
@@ -189,14 +189,14 @@ bool init_resources()
     g_vulkanRenderer->Initialize();
 
 #ifdef IMGUI_OPENVR_PLATFORM_BACKEND
-    g_subtitle_ovl_window = subtitle::init_ovl_window(g_vulkanRenderer, g_subtitle_overlay);
-    g_dashboard_ovl_window = dashboard::init_ovl_window(g_vulkanRenderer, g_dashboard_overlay);
+    g_subtitle_ovl_window = subtitle_ovl::init_ovl_window(g_vulkanRenderer, g_subtitle_overlay);
+    g_dashboard_ovl_window = dashboard_ovl::init_ovl_window(g_vulkanRenderer, g_dashboard_overlay);
 #endif
 
 #ifdef IMGUI_SDL_PLATFORM_BACKEND
     g_dpiScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
-    g_subtitle_window = subtitle::init_window(g_vulkanRenderer, g_dpiScale);
-    g_dashboard_window = dashboard::init_window(g_vulkanRenderer, g_dpiScale);
+    g_subtitle_window = subtitle_ovl::init_window(g_vulkanRenderer, g_dpiScale);
+    g_dashboard_window = dashboard_ovl::init_window(g_vulkanRenderer, g_dpiScale);
 #endif
 
     std::thread tcp_server_thread(tcp_server::tcp_server_thread);

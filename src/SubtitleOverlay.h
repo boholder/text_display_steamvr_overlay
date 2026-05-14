@@ -10,7 +10,7 @@
 #include "base/ImGuiWindow.h"
 #include "backends/imgui_impl_openvr.h"
 
-namespace subtitle
+namespace subtitle_ovl
 {
 
 static VrOverlay* create_overlay()
@@ -122,7 +122,7 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
                   SUBTITLE_WIDTH,
                   SUBTITLE_HEIGHT,
                   g_dpiScale,
-                  subtitle::draw,
+                  subtitle_ovl::draw,
                   SDL_WINDOWPOS_CENTERED,
                   20, // offset from top of monitor, enough to show a part of titlebar for cursor to drag
                   SDL_WINDOW_TRANSPARENT);
@@ -137,10 +137,10 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
 static ImGuiOverlayWindow* init_ovl_window(VulkanRenderer*& g_vulkanRenderer, VrOverlay*& g_subtitle_overlay)
 {
     const auto w = new ImGuiOverlayWindow();
-    w->Initialize(g_vulkanRenderer, g_subtitle_overlay, SUBTITLE_WIDTH, SUBTITLE_HEIGHT, SUBTITLE_INDEX, subtitle::draw);
+    w->Initialize(g_vulkanRenderer, g_subtitle_overlay, SUBTITLE_WIDTH, SUBTITLE_HEIGHT, SUBTITLE_INDEX, subtitle_ovl::draw);
     return w;
 }
 
-} // namespace subtitle
+} // namespace subtitle_ovl
 
 #endif // TEXT_DISPLAY_STEAMVR_OVERLAY_SUBTITLEOVERLAY_H

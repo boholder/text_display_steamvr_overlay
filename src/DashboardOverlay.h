@@ -7,7 +7,7 @@
 #include "base/ImGuiWindow.h"
 #include "utils.h"
 
-namespace dashboard
+namespace dashboard_ovl
 {
 
 static VrOverlay* create_overlay()
@@ -119,7 +119,7 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
                   DASHBOARD_WIDTH,
                   DASHBOARD_HEIGHT,
                   g_dpiScale,
-                  dashboard::draw,
+                  dashboard_ovl::draw,
                   SDL_WINDOWPOS_CENTERED,
                   250.0F * g_dpiScale);
 
@@ -133,10 +133,10 @@ static ImGuiWindow* init_window(VulkanRenderer*& g_vulkanRenderer, float g_dpiSc
 static ImGuiOverlayWindow* init_ovl_window(VulkanRenderer*& g_vulkanRenderer, VrOverlay*& g_dashboard_overlay)
 {
     const auto w = new ImGuiOverlayWindow();
-    w->Initialize(g_vulkanRenderer, g_dashboard_overlay, DASHBOARD_WIDTH, DASHBOARD_HEIGHT, DASHBOARD_INDEX, dashboard::draw);
+    w->Initialize(g_vulkanRenderer, g_dashboard_overlay, DASHBOARD_WIDTH, DASHBOARD_HEIGHT, DASHBOARD_INDEX, dashboard_ovl::draw);
     return w;
 }
 
-} // namespace dashboard
+} // namespace dashboard_ovl
 
 #endif // TEXT_DISPLAY_STEAMVR_OVERLAY_DASHBOARDOVERLAY_H
