@@ -6,6 +6,7 @@
 
 #include "log.h"
 #include "Settings.h"
+#include "Subtitle.h"
 
 /**
  * For checking if the TCP server port setting option has changed
@@ -91,6 +92,7 @@ static void tcp_server_thread()
                 {
                     SPDLOG_DEBUG("[{}] sends: [{}]", peer_addr, buf);
                     last_len = r.value();
+                    Subtitle::append(buf);
                 }
                 else if (r.error().value() == 0 && r.value() == 0)
                 {

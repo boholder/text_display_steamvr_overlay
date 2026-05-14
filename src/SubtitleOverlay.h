@@ -9,6 +9,7 @@
 #include "base/ImGuiUtils.h"
 #include "base/ImGuiWindow.h"
 #include "backends/imgui_impl_openvr.h"
+#include "Subtitle.h"
 
 namespace subtitle_ovl
 {
@@ -89,11 +90,7 @@ static void draw()
     // subtitle text uses its own specific font size and color
     ImGui::PushFont(nullptr, settings.subtitle_font_size);
     ImGui::PushStyleColor(ImGuiCol_Text, settings.subtitle_font_color);
-    ImGui::TextWrapped(
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut "
-        "enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in "
-        "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, "
-        "sunt in culpa qui officia deserunt mollit anim id est laborum.");
+    ImGui::TextWrapped(Subtitle::getShown().c_str());
     ImGui::PopStyleColor();
     ImGui::PopFont();
 

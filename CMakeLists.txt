@@ -94,6 +94,7 @@ add_executable(${PNAME}
         "src/log.h"
         "src/utils.h"
         "src/macro.h"
+        "src/Subtitle.cpp"
 )
 
 add_executable(tests
