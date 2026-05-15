@@ -50,11 +50,11 @@ static void tcp_server_thread()
 
         // accept a new client connection
         sockpp::inet_address peer;
-        if (auto res = server.accept(TCP_SERVER_TIMEOUT, &peer); !res)
+        if (auto conn_result = server.accept(TCP_SERVER_TIMEOUT, &peer); !conn_result)
         {
-            if (res != std::errc::timed_out)
+            if (conn_result != std::errc::timed_out)
             {
-                SPDLOG_ERROR("Error accepting connection: {}", res.error_message());
+                SPDLOG_ERROR("Error accepting connection: {}", conn_result.error_message());
                 return;
             }
         }
@@ -63,14 +63,13 @@ static void tcp_server_thread()
             auto peer_addr = peer.to_string();
             SPDLOG_INFO("Accept connection with [{}]", peer_addr);
 
-            sockpp::tcp_socket sock = res.release();
-            sock.read_timeout(TCP_SOCKET_TIMEOUT);
+            sockpp::tcp_socket socket = conn_result.release();
+            socket.read_timeout(TCP_SOCKET_TIMEOUT);
             sockpp::result<size_t> r;
 
             char buf[TCP_SERVER_BUFFER_SIZE];
             auto* const begin = reinterpret_cast<char*>(&buf);
             std::fill_n(begin, TCP_SERVER_BUFFER_SIZE, 0);
-            // only zeroing non-zero (used for storing last data) parts in every loop
             unsigned long long last_len = 0;
 
             // keep connection alive, but check port changing every TCP_SOCKET_TIMEOUT
@@ -79,13 +78,14 @@ static void tcp_server_thread()
                 if (settings.is_tcp_server_port_changed())
                 {
                     SPDLOG_INFO("Option [TCP Server Port] changed, close connection with [{}]", peer_addr);
-                    sock.close();
-                    break; // to
+                    socket.close();
+                    break; // to listening new connection
                 }
 
+                // only zeroing non-zero (used for storing last data) parts in every loop
                 std::fill_n(begin, last_len, 0);
 
-                r = sock.read(buf, sizeof(buf)); // blocking
+                r = socket.read(buf, sizeof(buf)); // blocking I/O until socket timeout
 
                 if (r.value() > 0)
                 {
@@ -95,10 +95,17 @@ static void tcp_server_thread()
                 }
                 else if (r.error().value() == 0 && r.value() == 0)
                 {
-                    // a successful read that returns a value of zero indicates that the connection is closed
+                    // a successful read that returns a value of zero indicates that
+                    // the peer actively closed the connection
                     // ref: https://github.com/fpagliughi/sockpp/issues/99#issuecomment-4263496155
                     SPDLOG_INFO("Connection with [{}] closed by peer", peer_addr);
-                    break;
+                    break; // to listening new connection
+                }
+                else
+                {
+                    SPDLOG_ERROR("Error reading from connection with [{}], close it: {}", peer_addr, r.error().message());
+                    socket.close();
+                    break; // to listening new connection
                 }
             }
         }

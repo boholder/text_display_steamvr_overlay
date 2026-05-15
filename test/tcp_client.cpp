@@ -77,6 +77,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
         if (auto res = conn.write(s); res != s.length())
         {
             std::cerr << "Error writing to the TCP stream: " << res.error_message() << '\n';
+            conn.close();
             return 1;
         }
     }
