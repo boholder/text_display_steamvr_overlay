@@ -30,6 +30,9 @@
 #define TCP_SOCKET_TIMEOUT std::chrono::seconds(3)
 #define TCP_SERVER_BUFFER_SIZE 10240
 
+// in milliseconds
+#define SUBTITLE_CLEARING_INTERVAL 1000
+
 #define HELP_TEXT                                                                             \
     "Usage: text_display_steamvr_overlay [OPTIONS]\n\n"                                       \
     "OPTIONS:\n"                                                                              \

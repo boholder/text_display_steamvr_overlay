@@ -1,6 +1,8 @@
 #ifndef TEXT_DISPLAY_STEAMVR_OVERLAY_SUBTITLE_H
 #define TEXT_DISPLAY_STEAMVR_OVERLAY_SUBTITLE_H
 
+#include "utils.h"
+
 #include <chrono>
 #include <deque>
 #include <string>
@@ -11,7 +13,9 @@ class Sentence
 public:
     explicit Sentence(std::string txt) : text(std::move(txt)) {}
 
-    uint32_t time = std::chrono::floor<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    explicit Sentence(const uint64_t time, std::string txt) : time(time), text(std::move(txt)) {}
+
+    uint64_t time = util::current_time_in_milliseconds();
     std::string text;
 
     void append(const std::string& txt)
@@ -32,6 +36,11 @@ public:
 
 private:
     static std::deque<Sentence> list;
+    /**
+     * Remove sentences that exist longer than the setting option.
+     * Being called by draw() at SUBTITLE_CLEARING_INTERVAL interval.
+     */
+    static void clear_aged_sentences();
 };
 
 #endif // TEXT_DISPLAY_STEAMVR_OVERLAY_SUBTITLE_H

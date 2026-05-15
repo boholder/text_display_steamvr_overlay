@@ -80,6 +80,9 @@ static uint32_t revert_color_channel_order(const uint32_t color)
     return ImGui::ColorConvertFloat4ToU32({v.w, v.z, v.y, v.x});
 }
 
+static uint64_t current_time_in_milliseconds()
+{ return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(); }
+
 } // namespace util
 
 #endif // TEXT_DISPLAY_STEAMVR_OVERLAY_UTILS_H
