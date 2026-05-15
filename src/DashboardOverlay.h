@@ -53,6 +53,7 @@ static void draw()
         {
             ImGui::PopStyleColor(2);
             ImGui::PopStyleVar();
+            // hard to describe this color, typical light red that represents error
             ImGui::TextColored(ImVec4(1.0F, 0.4F, 0.4F, 1.0F), "%s", v.value().c_str());
         }
     };

@@ -8,6 +8,7 @@
 #include "imgui.h"
 #include "base/ImGuiUtils.h"
 #include "base/ImGuiWindow.h"
+#include "base/ImGuiOverlayWindow.h"
 #include "backends/imgui_impl_openvr.h"
 #include "Subtitle.h"
 
