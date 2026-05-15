@@ -57,6 +57,15 @@ static void draw()
         }
     };
 
+    // when one option changed, show a "Revert" button behind
+#define REVERT_BUTTON(K)             \
+    if (Settings::K##_changed())     \
+    {                                \
+        ImGui::SameLine();           \
+        if (ImGui::Button("Revert")) \
+            Settings::revert_##K();  \
+    }
+
     settings.apply_to_dashboard();
 
     const int window_flags = im_util::set_next_window_fill_os_window();
@@ -66,24 +75,31 @@ static void draw()
     ImGui::SeparatorText("Subtitle Font");
 
     ImGui::SliderInt("Font Size", &settings.subtitle_font_size, SUBTITLE_FONT_SIZE_MIN, SUBTITLE_FONT_SIZE_MAX);
+    REVERT_BUTTON(subtitle_font_size);
 
     float font_color[4];
     util::color_u32_to_f4(settings.subtitle_font_color, font_color);
     if (ImGui::ColorEdit4("Font Color", font_color, ImGuiColorEditFlags_AlphaBar))
         settings.subtitle_font_color = util::color_f4_to_u32(font_color);
+    REVERT_BUTTON(subtitle_font_color);
 
     float bg_color[4];
     util::color_u32_to_f4(settings.subtitle_background_color, bg_color);
     if (ImGui::ColorEdit4("Background Color", bg_color, ImGuiColorEditFlags_AlphaBar))
         settings.subtitle_background_color = util::color_f4_to_u32(bg_color);
+    REVERT_BUTTON(subtitle_background_color);
 
     ImGui::SeparatorText("Subtitle Frame");
     ImGui::Checkbox("Show Red Boarder", &settings.show_boarder_around_subtitle);
+    REVERT_BUTTON(show_boarder_around_subtitle);
     ImGui::SliderInt("Frame Width", &settings.subtitle_frame_width, SUBTITLE_FRAME_WIDTH_MIN, SUBTITLE_FRAME_WIDTH_MAX);
+    REVERT_BUTTON(subtitle_frame_width);
     ImGui::SliderInt("Frame Height", &settings.subtitle_frame_height, SUBTITLE_FRAME_HEIGHT_MIN, SUBTITLE_FRAME_HEIGHT_MAX);
+    REVERT_BUTTON(subtitle_frame_height);
 
     ImGui::SeparatorText("TCP Server");
     validate_with_hint(&Settings::validate_tcp_server_port, [] { ImGui::InputInt("Port", &settings.tcp_server_port, 0, 0, 0); });
+    REVERT_BUTTON(tcp_server_port);
 
     // Cancel, Apply buttons at bottom
     ImGui::Dummy(ImVec2(0.0f, 100.0f));
