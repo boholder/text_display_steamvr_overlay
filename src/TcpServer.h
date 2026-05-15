@@ -40,7 +40,7 @@ static void tcp_server_thread()
 
     while (true)
     {
-        if (settings.is_tcp_server_port_changed())
+        if (settings.tcp_server_port_changed())
         {
             server.shutdown();
             if (!start_server(server))
@@ -75,7 +75,7 @@ static void tcp_server_thread()
             // keep connection alive, but check port changing every TCP_SOCKET_TIMEOUT
             while (true)
             {
-                if (settings.is_tcp_server_port_changed())
+                if (settings.tcp_server_port_changed())
                 {
                     SPDLOG_INFO("Option [TCP Server Port] changed, close connection with [{}]", peer_addr);
                     socket.close();

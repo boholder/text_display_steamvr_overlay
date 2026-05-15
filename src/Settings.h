@@ -35,6 +35,10 @@
 
 #define DEBUG_MODE false
 
+#define DEFINE_HELPER_FUNC(K)  \
+    static bool K##_changed(); \
+    static void revert_##K();
+
 class Settings
 {
 public:
@@ -58,22 +62,30 @@ public:
     static void revert_to_last_applied();
     static bool has_changed_after_last_applied();
 
+    int subtitle_font_size = SUBTITLE_FONT_SIZE_DEFAULT;
     /**
      * color channel sequence: ABGR
      */
     uint32_t subtitle_font_color = SUBTITLE_FONT_COLOR_DEFAULT;
-    int subtitle_font_size = SUBTITLE_FONT_SIZE_DEFAULT;
-    bool show_boarder_around_subtitle = false;
-    int subtitle_frame_width = SUBTITLE_FRAME_WIDTH_DEFAULT;
-    int subtitle_frame_height = SUBTITLE_FRAME_HEIGHT_DEFAULT;
     /**
      * color channel sequence: ABGR
      */
     uint32_t subtitle_background_color = DIFF_ON_VR(SUBTITLE_FRAME_BG_COLOR_DEFAULT);
 
+    bool show_boarder_around_subtitle = false;
+    int subtitle_frame_width = SUBTITLE_FRAME_WIDTH_DEFAULT;
+    int subtitle_frame_height = SUBTITLE_FRAME_HEIGHT_DEFAULT;
+
     int tcp_server_port = TCP_SERVER_DEFAULT_PORT;
     [[nodiscard]] std::optional<std::string> validate_tcp_server_port() const;
-    static bool is_tcp_server_port_changed();
+
+    DEFINE_HELPER_FUNC(subtitle_font_color);
+    DEFINE_HELPER_FUNC(subtitle_font_size);
+    DEFINE_HELPER_FUNC(show_boarder_around_subtitle);
+    DEFINE_HELPER_FUNC(subtitle_frame_width);
+    DEFINE_HELPER_FUNC(subtitle_frame_height);
+    DEFINE_HELPER_FUNC(subtitle_background_color);
+    DEFINE_HELPER_FUNC(tcp_server_port);
 
     std::string config_file_path = DIFF_ON_VR(CONFIG_FILE_PATH);
     /**

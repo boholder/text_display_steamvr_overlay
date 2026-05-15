@@ -60,12 +60,26 @@ void Settings::revert_to_last_applied()
 bool Settings::has_changed_after_last_applied()
 { return settings != last_applied; }
 
+#define IMPL_HELPER_FUNC(K)                  \
+    bool Settings::K##_changed()             \
+    { return settings.K != last_applied.K; } \
+    void Settings::revert_##K()              \
+    { settings.K = last_applied.K; }
+
+IMPL_HELPER_FUNC(subtitle_font_color);
+IMPL_HELPER_FUNC(subtitle_font_size);
+IMPL_HELPER_FUNC(show_boarder_around_subtitle);
+IMPL_HELPER_FUNC(subtitle_frame_width);
+IMPL_HELPER_FUNC(subtitle_frame_height);
+IMPL_HELPER_FUNC(subtitle_background_color);
+IMPL_HELPER_FUNC(tcp_server_port);
+
 bool Settings::operator==(const Settings& other) const // NOLINT(*-overloaded-operator)
 {
-    return subtitle_font_color == other.subtitle_font_color && subtitle_font_size == other.subtitle_font_size
-           && show_boarder_around_subtitle == other.show_boarder_around_subtitle && subtitle_frame_width == other.subtitle_frame_width
-           && subtitle_frame_height == other.subtitle_frame_height && subtitle_background_color == other.subtitle_background_color
-           && tcp_server_port == other.tcp_server_port && debug_mode == other.debug_mode;
+#define EQ(K) K == other.K
+
+    return EQ(subtitle_font_size) && EQ(subtitle_font_color) && EQ(subtitle_background_color) && EQ(show_boarder_around_subtitle)
+           && EQ(subtitle_frame_width) && EQ(subtitle_frame_height) && EQ(tcp_server_port);
 }
 
 void Settings::write_yaml_to(YAML::Emitter& o) const
@@ -76,13 +90,13 @@ void Settings::write_yaml_to(YAML::Emitter& o) const
 #define KV_COLOR(key) K #key V std::format("#{:08X}", util::revert_color_channel_order(key))
 
     o << YAML::BeginMap;
+    o << KV(subtitle_font_size);
     o << YAML::Comment("color channel sequence: RRGGBBAA, eight hex bits corresponding to the Red, Green, Blue, Alpha channel");
     o << KV_COLOR(subtitle_font_color);
-    o << KV(subtitle_font_size);
+    o << KV_COLOR(subtitle_background_color);
     o << KV(show_boarder_around_subtitle);
     o << KV(subtitle_frame_width);
     o << KV(subtitle_frame_height);
-    o << KV_COLOR(subtitle_background_color);
     o << KV(tcp_server_port);
     o << YAML::Newline;
     o << YAML::Comment("debug mode: enable more detailed logging, can only be changed in here, won't show in the dashboard");
@@ -121,7 +135,6 @@ void Settings::load_from_yaml_file(const std::string& config_file_path)
     APPLY(subtitle_frame_height);
     APPLY_COLOR(subtitle_background_color);
     APPLY(tcp_server_port);
-    APPLY(config_file_path);
     APPLY(debug_mode);
 
     if (!config_file_exists)
@@ -163,6 +176,3 @@ std::optional<std::string> Settings::validate_tcp_server_port() const
     }
     return std::nullopt;
 }
-
-bool Settings::is_tcp_server_port_changed()
-{ return settings.tcp_server_port != last_applied.tcp_server_port; }
