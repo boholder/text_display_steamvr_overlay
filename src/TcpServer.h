@@ -1,8 +1,7 @@
 #ifndef TEXT_DISPLAY_STEAMVR_OVERLAY_TCPSERVER_H
 #define TEXT_DISPLAY_STEAMVR_OVERLAY_TCPSERVER_H
 
-#include "sockpp/tcp_acceptor.h"
-#include <chrono>
+#include <sockpp/tcp_acceptor.h>
 
 #include "log.h"
 #include "Settings.h"

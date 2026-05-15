@@ -97,20 +97,10 @@ add_executable(${PNAME}
         "src/Subtitle.cpp"
 )
 
-add_executable(tests
-        "test/test_util.cpp"
-)
-target_link_libraries(tests
-        gtest
-        gtest_main
-        ImGui
-        spdlog::spdlog
-)
-
 target_compile_features(${PNAME} PUBLIC cxx_std_23)
 
 target_link_libraries(${PNAME}
-    PRIVATE
+        PRIVATE
         OpenVR::API
         ImGui
         glm::glm
@@ -118,6 +108,29 @@ target_link_libraries(${PNAME}
         Sockpp::sockpp
         yaml-cpp::yaml-cpp
 )
+
+# --- unit tests ---
+add_executable(tests
+        "src/Settings.h"
+        "test/test_util.cpp"
+        "test/tcp_client.cpp"
+)
+
+target_compile_features(tests PUBLIC cxx_std_23)
+
+target_link_libraries(tests
+        gtest
+        gtest_main
+        ImGui
+        spdlog::spdlog
+        Sockpp::sockpp
+        yaml-cpp::yaml-cpp
+)
+
+# --- tcp client that continue sending text for debuging purpose ---
+add_executable(test_tcp_client "test/tcp_client.cpp")
+target_compile_features(test_tcp_client PUBLIC cxx_std_23)
+target_link_libraries(test_tcp_client Sockpp::sockpp)
 
 if (ENABLE_VULKAN_VALIDATION)
     add_definitions(-DENABLE_VULKAN_VALIDATION)

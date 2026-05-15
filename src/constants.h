@@ -23,7 +23,7 @@
 #define DASHBOARD_HEIGHT 720
 #define DASHBOARD_INDEX 1
 
-#define TCP_SERVER_TIMEOUT std::chrono::seconds(60)
+#define TCP_SERVER_TIMEOUT std::chrono::seconds(10)
 #define TCP_SOCKET_TIMEOUT std::chrono::seconds(3)
 #define TCP_SERVER_BUFFER_SIZE 10240
 
