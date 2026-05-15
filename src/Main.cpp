@@ -418,12 +418,14 @@ static void parse_cmd_args(const int argc, char** argv)
     const InputParser input(argc, argv);
     std::string option;
 
-#define HANDLE(SHORT, LONG, HANDLER)                                 \
-    if (input.cmdOptionExists(SHORT) || input.cmdOptionExists(LONG)) \
+#define OPTION_PASSED(SHORT, LONG) input.cmdOptionExists(SHORT) || input.cmdOptionExists(LONG)
+
+#define HANDLE(SHORT, LONG, HANDLER) \
+    if (OPTION_PASSED(SHORT, LONG))  \
         HANDLER();
 
 #define HANDLE_WITH_VALUE(SHORT, LONG, HANDLER)                                                \
-    if (input.cmdOptionExists(SHORT) || input.cmdOptionExists(LONG))                           \
+    if (OPTION_PASSED(SHORT, LONG))                                                            \
     {                                                                                          \
         option = input.getCmdOption(SHORT);                                                    \
         if (option.empty())                                                                    \
@@ -445,6 +447,9 @@ static void parse_cmd_args(const int argc, char** argv)
     HANDLE("-h", "--help", print_help_msg);
 
     HANDLE_WITH_VALUE("-c", "--config", settings.load_from_yaml_file);
+    if (!OPTION_PASSED("-c", "--config"))
+        // try to load config file from default location
+        settings.load_from_yaml_file(settings.config_file_path);
 }
 
 int main([[maybe_unused]] const int argc, [[maybe_unused]] char** argv)

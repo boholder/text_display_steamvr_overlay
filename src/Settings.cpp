@@ -19,7 +19,7 @@ auto settings = Settings();
 
 void Settings::apply_current()
 {
-    SPDLOG_INFO("Apply changed settings");
+    SPDLOG_INFO("Apply changed settings and save to [{}]", settings.config_file_path);
 
     YAML::Emitter ss;
     last_applied.write_yaml_to(ss);
