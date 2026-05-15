@@ -11,7 +11,7 @@ class Subtitle
 {
 public:
     static void append(const char* text);
-    static void draw();
+    static void draw(uint32_t font_color, uint32_t bg_color);
 
 private:
     static std::deque<std::string> shown;

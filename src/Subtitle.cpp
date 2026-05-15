@@ -18,8 +18,28 @@ void Subtitle::append(const char* text)
     }
 }
 
-void Subtitle::draw()
+void Subtitle::draw(const uint32_t font_color, const uint32_t bg_color)
 {
+    // visible = the alpha channel is not 00
+    const bool bg_color_visible = (bg_color & 0xFF000000) != 0;
+
+    ImGui::PushStyleColor(ImGuiCol_Text, font_color);
     for (const auto& s : shown)
-        ImGui::TextWrapped(s.c_str());
+    {
+        const auto* const txt = s.c_str();
+
+        // Manually draw background around text.
+        // In this way the background will cover less space when the subtitle text is few words,
+        // compared with filling the whole subtitle text child window.
+        if (bg_color_visible)
+        {
+            const auto txt_space = ImGui::CalcTextSize(txt);
+            auto upper_left = ImGui::GetCursorScreenPos();
+            const auto lower_right = ImVec2(upper_left.x + txt_space.x, upper_left.y + txt_space.y);
+            ImGui::GetWindowDrawList()->AddRectFilled(upper_left, lower_right, bg_color);
+        }
+
+        ImGui::TextWrapped(txt);
+    }
+    ImGui::PopStyleColor(); // ImGuiCol_Text
 }
