@@ -65,7 +65,7 @@ bool Settings::operator==(const Settings& other) const // NOLINT(*-overloaded-op
     return subtitle_font_color == other.subtitle_font_color && subtitle_font_size == other.subtitle_font_size
            && show_boarder_around_subtitle == other.show_boarder_around_subtitle && subtitle_frame_width == other.subtitle_frame_width
            && subtitle_frame_height == other.subtitle_frame_height && subtitle_background_color == other.subtitle_background_color
-           && tcp_server_port == other.tcp_server_port;
+           && tcp_server_port == other.tcp_server_port && debug_mode == other.debug_mode;
 }
 
 void Settings::write_yaml_to(YAML::Emitter& o) const
@@ -84,6 +84,9 @@ void Settings::write_yaml_to(YAML::Emitter& o) const
     o << KV(subtitle_frame_height);
     o << KV_COLOR(subtitle_background_color);
     o << KV(tcp_server_port);
+    o << YAML::Newline;
+    o << YAML::Comment("debug mode: enable more detailed logging, can only be changed in here, won't show in the dashboard");
+    o << KV(debug_mode);
     o << YAML::EndMap;
 }
 
@@ -119,6 +122,7 @@ void Settings::load_from_yaml_file(const std::string& config_file_path)
     APPLY_COLOR(subtitle_background_color);
     APPLY(tcp_server_port);
     APPLY(config_file_path);
+    APPLY(debug_mode);
 
     if (!config_file_exists)
     {

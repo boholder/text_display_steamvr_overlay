@@ -454,14 +454,20 @@ static void parse_cmd_args(const int argc, char** argv)
 
 int main([[maybe_unused]] const int argc, [[maybe_unused]] char** argv)
 {
+#ifdef ENABLE_DEBUG_LOG
+    SPDLOG_DEBUG("Compiled as the debug version, logging level set to DEBUG");
+    spdlog::set_pattern(LOG_PATTERN_DEBUG);
+#else
+    spdlog::set_pattern(LOG_PATTERN);
+#endif
+
     parse_cmd_args(argc, argv);
 
-    spdlog::set_pattern(LOG_PATTERN);
-
-#ifdef ENABLE_DEBUG_LOG
-    spdlog::set_level(spdlog::level::debug);
-    SPDLOG_DEBUG("Log level set to DEBUG");
-#endif
+    if (settings.debug_mode)
+    {
+        spdlog::set_level(spdlog::level::debug);
+        SPDLOG_DEBUG("Debug mode enabled, logging level set to [DEBUG]");
+    }
 
     if (!init_resources())
         return EXIT_FAILURE;

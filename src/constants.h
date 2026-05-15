@@ -6,7 +6,10 @@
 
 // [26-10-31 23:46:59.678] shorten-level thread-id source-file-and-line: message
 // ref: https://github.com/gabime/spdlog/wiki/Custom-formatting
-#define LOG_PATTERN "%^[%C-%m-%d %T.%e] %L %-5t %-8!s:%-4#: %v%$"
+#define LOG_PATTERN_DEBUG "%^[%C-%m-%d %T.%e] %L %-5t %-8!s:%-4#: %v%$"
+// [26-10-31 23:46:59.678] shorten-level thread-id: message
+// spdlog can't record source code metadata with runtime calls like spdlog::xxx().
+#define LOG_PATTERN "%^[%C-%m-%d %T.%e] %L %-5t: %v%$"
 
 #define APP_KEY "com.github.boholder.text_display_steamvr_overlay"
 #define APP_NAME "Text Display Overlay"

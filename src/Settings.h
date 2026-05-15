@@ -33,6 +33,8 @@
 #define CONFIG_FILE_PATH "settings.yaml"
 #define CONFIG_FILE_PATH_NO_VR "settings_debug.yaml"
 
+#define DEBUG_MODE false
+
 class Settings
 {
 public:
@@ -78,6 +80,8 @@ public:
      * Load options to the 'settings' instance
      */
     static void load_from_yaml_file(const std::string& config_file_path);
+
+    bool debug_mode = DEBUG_MODE;
 
 private:
     static bool dirty_to_subtitle;
