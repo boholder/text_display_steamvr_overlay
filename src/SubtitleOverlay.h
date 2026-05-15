@@ -95,7 +95,7 @@ static void draw()
     // subtitle text uses its own specific font size and color
     ImGui::PushFont(nullptr, settings.subtitle_font_size);
     ImGui::PushStyleColor(ImGuiCol_Text, settings.subtitle_font_color);
-    ImGui::TextWrapped(Subtitle::getShown().c_str());
+    Subtitle::draw();
     ImGui::PopStyleColor(); // ImGuiCol_Text
     ImGui::PopFont();
 

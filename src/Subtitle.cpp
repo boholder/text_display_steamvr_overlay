@@ -1,11 +1,16 @@
+#include <imgui.h>
 #include "Subtitle.h"
 
-std::string Subtitle::shown
-    = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut "
-      "enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor "
-      "in "
-      "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, "
-      "sunt in culpa qui officia deserunt mollit anim id est laborum.";
+std::deque<std::string> Subtitle::shown = {};
 
 void Subtitle::append(const char* text)
-{ shown += text; }
+{
+    const std::string s = text;
+    shown.push_back(s);
+}
+
+void Subtitle::draw()
+{
+    for (const auto& s : shown)
+        ImGui::TextWrapped(s.c_str());
+}

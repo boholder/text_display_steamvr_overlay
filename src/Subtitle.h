@@ -1,6 +1,7 @@
 #ifndef TEXT_DISPLAY_STEAMVR_OVERLAY_SUBTITLE_H
 #define TEXT_DISPLAY_STEAMVR_OVERLAY_SUBTITLE_H
 
+#include <deque>
 #include <string>
 
 /**
@@ -10,12 +11,10 @@ class Subtitle
 {
 public:
     static void append(const char* text);
-
-    static std::string getShown()
-    { return shown; }
+    static void draw();
 
 private:
-    static std::string shown;
+    static std::deque<std::string> shown;
 };
 
 #endif // TEXT_DISPLAY_STEAMVR_OVERLAY_SUBTITLE_H
