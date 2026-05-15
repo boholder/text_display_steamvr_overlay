@@ -25,6 +25,7 @@ void Subtitle::draw(const uint32_t font_color, const uint32_t bg_color)
 {
     // visible = the alpha channel is not 00
     const bool bg_color_visible = (bg_color & 0xFF000000) != 0;
+    const float frame_width = ImGui::GetContentRegionAvail().x;
 
     ImGui::PushStyleColor(ImGuiCol_Text, font_color);
     for (const auto& s : list)
@@ -36,7 +37,7 @@ void Subtitle::draw(const uint32_t font_color, const uint32_t bg_color)
         // compared with filling the whole subtitle text child window.
         if (bg_color_visible)
         {
-            const auto txt_space = ImGui::CalcTextSize(txt);
+            const auto txt_space = ImGui::CalcTextSize(txt, nullptr, false, frame_width);
             auto upper_left = ImGui::GetCursorScreenPos();
             const auto lower_right = ImVec2(upper_left.x + txt_space.x, upper_left.y + txt_space.y);
             ImGui::GetWindowDrawList()->AddRectFilled(upper_left, lower_right, bg_color);

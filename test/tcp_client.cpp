@@ -9,7 +9,7 @@
 #include <thread>
 
 #define PORT 18781
-#define SEND_INTERVAL std::chrono::seconds(1)
+#define SEND_INTERVAL std::chrono::milliseconds(300)
 #define MIN_LEN_PER_SEND 5
 #define MAX_LEN_PER_SEND 15
 
