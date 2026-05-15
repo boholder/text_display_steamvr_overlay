@@ -63,33 +63,31 @@ static void draw()
 
     ImGui::Begin(DASHBOARD_NAME, nullptr, window_flags);
 
-    ImGui::SeparatorText("Subtitle Options");
-    ImGui::SliderInt("Subtitle Font Size", &settings.subtitle_font_size, SUBTITLE_FONT_SIZE_MIN, SUBTITLE_FONT_SIZE_MAX);
+    ImGui::SeparatorText("Subtitle Font");
+
+    ImGui::SliderInt("Font Size", &settings.subtitle_font_size, SUBTITLE_FONT_SIZE_MIN, SUBTITLE_FONT_SIZE_MAX);
 
     float font_color[4];
     util::color_u32_to_f4(settings.subtitle_font_color, font_color);
-    if (ImGui::ColorEdit4("Subtitle Font Color", font_color, ImGuiColorEditFlags_AlphaBar))
+    if (ImGui::ColorEdit4("Font Color", font_color, ImGuiColorEditFlags_AlphaBar))
         settings.subtitle_font_color = util::color_f4_to_u32(font_color);
-
-    ImGui::Checkbox("Subtitle Boarder", &settings.show_boarder_around_subtitle);
-    ImGui::SliderInt("Subtitle Frame Width", &settings.subtitle_frame_width, SUBTITLE_FRAME_WIDTH_MIN, SUBTITLE_FRAME_WIDTH_MAX);
-    ImGui::SliderInt("Subtitle Frame Height", &settings.subtitle_frame_height, SUBTITLE_FRAME_HEIGHT_MIN, SUBTITLE_FRAME_HEIGHT_MAX);
 
     float bg_color[4];
     util::color_u32_to_f4(settings.subtitle_background_color, bg_color);
-    if (ImGui::ColorEdit4("Subtitle Background Color", bg_color, ImGuiColorEditFlags_AlphaBar))
+    if (ImGui::ColorEdit4("Background Color", bg_color, ImGuiColorEditFlags_AlphaBar))
         settings.subtitle_background_color = util::color_f4_to_u32(bg_color);
 
-    ImGui::SeparatorText("TCP Server Options");
+    ImGui::SeparatorText("Subtitle Frame");
+    ImGui::Checkbox("Show Red Boarder", &settings.show_boarder_around_subtitle);
+    ImGui::SliderInt("Frame Width", &settings.subtitle_frame_width, SUBTITLE_FRAME_WIDTH_MIN, SUBTITLE_FRAME_WIDTH_MAX);
+    ImGui::SliderInt("Frame Height", &settings.subtitle_frame_height, SUBTITLE_FRAME_HEIGHT_MIN, SUBTITLE_FRAME_HEIGHT_MAX);
 
+    ImGui::SeparatorText("TCP Server");
     validate_with_hint(&Settings::validate_tcp_server_port, [] { ImGui::InputInt("Port", &settings.tcp_server_port, 0, 0, 0); });
 
-    ImGui::Spacing();
-    ImGui::Separator();
-    ImGui::BeginDisabled();
-    ImGui::Button("OK");
-    ImGui::EndDisabled();
-    ImGui::SameLine();
+    // Cancel, Apply buttons at bottom
+    ImGui::Dummy(ImVec2(0.0f, 100.0f));
+    ImGui::SeparatorText("");
     const bool settings_not_changed = !Settings::has_changed_after_last_applied();
     if (settings_not_changed)
         ImGui::BeginDisabled();
