@@ -1,20 +1,23 @@
 #include <imgui.h>
 #include "Subtitle.h"
 
-std::deque<std::string> Subtitle::shown{""};
+std::deque<Sentence> Subtitle::list{Sentence{""}};
+
+static void clear_aged_sentences() {}
 
 void Subtitle::append(const char* text)
 {
-    if (const std::string s = text; s.contains("\n"))
+    if (const std::string t = text; t.contains("\n"))
     {
         // finish current sentence
-        shown.back().append(s.substr(0, s.find_first_of('\n')));
+        list.back().append(t.substr(0, t.find_first_of('\n')));
         // start next sentence
-        shown.push_back(s.substr(s.find_first_of('\n') + 1));
+        const Sentence s{t.substr(t.find_first_of('\n') + 1)};
+        list.push_back(s);
     }
     else
     {
-        shown.back().append(s);
+        list.back().append(t);
     }
 }
 
@@ -24,7 +27,7 @@ void Subtitle::draw(const uint32_t font_color, const uint32_t bg_color)
     const bool bg_color_visible = (bg_color & 0xFF000000) != 0;
 
     ImGui::PushStyleColor(ImGuiCol_Text, font_color);
-    for (const auto& s : shown)
+    for (const auto& s : list)
     {
         const auto* const txt = s.c_str();
 
